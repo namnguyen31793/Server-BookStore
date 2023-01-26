@@ -1,0 +1,168 @@
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: ${SERVICE_NAME}-${SERVICE_VER}
+  namespace: ${NAMESPACE}
+data:  
+  appsettings_cache.json: |-
+    {
+      "AppSettings": {
+        "CacheConfig": {
+          "expireSeconds": 3600,
+          "Redis": {
+            "Default": {
+              "EndPoints": ["core-cache-redis-cluster.services.svc.cluster.local:6379"],
+              "Ssl": "False",
+              "Password": "vtvlive2022",
+              "DefaultDatabase": 0,
+              "AllowAdmin": "True",
+              "KeepAlive": 180
+            },
+            "UserProfile": {
+              "EndPoints": ["core-cache-redis-cluster.services.svc.cluster.local:6379"],
+              "Ssl": "False",
+              "Password": "vtvlive2022",
+              "DefaultDatabase": 0,
+              "AllowAdmin": "True",
+              "KeepAlive": 180
+            }
+          }
+        }
+      }
+    }
+  appsettings.json: |-
+    {
+      "Logging": {
+        "LogLevel": {
+          "Default": "Information",
+          "Microsoft": "Warning",
+          "Microsoft.Hosting.Lifetime": "Information"
+        },
+        "Console": true
+      },
+      "AllowedHosts": [ "*" ],
+    
+      "AppSettings": {
+        "System.Threading.ThreadPool.MinThreads": 50,
+        "ServiceInfo": {
+          "ServiceName": "VTCOSRV",
+          "serviceId": 330013,
+          "serviceKey": "1ef62460640fa7fdf3e2fbeeac54152e",
+          "serviceCode": "IOE",
+          "rootPath":"https://${DOMAIN}/api-core/${SERVICE_VER}/${SERVICE_SHORT_NAME}",
+          "DevMode": "False"
+        },
+        "geoip_uri": "http://golibs-geoip-service-v1.${NAMESPACE}.svc.cluster.local/api",
+        "PROFILE_SYS_PARTNER_KEY": "e89f6cf75a2846814b82d5f6ac0a9caf",
+        "runworker": 1,
+        "ConnectionStrings": {
+          "ProfileAPI": "Server=10.51.10.21\\APIDB;uid=vtvlivedblink;password=UBwnP2GcBHdJ;database=VTVLIVE.ProfileAPI;",
+          "BillingAPI": "Server=10.51.10.21\\APIDB;uid=vtvlivedblink;password=UBwnP2GcBHdJ;database=VTVLIVE.BillingAPI;",
+          "VtvliveOTP": "server=10.51.10.21;uid=vtvlivedblink;password=UBwnP2GcBHdJ;database=VTVLIVE.OTP;",
+    
+          "VtvliveCore": "server=10.51.10.21; database=VTVLIVE.CORE; uid=vtvlivedblink; pwd=UBwnP2GcBHdJ; Max Pool Size=100;Connect Timeout=600;Pooling=true;",
+          "VtvliveTracking": "server=10.51.10.21; database=VTVLIVE.Tracking; uid=vtvlivedblink; pwd=UBwnP2GcBHdJ; Max Pool Size=100;Connect Timeout=600;Pooling=true;",
+          "OrderLog": "server=10.51.10.21; database=VTVLIVE.OrderLog; uid=vtvlivedblink; pwd=UBwnP2GcBHdJ; Max Pool Size=100;Connect Timeout=600;Pooling=true;",
+          "ShopLog": "server=10.51.10.21; database=VTVLIVE.ShopLog; uid=vtvlivedblink; pwd=UBwnP2GcBHdJ; Max Pool Size=100;Connect Timeout=600;Pooling=true;"
+        },
+    
+        "JwtBearer": {
+          "Issuer": "https://vtvlive.vn",
+          "tokenlifeTimeSec": 3600, //second
+          "refreshlifeTimeDay": 7, //days
+          "encryptKey": "nyyM2SHNosn/msRFrl2yYLbiHD0Yi1Hxv9J+lUjWKBeu5reKdX773pIemxQKniK",
+          "verifyclientIp": 0,
+          "VerifyDevice": 0
+        },
+        
+        "facebook": {
+          "client_id": "883962928943800",
+          "client_secret": "a484899953056e8694df121aa559c1c7",
+          "auth_uri": "https://www.facebook.com/v6.0/dialog/oauth",
+          "token_uri": "https://graph.facebook.com/v6.0/oauth/access_token",
+          "userinfo_uri": "https://graph.facebook.com/v12.0/me",
+          "Scope": "email",
+          "redirect_uri": ""
+        }
+      }
+    }
+
+
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: ${SERVICE_NAME}-${SERVICE_VER}
+  namespace: ${NAMESPACE}
+spec:
+  selector:
+    matchLabels:
+      service: ${SERVICE_NAME}-${SERVICE_VER}
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        service: ${SERVICE_NAME}-${SERVICE_VER}
+        logger: nlog
+      annotations:
+    spec:
+      terminationGracePeriodSeconds: 60
+      containers:
+      - name: ${SERVICE_NAME}-${SERVICE_VER}
+        image: ${IMAGE}
+        env:
+        - name: TZ
+          value: Etc/GMT-7
+        - name: ASPNETCORE_ENVIRONMENT
+          value: Development
+        ports:
+        - containerPort: ${CONTAINER_PORT}
+        volumeMounts:
+          - name: ${SERVICE_NAME}-${SERVICE_VER}
+            mountPath: /app/appsettings.json
+            subPath: appsettings.json
+          - name: ${SERVICE_NAME}-${SERVICE_VER}
+            mountPath: /app/appsettings_cache.json
+            subPath: appsettings_cache.json
+      nodeSelector:
+      imagePullSecrets:
+      - name: registry
+      restartPolicy: Always
+      volumes:
+      - name: ${SERVICE_NAME}-${SERVICE_VER}
+        configMap: 
+          name: ${SERVICE_NAME}-${SERVICE_VER}
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: ${SERVICE_NAME}-${SERVICE_VER}
+  namespace: ${NAMESPACE}
+spec:
+  ports:
+  - port: ${CONTAINER_PORT}
+    protocol: TCP
+  selector:
+    service: ${SERVICE_NAME}-${SERVICE_VER}
+---
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name:  ${SERVICE_NAME}-${SERVICE_VER}
+  namespace: ${NAMESPACE}
+  annotations:
+    kubernetes.io/ingress.class: nginx
+    nginx.ingress.kubernetes.io/rewrite-target: /$2
+spec:
+  rules:
+  - host: ${DOMAIN}
+    http:
+      paths:
+      - path: ${SERVICE_PATH}/${SERVICE_VER}/${SERVICE_SHORT_NAME}(/|$)(.*)
+        pathType: Prefix
+        backend:
+          service:
+            name: ${SERVICE_NAME}-${SERVICE_VER}
+            port:
+              number: ${CONTAINER_PORT}

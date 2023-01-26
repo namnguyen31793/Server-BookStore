@@ -1,0 +1,214 @@
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: ${SERVICE_NAME}-${SERVICE_VER}
+  namespace: ${NAMESPACE}
+data:  
+  appsettings_cache.json: |-
+    {
+      "AppSettings": {
+        "CacheConfig": {
+          "expireSeconds": 3600,
+          "Redis": {
+            "Default": {
+              "EndPoints": [ "core-cache-redis-cluster.shareservice.svc.cluster.local:6379" ],
+              "Ssl": "False",
+              "Password": "vtvlive2022",
+              "DefaultDatabase": 0,
+              "AllowAdmin": "True",
+              "KeepAlive": 180,
+              "SyncTimeout": 3000
+            },
+            "UserProfile": {
+              "EndPoints": [ "core-cache-redis-cluster.shareservice.svc.cluster.local:6379" ],
+              "Ssl": "False",
+              "Password": "vtvlive2022",
+              "DefaultDatabase": 0,
+              "AllowAdmin": "True",
+              "KeepAlive": 180,
+              "SyncTimeout": 3000
+            },
+            "GateInfo": {
+              "EndPoints": [ "core-cache-redis-cluster.shareservice.svc.cluster.local:6379" ],
+              "Ssl": "False",
+              "Password": "vtvlive2022",
+              "DefaultDatabase": 0,
+              "AllowAdmin": "True",
+              "KeepAlive": 180,
+              "SyncTimeout": 3000
+            },
+            "TokenStore": {
+              "EndPoints": [ "core-cache-redis-cluster.shareservice.svc.cluster.local:6379" ],
+              "Ssl": "False",
+              "Password": "vtvlive2022",
+              "DefaultDatabase": 0,
+              "AllowAdmin": "True",
+              "KeepAlive": 180,
+              "SyncTimeout": 3000
+            }
+          }
+        }
+      }
+    }
+  appsettings.json.template: |-
+    {
+      "Logging": {
+        "LogLevel": {
+          "Default": "Information",
+          "Microsoft": "Warning",
+          "Microsoft.Hosting.Lifetime": "Information"
+        },
+        "Console": true
+      },
+      "AllowedHosts": [ "https://beta-id.vplay.vn","https://beta-giftcode.vplay.vn","https://beta-vplay.vn","https://beta-nap.vplay.vn" ],
+      "ElasticApm": {
+        "Enabled": false,
+        "SecretToken": "${SECRET}APM_TOKEN",
+        "ServerUrls": "http://10.51.10.69:8200",
+        "ServiceName": "VTVlive_Authen_Service",
+        "Environment": "staging"
+      },
+      "AppSettings": {
+        "System.Threading.ThreadPool.MinThreads": 50,
+        "ServiceInfo": {
+          "ServiceName": "VTVLIVE",
+          "serviceId": 330013,
+          "serviceKey": "${SECRET}ServiceInfo_serviceKey",
+          "serviceCode": "VLIVE",
+          "rootPath":"https://${DOMAIN}${SERVICE_PATH}/${SERVICE_VER}/${SERVICE_SHORT_NAME}",
+          "DevMode": "False"
+        },
+        
+        "geoip_uri": "http://core-geoip-service-v1.${NAMESPACE}.svc.cluster.local/api",
+        "DB_SYS_PARTNER_KEY": "${SECRET}DB_SYS_PARTNER_KEY",
+        "runworker": 1,        
+        "UrlSentNotify": "https://id.vplay.vn/api-core/v1/notify",       
+        "AllowedAPIIP": [ "103.116.100", "58.186.86.130","103.169.146.4" ],
+        
+        "ConnectionStrings": {
+          "ProfileAPI": "${SECRET}DB_ProfileAPI",
+          "BillingAPI": "${SECRET}DB_BillingAPI",
+          "VtvliveOTP": "${SECRET}DB_VtvliveOTP",
+          "VtvliveTracking": "${SECRET}DB_VtvliveTracking",
+          "OrderLog": "${SECRET}DB_OrderLog",
+          "ShopLog": "${SECRET}DB_ShopLog"
+        },
+    
+        "JwtBearer": {
+          "Issuer": "https://beta-id.vplay.vn",
+          "tokenlifeTimeSec": 3600, //second
+          "refreshlifeTimeDay": 7, //days
+          "encryptKey": "${SECRET}JwtBearer_encryptKey",
+          "verifyclientIp": 0,
+          "VerifyDevice": 0
+        },
+        
+        "google": {
+          "project_id": "VTVLiveID",
+          "client_id": "${SECRET}google_client_id",
+          "client_secret": "${SECRET}google_client_secret",
+          "auth_uri": "https://accounts.google.com/o/oauth2/auth",
+          "token_uri": "https://accounts.google.com/o/oauth2/token",
+          "userinfo_uri": "https://www.googleapis.com/oauth2/v1/userinfo",
+          "auth_provider_x509_cert_url": "https://www.googleapis.com/oauth2/v1/certs",
+          "Scope": "email",
+          "redirect_uri": ""
+                
+                  
+        },
+        
+        "facebook": {
+          "client_id": "${SECRET}facebook_client_id",
+          "client_secret": "${SECRET}facebook_client_secret",
+          "auth_uri": "https://www.facebook.com/v6.0/dialog/oauth",
+          "token_uri": "https://graph.facebook.com/v6.0/oauth/access_token",
+          "userinfo_uri": "https://graph.facebook.com/v12.0/me",
+          "Scope": "email",
+          "redirect_uri": "",
+          "AppFacebookallow": [2957581241222038,883962928943800 ]
+        }
+      }
+    }
+
+
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: ${SERVICE_NAME}-${SERVICE_VER}
+  namespace: ${NAMESPACE}
+spec:
+  selector:
+    matchLabels:
+      service: ${SERVICE_NAME}-${SERVICE_VER}
+  replicas: 3
+  template:
+    metadata:
+      labels:
+        service: ${SERVICE_NAME}-${SERVICE_VER}
+        logger: nlog
+      annotations:
+    spec:
+      terminationGracePeriodSeconds: 60
+      containers:
+      - name: ${SERVICE_NAME}-${SERVICE_VER}
+        image: ${IMAGE}
+        envFrom:
+        - secretRef:
+            name: ${SERVICE_NAME}-${SERVICE_VER}
+        env:
+        - name: TZ
+          value: Etc/GMT-7
+        - name: ASPNETCORE_ENVIRONMENT
+          value: Development
+        ports:
+        - containerPort: ${CONTAINER_PORT}
+        volumeMounts:
+          - name: ${SERVICE_NAME}-${SERVICE_VER}
+            mountPath: /app/appsettings.json.template
+            subPath: appsettings.json.template
+          - name: ${SERVICE_NAME}-${SERVICE_VER}
+            mountPath: /app/appsettings_cache.json
+            subPath: appsettings_cache.json
+      nodeSelector:
+      imagePullSecrets:
+      - name: registry
+      restartPolicy: Always
+      volumes:
+      - name: ${SERVICE_NAME}-${SERVICE_VER}
+        configMap: 
+          name: ${SERVICE_NAME}-${SERVICE_VER}
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: ${SERVICE_NAME}-${SERVICE_VER}
+  namespace: ${NAMESPACE}
+spec:
+  ports:
+  - port: ${CONTAINER_PORT}
+    protocol: TCP
+  selector:
+    service: ${SERVICE_NAME}-${SERVICE_VER}
+---
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name:  ${SERVICE_NAME}-${SERVICE_VER}
+  namespace: ${NAMESPACE}
+  annotations:
+    kubernetes.io/ingress.class: nginx
+    nginx.ingress.kubernetes.io/rewrite-target: /$2
+spec:
+  rules:
+  - host: ${DOMAIN}
+    http:
+      paths:
+      - path: ${SERVICE_PATH}/${SERVICE_VER}/${SERVICE_SHORT_NAME}(/|$)(.*)
+        pathType: Prefix
+        backend:
+          service:
+            name: ${SERVICE_NAME}-${SERVICE_VER}
+            port:
+              number: ${CONTAINER_PORT}

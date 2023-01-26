@@ -1,0 +1,455 @@
+{
+  "format": 1,
+  "restore": {
+    "D:\\Vplay\\ServerEventChienGioi\\CoreWebApi\\WEB_API_GAME_LOGIC.csproj": {}
+  },
+  "projects": {
+    "D:\\Vplay\\ServerEventChienGioi\\CoreWebApi\\WEB_API_GAME_LOGIC.csproj": {
+      "version": "1.0.0",
+      "restore": {
+        "projectUniqueName": "D:\\Vplay\\ServerEventChienGioi\\CoreWebApi\\WEB_API_GAME_LOGIC.csproj",
+        "projectName": "WEB_API_GAME_LOGIC",
+        "projectPath": "D:\\Vplay\\ServerEventChienGioi\\CoreWebApi\\WEB_API_GAME_LOGIC.csproj",
+        "packagesPath": "C:\\Users\\Nam PC\\.nuget\\packages\\",
+        "outputPath": "D:\\Vplay\\ServerEventChienGioi\\CoreWebApi\\obj\\",
+        "projectStyle": "PackageReference",
+        "configFilePaths": [
+          "C:\\Users\\Nam PC\\AppData\\Roaming\\NuGet\\NuGet.Config",
+          "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.Offline.config"
+        ],
+        "originalTargetFrameworks": [
+          "netcoreapp3.1"
+        ],
+        "sources": {
+          "C:\\Program Files (x86)\\Microsoft SDKs\\NuGetPackages\\": {},
+          "https://api.nuget.org/v3/index.json": {}
+        },
+        "frameworks": {
+          "netcoreapp3.1": {
+            "targetAlias": "netcoreapp3.1",
+            "projectReferences": {
+              "D:\\Vplay\\ServerEventChienGioi\\DAO\\DAO.csproj": {
+                "projectPath": "D:\\Vplay\\ServerEventChienGioi\\DAO\\DAO.csproj"
+              },
+              "D:\\Vplay\\ServerEventChienGioi\\LoggerService\\LoggerService.csproj": {
+                "projectPath": "D:\\Vplay\\ServerEventChienGioi\\LoggerService\\LoggerService.csproj"
+              },
+              "D:\\Vplay\\ServerEventChienGioi\\RedisSystem\\RedisSystem.csproj": {
+                "projectPath": "D:\\Vplay\\ServerEventChienGioi\\RedisSystem\\RedisSystem.csproj"
+              },
+              "D:\\Vplay\\ServerEventChienGioi\\ShareData\\ShareData.csproj": {
+                "projectPath": "D:\\Vplay\\ServerEventChienGioi\\ShareData\\ShareData.csproj"
+              },
+              "D:\\Vplay\\ServerEventChienGioi\\UtilsSystem\\UtilsSystem.csproj": {
+                "projectPath": "D:\\Vplay\\ServerEventChienGioi\\UtilsSystem\\UtilsSystem.csproj"
+              }
+            }
+          }
+        },
+        "warningProperties": {
+          "warnAsError": [
+            "NU1605"
+          ]
+        }
+      },
+      "frameworks": {
+        "netcoreapp3.1": {
+          "targetAlias": "netcoreapp3.1",
+          "dependencies": {
+            "Microsoft.AspNetCore.Cors": {
+              "target": "Package",
+              "version": "[2.2.0, )"
+            },
+            "Microsoft.AspNetCore.Mvc.Versioning": {
+              "target": "Package",
+              "version": "[5.0.0, )"
+            },
+            "Newtonsoft.Json": {
+              "target": "Package",
+              "version": "[13.0.2, )"
+            },
+            "RestSharp": {
+              "target": "Package",
+              "version": "[108.0.2, )"
+            },
+            "StackExchange.Redis.Extensions.AspNetCore": {
+              "target": "Package",
+              "version": "[8.0.5, )"
+            },
+            "StackExchange.Redis.Extensions.Core": {
+              "target": "Package",
+              "version": "[8.0.5, )"
+            }
+          },
+          "imports": [
+            "net461",
+            "net462",
+            "net47",
+            "net471",
+            "net472",
+            "net48"
+          ],
+          "assetTargetFallback": true,
+          "warn": true,
+          "frameworkReferences": {
+            "Microsoft.AspNetCore.App": {
+              "privateAssets": "none"
+            },
+            "Microsoft.NETCore.App": {
+              "privateAssets": "all"
+            }
+          },
+          "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\5.0.404\\RuntimeIdentifierGraph.json"
+        }
+      }
+    },
+    "D:\\Vplay\\ServerEventChienGioi\\DAO\\DAO.csproj": {
+      "version": "1.0.0",
+      "restore": {
+        "projectUniqueName": "D:\\Vplay\\ServerEventChienGioi\\DAO\\DAO.csproj",
+        "projectName": "DAO",
+        "projectPath": "D:\\Vplay\\ServerEventChienGioi\\DAO\\DAO.csproj",
+        "packagesPath": "C:\\Users\\Nam PC\\.nuget\\packages\\",
+        "outputPath": "D:\\Vplay\\ServerEventChienGioi\\DAO\\obj\\",
+        "projectStyle": "PackageReference",
+        "configFilePaths": [
+          "C:\\Users\\Nam PC\\AppData\\Roaming\\NuGet\\NuGet.Config",
+          "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.Offline.config"
+        ],
+        "originalTargetFrameworks": [
+          "netcoreapp3.1"
+        ],
+        "sources": {
+          "C:\\Program Files (x86)\\Microsoft SDKs\\NuGetPackages\\": {},
+          "https://api.nuget.org/v3/index.json": {}
+        },
+        "frameworks": {
+          "netcoreapp3.1": {
+            "targetAlias": "netcoreapp3.1",
+            "projectReferences": {
+              "D:\\Vplay\\ServerEventChienGioi\\LoggerService\\LoggerService.csproj": {
+                "projectPath": "D:\\Vplay\\ServerEventChienGioi\\LoggerService\\LoggerService.csproj"
+              },
+              "D:\\Vplay\\ServerEventChienGioi\\ShareData\\ShareData.csproj": {
+                "projectPath": "D:\\Vplay\\ServerEventChienGioi\\ShareData\\ShareData.csproj"
+              }
+            }
+          }
+        },
+        "warningProperties": {
+          "warnAsError": [
+            "NU1605"
+          ]
+        }
+      },
+      "frameworks": {
+        "netcoreapp3.1": {
+          "targetAlias": "netcoreapp3.1",
+          "dependencies": {
+            "System.Data.SqlClient": {
+              "target": "Package",
+              "version": "[4.8.4, )"
+            },
+            "System.Linq": {
+              "target": "Package",
+              "version": "[4.3.0, )"
+            }
+          },
+          "imports": [
+            "net461",
+            "net462",
+            "net47",
+            "net471",
+            "net472",
+            "net48"
+          ],
+          "assetTargetFallback": true,
+          "warn": true,
+          "frameworkReferences": {
+            "Microsoft.NETCore.App": {
+              "privateAssets": "all"
+            }
+          },
+          "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\5.0.404\\RuntimeIdentifierGraph.json"
+        }
+      }
+    },
+    "D:\\Vplay\\ServerEventChienGioi\\LoggerService\\LoggerService.csproj": {
+      "version": "1.0.0",
+      "restore": {
+        "projectUniqueName": "D:\\Vplay\\ServerEventChienGioi\\LoggerService\\LoggerService.csproj",
+        "projectName": "LoggerService",
+        "projectPath": "D:\\Vplay\\ServerEventChienGioi\\LoggerService\\LoggerService.csproj",
+        "packagesPath": "C:\\Users\\Nam PC\\.nuget\\packages\\",
+        "outputPath": "D:\\Vplay\\ServerEventChienGioi\\LoggerService\\obj\\",
+        "projectStyle": "PackageReference",
+        "configFilePaths": [
+          "C:\\Users\\Nam PC\\AppData\\Roaming\\NuGet\\NuGet.Config",
+          "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.Offline.config"
+        ],
+        "originalTargetFrameworks": [
+          "netcoreapp3.1"
+        ],
+        "sources": {
+          "C:\\Program Files (x86)\\Microsoft SDKs\\NuGetPackages\\": {},
+          "https://api.nuget.org/v3/index.json": {}
+        },
+        "frameworks": {
+          "netcoreapp3.1": {
+            "targetAlias": "netcoreapp3.1",
+            "projectReferences": {
+              "D:\\Vplay\\ServerEventChienGioi\\ShareData\\ShareData.csproj": {
+                "projectPath": "D:\\Vplay\\ServerEventChienGioi\\ShareData\\ShareData.csproj"
+              }
+            }
+          }
+        },
+        "warningProperties": {
+          "warnAsError": [
+            "NU1605"
+          ]
+        }
+      },
+      "frameworks": {
+        "netcoreapp3.1": {
+          "targetAlias": "netcoreapp3.1",
+          "dependencies": {
+            "MongoDB.Driver": {
+              "target": "Package",
+              "version": "[2.18.0, )"
+            },
+            "Newtonsoft.Json": {
+              "target": "Package",
+              "version": "[13.0.2, )"
+            }
+          },
+          "imports": [
+            "net461",
+            "net462",
+            "net47",
+            "net471",
+            "net472",
+            "net48"
+          ],
+          "assetTargetFallback": true,
+          "warn": true,
+          "frameworkReferences": {
+            "Microsoft.NETCore.App": {
+              "privateAssets": "all"
+            }
+          },
+          "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\5.0.404\\RuntimeIdentifierGraph.json"
+        }
+      }
+    },
+    "D:\\Vplay\\ServerEventChienGioi\\RedisSystem\\RedisSystem.csproj": {
+      "version": "1.0.0",
+      "restore": {
+        "projectUniqueName": "D:\\Vplay\\ServerEventChienGioi\\RedisSystem\\RedisSystem.csproj",
+        "projectName": "RedisSystem",
+        "projectPath": "D:\\Vplay\\ServerEventChienGioi\\RedisSystem\\RedisSystem.csproj",
+        "packagesPath": "C:\\Users\\Nam PC\\.nuget\\packages\\",
+        "outputPath": "D:\\Vplay\\ServerEventChienGioi\\RedisSystem\\obj\\",
+        "projectStyle": "PackageReference",
+        "configFilePaths": [
+          "C:\\Users\\Nam PC\\AppData\\Roaming\\NuGet\\NuGet.Config",
+          "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.Offline.config"
+        ],
+        "originalTargetFrameworks": [
+          "netcoreapp3.1"
+        ],
+        "sources": {
+          "C:\\Program Files (x86)\\Microsoft SDKs\\NuGetPackages\\": {},
+          "https://api.nuget.org/v3/index.json": {}
+        },
+        "frameworks": {
+          "netcoreapp3.1": {
+            "targetAlias": "netcoreapp3.1",
+            "projectReferences": {
+              "D:\\Vplay\\ServerEventChienGioi\\LoggerService\\LoggerService.csproj": {
+                "projectPath": "D:\\Vplay\\ServerEventChienGioi\\LoggerService\\LoggerService.csproj"
+              },
+              "D:\\Vplay\\ServerEventChienGioi\\ShareData\\ShareData.csproj": {
+                "projectPath": "D:\\Vplay\\ServerEventChienGioi\\ShareData\\ShareData.csproj"
+              }
+            }
+          }
+        },
+        "warningProperties": {
+          "warnAsError": [
+            "NU1605"
+          ]
+        }
+      },
+      "frameworks": {
+        "netcoreapp3.1": {
+          "targetAlias": "netcoreapp3.1",
+          "dependencies": {
+            "Newtonsoft.Json": {
+              "target": "Package",
+              "version": "[13.0.2, )"
+            },
+            "StackExchange.Redis": {
+              "target": "Package",
+              "version": "[2.6.70, )"
+            }
+          },
+          "imports": [
+            "net461",
+            "net462",
+            "net47",
+            "net471",
+            "net472",
+            "net48"
+          ],
+          "assetTargetFallback": true,
+          "warn": true,
+          "frameworkReferences": {
+            "Microsoft.NETCore.App": {
+              "privateAssets": "all"
+            }
+          },
+          "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\5.0.404\\RuntimeIdentifierGraph.json"
+        }
+      }
+    },
+    "D:\\Vplay\\ServerEventChienGioi\\ShareData\\ShareData.csproj": {
+      "version": "1.0.0",
+      "restore": {
+        "projectUniqueName": "D:\\Vplay\\ServerEventChienGioi\\ShareData\\ShareData.csproj",
+        "projectName": "ShareData",
+        "projectPath": "D:\\Vplay\\ServerEventChienGioi\\ShareData\\ShareData.csproj",
+        "packagesPath": "C:\\Users\\Nam PC\\.nuget\\packages\\",
+        "outputPath": "D:\\Vplay\\ServerEventChienGioi\\ShareData\\obj\\",
+        "projectStyle": "PackageReference",
+        "configFilePaths": [
+          "C:\\Users\\Nam PC\\AppData\\Roaming\\NuGet\\NuGet.Config",
+          "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.Offline.config"
+        ],
+        "originalTargetFrameworks": [
+          "netcoreapp3.1"
+        ],
+        "sources": {
+          "C:\\Program Files (x86)\\Microsoft SDKs\\NuGetPackages\\": {},
+          "https://api.nuget.org/v3/index.json": {}
+        },
+        "frameworks": {
+          "netcoreapp3.1": {
+            "targetAlias": "netcoreapp3.1",
+            "projectReferences": {}
+          }
+        },
+        "warningProperties": {
+          "warnAsError": [
+            "NU1605"
+          ]
+        }
+      },
+      "frameworks": {
+        "netcoreapp3.1": {
+          "targetAlias": "netcoreapp3.1",
+          "dependencies": {
+            "Newtonsoft.Json": {
+              "target": "Package",
+              "version": "[13.0.2, )"
+            },
+            "System.Configuration.ConfigurationManager": {
+              "target": "Package",
+              "version": "[6.0.1, )"
+            }
+          },
+          "imports": [
+            "net461",
+            "net462",
+            "net47",
+            "net471",
+            "net472",
+            "net48"
+          ],
+          "assetTargetFallback": true,
+          "warn": true,
+          "frameworkReferences": {
+            "Microsoft.NETCore.App": {
+              "privateAssets": "all"
+            }
+          },
+          "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\5.0.404\\RuntimeIdentifierGraph.json"
+        }
+      }
+    },
+    "D:\\Vplay\\ServerEventChienGioi\\UtilsSystem\\UtilsSystem.csproj": {
+      "version": "1.0.0",
+      "restore": {
+        "projectUniqueName": "D:\\Vplay\\ServerEventChienGioi\\UtilsSystem\\UtilsSystem.csproj",
+        "projectName": "UtilsSystem",
+        "projectPath": "D:\\Vplay\\ServerEventChienGioi\\UtilsSystem\\UtilsSystem.csproj",
+        "packagesPath": "C:\\Users\\Nam PC\\.nuget\\packages\\",
+        "outputPath": "D:\\Vplay\\ServerEventChienGioi\\UtilsSystem\\obj\\",
+        "projectStyle": "PackageReference",
+        "configFilePaths": [
+          "C:\\Users\\Nam PC\\AppData\\Roaming\\NuGet\\NuGet.Config",
+          "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.Offline.config"
+        ],
+        "originalTargetFrameworks": [
+          "netcoreapp3.1"
+        ],
+        "sources": {
+          "C:\\Program Files (x86)\\Microsoft SDKs\\NuGetPackages\\": {},
+          "https://api.nuget.org/v3/index.json": {}
+        },
+        "frameworks": {
+          "netcoreapp3.1": {
+            "targetAlias": "netcoreapp3.1",
+            "projectReferences": {
+              "D:\\Vplay\\ServerEventChienGioi\\LoggerService\\LoggerService.csproj": {
+                "projectPath": "D:\\Vplay\\ServerEventChienGioi\\LoggerService\\LoggerService.csproj"
+              },
+              "D:\\Vplay\\ServerEventChienGioi\\RedisSystem\\RedisSystem.csproj": {
+                "projectPath": "D:\\Vplay\\ServerEventChienGioi\\RedisSystem\\RedisSystem.csproj"
+              },
+              "D:\\Vplay\\ServerEventChienGioi\\ShareData\\ShareData.csproj": {
+                "projectPath": "D:\\Vplay\\ServerEventChienGioi\\ShareData\\ShareData.csproj"
+              }
+            }
+          }
+        },
+        "warningProperties": {
+          "warnAsError": [
+            "NU1605"
+          ]
+        }
+      },
+      "frameworks": {
+        "netcoreapp3.1": {
+          "targetAlias": "netcoreapp3.1",
+          "dependencies": {
+            "Newtonsoft.Json": {
+              "target": "Package",
+              "version": "[13.0.2, )"
+            },
+            "RestSharp": {
+              "target": "Package",
+              "version": "[108.0.2, )"
+            }
+          },
+          "imports": [
+            "net461",
+            "net462",
+            "net47",
+            "net471",
+            "net472",
+            "net48"
+          ],
+          "assetTargetFallback": true,
+          "warn": true,
+          "frameworkReferences": {
+            "Microsoft.NETCore.App": {
+              "privateAssets": "all"
+            }
+          },
+          "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\5.0.404\\RuntimeIdentifierGraph.json"
+        }
+      }
+    }
+  }
+}
