@@ -18,21 +18,6 @@ namespace UtilsSystem.Utils
             return true;
         }
 
-        public static string GetTelcoName(int telcoType)
-        {
-            switch (telcoType)
-            {
-                case (int)ENSPType.VT:
-                    return "VIETTEL";
-                case (int)ENSPType.VN:
-                    return "VINAPHONE";
-                case (int)ENSPType.MB:
-                    return "MOBIFONE";
-                default:
-                    return "";
-            }
-        }
-
         public static string formatMoney(long number, bool skip = true, string name = "", string sign = "")
         {
             skip = true;
@@ -134,6 +119,21 @@ namespace UtilsSystem.Utils
                     break;
                 case EStatusCode.TRANSACTION_SPAM:
                     message = "Thao tác quá nhanh!";
+                    break;
+                case EStatusCode.ACCOUNT_NOT_EXITS:
+                    message = "Tài khoản không tồn tại!";
+                    break;
+                case EStatusCode.INVALID_PASSWORD:
+                    message = "Mật khẩu không chính xác!";
+                    break;
+                case EStatusCode.ACCOUNT_EXITS:
+                    message = "Tài khoản đã tồn tại!";
+                    break;
+                case EStatusCode.TOKEN_INVALID:
+                    message = "Tài khoản của bạn đã đăng nhập ở nơi khác!";
+                    break;
+                case EStatusCode.TOKEN_EXPIRES:
+                    message = "Token hết hạn!";
                     break;
             }
             return message;

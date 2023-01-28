@@ -1,5 +1,4 @@
 ﻿using RedisSystem;
-using ShareData.VtvId.ResponseCode;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -30,6 +29,18 @@ namespace UtilsSystem.Utils
         public string GetInfobyToken(string Token) {
             string cache = RedisGatewayManager<GoProfile>.Inst.GetDataFromCache("Token:" + Token);
             return cache;
+        }
+
+        public string InitCookieByAccountId(int accountId, string MerchantId, string DeviceId)
+        {
+            var response = string.Format("{0}|{1}|{2}|{3}",
+                                          DateTime.UtcNow.Ticks,
+                                          accountId,
+                                          MerchantId,
+                                          DeviceId);
+            response = Security.Encrypt(CONFIG.SecretTokenKey, response);
+            string result = response.Replace("=", "_");
+            return result;
         }
     }
 }

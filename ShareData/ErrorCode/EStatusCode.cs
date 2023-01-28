@@ -33,7 +33,7 @@ namespace ShareData.ErrorCode
         public const int NOT_ENOUGH_MONEY = -66;
         public const int OUT_OF_EVENT_TIME = -67;
 
-        public const int TOKEN_EXPIRES = 86;
+        public const int TOKEN_EXPIRES = -86;
 
         public const int CONNECT_ERROR = -100;
         public const int CAPTCHA_INVALID = -101;

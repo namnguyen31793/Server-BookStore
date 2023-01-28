@@ -24,6 +24,25 @@ namespace BookStore.Instance
             }
         }
 
+        public bool IsValidEmail(string email)
+        {
+            var trimmedEmail = email.Trim();
+
+            if (trimmedEmail.EndsWith("."))
+            {
+                return false; // suggested by @TK-421
+            }
+            try
+            {
+                var addr = new System.Net.Mail.MailAddress(email);
+                return addr.Address == trimmedEmail;
+            }
+            catch
+            {
+                return false;
+            }
+        }
+
         public void SendGmailMail(string address, string subject, string mailbody) {
             string to = "toaddress@gmail.com"; //To address    
             string from = address; //From address    

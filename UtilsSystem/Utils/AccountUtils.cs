@@ -1,4 +1,5 @@
 ﻿using ShareData.Helper;
+using ShareData.Request;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -73,6 +74,50 @@ namespace UtilsSystem.Utils
             var dataEncrypt = StaticData.SecretPassKey + password;
             var response = Security.MD5Encrypt(dataEncrypt);
             return response;
+        }
+        public static bool IsLoginRequestTrue(RequestAuthenModel requestAuthen)
+        {
+            if (requestAuthen == null) return false;
+            if (string.IsNullOrEmpty(requestAuthen.AccountName) || string.IsNullOrEmpty(requestAuthen.Password))
+                return false;
+            return true;
+        }
+        public static bool IsLoginRequestTrue(RequestAuthenSocial requestAuthen)
+        {
+            if (requestAuthen == null) return false;
+            if (string.IsNullOrEmpty(requestAuthen.Token))
+                return false;
+            return true;
+        }
+
+        public static bool IsRegisterRequestTrue(RequestRegisterModel requestAuthen)
+        {
+            if (requestAuthen == null) return false;
+            if (string.IsNullOrEmpty(requestAuthen.AccountName) || string.IsNullOrEmpty(requestAuthen.Password))
+                return false;
+            return true;
+        }
+        public static bool IsValidEmail(string email)
+        {
+            var trimmedEmail = email.Trim();
+
+            if (trimmedEmail.EndsWith("."))
+            {
+                return false; // suggested by @TK-421
+            }
+            try
+            {
+                var addr = new System.Net.Mail.MailAddress(email);
+                return addr.Address == trimmedEmail;
+            }
+            catch
+            {
+                return false;
+            }
+        }
+        public static bool IsPhoneNumber(string number)
+        {
+            return Regex.Match(number, @"^(\+[0-9]{9})$").Success;
         }
     }
 }
