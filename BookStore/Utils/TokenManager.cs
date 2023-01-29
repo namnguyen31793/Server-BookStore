@@ -26,9 +26,12 @@ namespace BookStore.Utils
             return result;
         }
 
-        public static bool CheckAccessToken(string accessToken) {
+        public static long GetAccountIdByAccessToken(string accessToken) {
             string keyRedis = "Token:" + accessToken;
-            return RedisGatewayCacheManager.Inst.CheckExistKey(keyRedis);
+            long accountId = -1;
+            var data = RedisGatewayCacheManager.Inst.GetDataFromCache(keyRedis);
+            long.TryParse(data, out accountId);
+            return accountId;
         }
 
         public static string GenerateRefreshToken()

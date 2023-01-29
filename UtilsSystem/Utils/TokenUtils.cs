@@ -14,33 +14,10 @@ namespace UtilsSystem.Utils
             return !isExpires;
         }
 
-        public void AddTokenCache(string Token, byte[] result, int timeExpires)
-        {
-            string keyRedis = "Token:" + Token;
-            RedisGatewayManager<GoProfile>.Inst.SaveByte(keyRedis, result, (int)(timeExpires / 60));
-        }
-
         public void AddTokenCache(string Token, string result, int timeExpires) {
             string keyRedis = "Token:" + Token;
 
             RedisGatewayCacheManager.Inst.SaveData(keyRedis, result, (int)(timeExpires / 60));
-        }
-
-        public string GetInfobyToken(string Token) {
-            string cache = RedisGatewayManager<GoProfile>.Inst.GetDataFromCache("Token:" + Token);
-            return cache;
-        }
-
-        public string InitCookieByAccountId(int accountId, string MerchantId, string DeviceId)
-        {
-            var response = string.Format("{0}|{1}|{2}|{3}",
-                                          DateTime.UtcNow.Ticks,
-                                          accountId,
-                                          MerchantId,
-                                          DeviceId);
-            response = Security.Encrypt(CONFIG.SecretTokenKey, response);
-            string result = response.Replace("=", "_");
-            return result;
         }
     }
 }

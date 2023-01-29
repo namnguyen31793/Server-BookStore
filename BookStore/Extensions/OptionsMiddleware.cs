@@ -3,7 +3,7 @@ using Microsoft.AspNetCore.Http;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Hosting;
 
-namespace ServerEventTet2023.Extensions
+namespace BookStore.Extensions
 {
     public class OptionsMiddleware
     {

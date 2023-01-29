@@ -24,3 +24,16 @@ D:\Server\NetCoreApi\NetCoreApi\LoggerService\obj\Debug\netcoreapp3.1\LoggerServ
 D:\Project\NetCoreApi\NetCoreApi\LoggerService\bin\Debug\netcoreapp3.1\ShareData.dll
 D:\Project\NetCoreApi\NetCoreApi\LoggerService\bin\Debug\netcoreapp3.1\ShareData.pdb
 D:\Project\NetCoreApi\NetCoreApi\LoggerService\obj\Debug\netcoreapp3.1\LoggerService.csproj.CopyComplete
+D:\Server\Server-BookStore\LoggerService\obj\Debug\netcoreapp3.1\LoggerService.csproj.AssemblyReference.cache
+D:\Server\Server-BookStore\LoggerService\obj\Debug\netcoreapp3.1\LoggerService.GeneratedMSBuildEditorConfig.editorconfig
+D:\Server\Server-BookStore\LoggerService\obj\Debug\netcoreapp3.1\LoggerService.AssemblyInfoInputs.cache
+D:\Server\Server-BookStore\LoggerService\obj\Debug\netcoreapp3.1\LoggerService.AssemblyInfo.cs
+D:\Server\Server-BookStore\LoggerService\obj\Debug\netcoreapp3.1\LoggerService.csproj.CoreCompileInputs.cache
+D:\Server\Server-BookStore\LoggerService\obj\Debug\netcoreapp3.1\LoggerService.dll
+D:\Server\Server-BookStore\LoggerService\obj\Debug\netcoreapp3.1\LoggerService.pdb
+D:\Server\Server-BookStore\LoggerService\bin\Debug\netcoreapp3.1\LoggerService.deps.json
+D:\Server\Server-BookStore\LoggerService\bin\Debug\netcoreapp3.1\LoggerService.dll
+D:\Server\Server-BookStore\LoggerService\bin\Debug\netcoreapp3.1\LoggerService.pdb
+D:\Server\Server-BookStore\LoggerService\bin\Debug\netcoreapp3.1\ShareData.dll
+D:\Server\Server-BookStore\LoggerService\bin\Debug\netcoreapp3.1\ShareData.pdb
+D:\Server\Server-BookStore\LoggerService\obj\Debug\netcoreapp3.1\LoggerService.csproj.CopyComplete

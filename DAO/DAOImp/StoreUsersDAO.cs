@@ -1,5 +1,6 @@
 ﻿using DAO.Utitlities;
 using LoggerService;
+using ShareData.DB.Users;
 using System;
 using System.Collections.Generic;
 using System.Data;
@@ -146,6 +147,30 @@ namespace DAO.DAOImp
             catch (Exception exception)
             {
                 Task.Run(async () => await _logger.LogError("SQL-ResfreshToken()", exception.ToString()).ConfigureAwait(false));
+            }
+            finally
+            {
+                db?.Close();
+            }
+            return response;
+        }
+        public AccountModel GetAccountInfo(long accountId, ref int responseStatus)
+        {
+            DBHelper db = null;
+            var response = new AccountModel();
+            try
+            {
+
+                db = new DBHelper(ConfigDb.StoreUsersConnectionString);
+                var pars = new SqlParameter[2];
+                pars[0] = new SqlParameter("@_AccountId", accountId);
+                pars[1] = new SqlParameter("@_ResponseStatus", SqlDbType.BigInt) { Direction = ParameterDirection.Output };
+                response = db.GetInstanceSP<AccountModel>("SP_UpdateNickName", 4, pars);
+                responseStatus = Convert.ToInt32(pars[1].Value);
+            }
+            catch (Exception exception)
+            {
+                Task.Run(async () => await _logger.LogError("SQL-GetAccountInfo()", exception.ToString()).ConfigureAwait(false));
             }
             finally
             {

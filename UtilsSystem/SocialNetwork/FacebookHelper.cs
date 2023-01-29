@@ -1,8 +1,12 @@
-﻿using Facebook;
-using Newtonsoft.Json;
+﻿using Newtonsoft.Json;
+using RestSharp;
 using System;
 using System.Collections.Generic;
+using System.Net;
 using System.Text;
+using System.Threading;
+using System.Threading.Tasks;
+using System.Web;
 using UtilsSystem.SocialNetwork;
 
 namespace UtilsSystem.SocialNetwork
@@ -10,14 +14,19 @@ namespace UtilsSystem.SocialNetwork
     public class FacebookHelper
     {
 
-        public static string GetFacebookUserId(string facebookToken)
+        public static async Task<string> GetFacebookUserIdAsync(string facebookToken)
         {
-            var facebookClient = new FacebookClient(facebookToken);
-            var me = facebookClient.Get("me") as JsonObject;
-            if (me != null)
+            var cancellationTokenSource = new CancellationTokenSource();
+            cancellationTokenSource.CancelAfter(30000); //30s
+
+            var request = new RestRequest(HttpUtility.UrlEncode("me?access_token=" +facebookToken), Method.Get);
+            var client = new RestClient(HttpUtility.UrlEncode("https://graph.facebook.com/"));
+            ServicePointManager.SecurityProtocol = SecurityProtocolType.Tls12 | SecurityProtocolType.Tls11 | SecurityProtocolType.Tls;
+            var response = await client.ExecuteAsync(request, cancellationTokenSource.Token);
+            var content = response.Content;
+            if (content != null)
             {
-                var uid = me["id"];
-                return uid.ToString();
+                return content;
             }
             else
             {
@@ -25,43 +34,10 @@ namespace UtilsSystem.SocialNetwork
             }
         }
 
-
-        /// <summary>
-        /// Lấy Fb Id -- Hot fix trường hợp business : nhiều appfacebook dùng chung 1 db (27-12-2017)
-        /// TODO Cách tốt nhất là nên dùng 'token_for_business' để phân biệt
-        /// </summary>
-        /// <param name="facebookToken"></param>
-        /// <returns></returns>
-        public static string GetFacebookBusinessToken(string facebookToken)
-        {
-            var response = "";
-            try
-            {
-                var facebookClient = new FacebookClient(facebookToken);
-                var mes = facebookClient.Get("me?fields=token_for_business").ToString();
-                var mesInfo = JsonConvert.DeserializeObject<FacebookBusinessResponse>(mes);
-                //lấy UID app 1
-                if (mesInfo != null)
-                {
-                    response = mesInfo.token_for_business;
-                }
-                else
-                {
-                    //Thường là Token hết hạn
-                }
-            }
-            catch (Exception exception)
-            {
-                //Thường là mất kết nối tới Fb
-                //NLogManager.PublishException(exception);
-            }
-            return response;
-        }
-
-        public static string GetFacebookUserName(string facebookToken)
+        public static async Task<string> GetFacebookUserNameAsync(string facebookToken)
         {
             //lay rieng
-            var facebookAccountId = GetFacebookUserId(facebookToken);
+            var facebookAccountId = await GetFacebookUserIdAsync(facebookToken);
             if (!string.IsNullOrEmpty(facebookAccountId)) return "FB_" + facebookAccountId;
             return string.Empty;
         }

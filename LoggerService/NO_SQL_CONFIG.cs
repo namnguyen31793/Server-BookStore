@@ -1,5 +1,4 @@
-﻿using ShareData.Game.Slot;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Text;
 
@@ -29,57 +28,5 @@ namespace LoggerService
         public static readonly string API_LOG_NORMAL_COLLECTION = "ApiNormalLog_Collection";
         #endregion
 
-        #region T09
-        public static readonly string T09_SYSTEM_DATABASE_NAME = "T09System";
-        public static readonly string SLOTMACHINE_TUTIEN_JACKPOT_LOG_COLLECTION = "SlotMachine_TuTien_Jackpot_Log_Collection";
-        public static readonly string SLOTMACHINE_TUTIEN_DETAIL_COLLECTION = "SlotMachine_TuTien_Detail_Collection";
-        public static readonly string SLOTMACHINE_TUTIEN_SPECIAL_DETAIL_COLLECTION = "SlotMachine_TuTien_Special_Detail_Collection";
-        public static readonly string SLOTMACHINE_TUTIEN_SHOP_EXCHANGE_HISTORY_COLLECTION = "SlotMachine_TuTien_Shop_Exchange_History_Collection";
-        public static readonly string T09_EVENT_STORE_BUY_GIFTCODE_LOG_COLLECTION = "T09_Event_Tet_Buy_GiftCode_Log_Collection";
-
-
-        public static readonly string SLOTMACHINE_PUNCH_CAT_DETAIL_COLLECTION = "SlotMachine_PunchCat_Detail_Collection";
-        public static readonly string SLOTMACHINE_PUNCH_CAT_JACKPOT_FAIL_COLLECTION = "SlotMachine_PunchCat_Jackpot_Fail_Collection";
-        public static readonly string SLOTMACHINE_PUNCH_CAT_JACKPOT_DETAIL_COLLECTION = "SlotMachine_PunchCat_Jackpot_Detail_Collection";
-        public static readonly string SLOTMACHINE_PUNCH_CAT_SWAPCAT = "SlotMachine_PunchCat_SwapCat";
-
-        #endregion
-
-        public static string Get_Slot_DetailSpin_CollectionName(int GameType)
-        {
-            switch (GameType)
-            {
-                case (int)GAME_TYPE.TUTIEN:
-                    return NO_SQL_CONFIG.SLOTMACHINE_TUTIEN_DETAIL_COLLECTION;
-                case (int)GAME_TYPE.EVENT_TET_2023:
-                    return NO_SQL_CONFIG.SLOTMACHINE_PUNCH_CAT_DETAIL_COLLECTION;
-                default:
-                    return "";
-            }
-        }
-        public static string Get_Slot_Jackpot_Fail_CollectionName(int GameType)
-        {
-            switch (GameType)
-            {
-                case (int)GAME_TYPE.TUTIEN:
-                    return NO_SQL_CONFIG.SLOTMACHINE_TUTIEN_JACKPOT_LOG_COLLECTION;
-                case (int)GAME_TYPE.EVENT_TET_2023:
-                    return NO_SQL_CONFIG.SLOTMACHINE_PUNCH_CAT_JACKPOT_FAIL_COLLECTION;
-                default:
-                    return "";
-            }
-        }
-        public static string Get_Slot_Jackpot_Detail_CollectionName(int GameType)
-        {
-            switch (GameType)
-            {
-                case (int)GAME_TYPE.TUTIEN:
-                    return NO_SQL_CONFIG.SLOTMACHINE_TUTIEN_JACKPOT_LOG_COLLECTION;
-                case (int)GAME_TYPE.EVENT_TET_2023:
-                    return NO_SQL_CONFIG.SLOTMACHINE_PUNCH_CAT_JACKPOT_DETAIL_COLLECTION;
-                default:
-                    return "";
-            }
-        }
     }
 }

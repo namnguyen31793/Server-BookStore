@@ -18,3 +18,13 @@ D:\Project\NetCoreApi\NetCoreApi\ShareData\obj\Debug\netcoreapp3.1\ShareData.Ass
 D:\Project\NetCoreApi\NetCoreApi\ShareData\obj\Debug\netcoreapp3.1\ShareData.csproj.CoreCompileInputs.cache
 D:\Project\NetCoreApi\NetCoreApi\ShareData\obj\Debug\netcoreapp3.1\ShareData.dll
 D:\Project\NetCoreApi\NetCoreApi\ShareData\obj\Debug\netcoreapp3.1\ShareData.pdb
+D:\Server\Server-BookStore\ShareData\obj\Debug\netcoreapp3.1\ShareData.csproj.AssemblyReference.cache
+D:\Server\Server-BookStore\ShareData\obj\Debug\netcoreapp3.1\ShareData.GeneratedMSBuildEditorConfig.editorconfig
+D:\Server\Server-BookStore\ShareData\obj\Debug\netcoreapp3.1\ShareData.AssemblyInfoInputs.cache
+D:\Server\Server-BookStore\ShareData\obj\Debug\netcoreapp3.1\ShareData.AssemblyInfo.cs
+D:\Server\Server-BookStore\ShareData\obj\Debug\netcoreapp3.1\ShareData.csproj.CoreCompileInputs.cache
+D:\Server\Server-BookStore\ShareData\obj\Debug\netcoreapp3.1\ShareData.dll
+D:\Server\Server-BookStore\ShareData\obj\Debug\netcoreapp3.1\ShareData.pdb
+D:\Server\Server-BookStore\ShareData\bin\Debug\netcoreapp3.1\ShareData.deps.json
+D:\Server\Server-BookStore\ShareData\bin\Debug\netcoreapp3.1\ShareData.dll
+D:\Server\Server-BookStore\ShareData\bin\Debug\netcoreapp3.1\ShareData.pdb

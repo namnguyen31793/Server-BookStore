@@ -6,6 +6,7 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using RedisSystem;
 using ShareData.API;
+using ShareData.DB.Users;
 using ShareData.ErrorCode;
 using ShareData.Request;
 using ShareData.Response;
@@ -29,6 +30,7 @@ namespace BookStore.Controllers
         {
             _logger = logger;
         }
+        private string token = string.Empty;
 
         [HttpPost]
         [Route("Login")]
@@ -42,7 +44,6 @@ namespace BookStore.Controllers
             }
             try
             {
-                int res = EStatusCode.SUCCESS;
                 var clientInfo = new ClientRequestInfo(Request);
                 response = await LoginAsync(requestLogin, clientInfo);
             }
@@ -64,7 +65,8 @@ namespace BookStore.Controllers
 
             var clientInfo = new ClientRequestInfo(Request);
 
-            var facebookUserName = FacebookHelper.GetFacebookUserName(requestLogin.Token);
+            var facebookUserName = await FacebookHelper.GetFacebookUserNameAsync(requestLogin.Token);
+            await _logger.LogError("Account-Register{}", facebookUserName).ConfigureAwait(false);
             var responseCode = -99;
             if (string.IsNullOrEmpty(facebookUserName))
                 return Ok(new ResponseApiLauncher<string>() { Status = EStatusCode.SYSTEM_ERROR, Messenger = UltilsHelper.GetMessageByErrorCode(EStatusCode.SYSTEM_ERROR) });
@@ -108,7 +110,6 @@ namespace BookStore.Controllers
             {
                 return Ok(new ResponseApiLauncher<string>() { Status = EStatusCode.DATA_INVAILD, Messenger = UltilsHelper.GetMessageByErrorCode(EStatusCode.DATA_INVAILD) });
             }
-            var data = "";
             var clientInfo = new ClientRequestInfo(Request);
             var responseCode = -99;
             try
@@ -216,7 +217,7 @@ namespace BookStore.Controllers
             }
             catch (Exception ex)
             {
-                await _logger.LogError("NotifyServices-RefreshToken{}", ex.ToString()).ConfigureAwait(false);
+                await _logger.LogError("Account-RefreshToken{}", ex.ToString()).ConfigureAwait(false);
             }
             return Ok(new ResponseApiLauncher<string>() { Status = EStatusCode.SYSTEM_ERROR, Messenger = UltilsHelper.GetMessageByErrorCode(EStatusCode.SYSTEM_ERROR) });
         }
@@ -226,33 +227,27 @@ namespace BookStore.Controllers
         [ResponseCache(Duration = 5)]
         public async Task<IActionResult> GetAccountInfo()
         {
-            var data = "";
+            int responseStatus = -99;
+            AccountModel response = null;
             try
             {
+                if (Request.Headers.TryGetValue("Authorization", out var values)) {
+                    token = values.FirstOrDefault();
+                }
+                if (string.IsNullOrEmpty(token))
+                    return Ok(new ResponseApiModel<string>() { Status = EStatusCode.USER_NOT_LOGIN, Messenger = UltilsHelper.GetMessageByErrorCode(EStatusCode.USER_NOT_LOGIN) });
+                long accountId = TokenManager.GetAccountIdByAccessToken(token);
+                if ( accountId <= 0)
+                    return Ok(new ResponseApiModel<string>() { Status = EStatusCode.TOKEN_EXPIRES, Messenger = UltilsHelper.GetMessageByErrorCode(EStatusCode.TOKEN_EXPIRES) });
+                response = StoreUsersDAO.Inst.GetAccountInfo(accountId, ref responseStatus);
             }
             catch (Exception ex)
             {
-                await _logger.LogError("NotifyServices-GetNotifyAdmin{}", ex.ToString()).ConfigureAwait(false);
+                await _logger.LogError("Account-GetAccountInfo{}", ex.ToString()).ConfigureAwait(false);
             }
 
-            return Ok(new ResponseApiLauncher<string>() { Status = EStatusCode.SUCCESS, Messenger = UtilsSystem.Utils.UltilsHelper.GetMessageByErrorCode(EStatusCode.SUCCESS), DataResponse = data });
+            return Ok(new ResponseApiLauncher<AccountModel>() { Status = responseStatus, Messenger = UltilsHelper.GetMessageByErrorCode(responseStatus), DataResponse = response });
         }
 
-        [HttpGet]
-        [Route("GetListBook")]
-        [ResponseCache(Duration = 5)]
-        public async Task<IActionResult> GetListBook()
-        {
-            var data = "";
-            try
-            {
-            }
-            catch (Exception ex)
-            {
-                await _logger.LogError("NotifyServices-GetNotifyAdmin{}", ex.ToString()).ConfigureAwait(false);
-            }
-
-            return Ok(new ResponseApiLauncher<string>() { Status = EStatusCode.SUCCESS, Messenger = UtilsSystem.Utils.UltilsHelper.GetMessageByErrorCode(EStatusCode.SUCCESS), DataResponse = data });
-        }
     }
 }

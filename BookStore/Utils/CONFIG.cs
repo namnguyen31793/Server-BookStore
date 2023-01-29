@@ -9,7 +9,7 @@ namespace BookStore.Utils
     {
         public static void Initialize(string secretCookieKey)
         {
-            SecretTokenKey = secretCookieKey;
+            CONFIG.SecretTokenKey = secretCookieKey;
         }
 
         public static string SecretTokenKey = "";

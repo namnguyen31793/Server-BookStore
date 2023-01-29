@@ -5,16 +5,14 @@ using Microsoft.AspNetCore.Mvc;
 using Newtonsoft.Json;
 using RedisSystem;
 using ShareData.API;
-using ShareData.DAO;
 using ShareData.ErrorCode;
 using ShareData.RequestCode;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using ServerEventTet2023.Utils;
 
-namespace ServerEventTet2023.Controllers
+namespace BookStore.Controllers
 {
     [ApiVersion("1.0")]
     [Route("v1/NotifyServices")]
@@ -35,10 +33,6 @@ namespace ServerEventTet2023.Controllers
             var data = "";
             try
             {
-                data = await Task.Run(() =>
-                {
-                    return new NotifyUtils().GetNotifyAdmin("Tet2023");
-                });
             }
             catch (Exception ex)
             {

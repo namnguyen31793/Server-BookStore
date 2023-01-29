@@ -9,7 +9,7 @@
       "UtilsSystem/1.0.0": {
         "dependencies": {
           "LoggerService": "1.0.0",
-          "Newtonsoft.Json": "13.0.1",
+          "Newtonsoft.Json": "13.0.2",
           "RedisSystem": "1.0.0",
           "RestSharp": "108.0.2",
           "ShareData": "1.0.0"
@@ -142,11 +142,11 @@
           }
         }
       },
-      "Newtonsoft.Json/13.0.1": {
+      "Newtonsoft.Json/13.0.2": {
         "runtime": {
           "lib/netstandard2.0/Newtonsoft.Json.dll": {
             "assemblyVersion": "13.0.0.0",
-            "fileVersion": "13.0.1.25517"
+            "fileVersion": "13.0.2.27524"
           }
         }
       },
@@ -387,6 +387,7 @@
       "LoggerService/1.0.0": {
         "dependencies": {
           "MongoDB.Driver": "2.18.0",
+          "Newtonsoft.Json": "13.0.2",
           "ShareData": "1.0.0"
         },
         "runtime": {
@@ -396,10 +397,9 @@
       "RedisSystem/1.0.0": {
         "dependencies": {
           "LoggerService": "1.0.0",
-          "Newtonsoft.Json": "13.0.1",
+          "Newtonsoft.Json": "13.0.2",
           "ShareData": "1.0.0",
-          "StackExchange.Redis": "2.6.70",
-          "System.Configuration.ConfigurationManager": "6.0.1"
+          "StackExchange.Redis": "2.6.70"
         },
         "runtime": {
           "RedisSystem.dll": {}
@@ -407,7 +407,7 @@
       },
       "ShareData/1.0.0": {
         "dependencies": {
-          "Newtonsoft.Json": "13.0.1",
+          "Newtonsoft.Json": "13.0.2",
           "System.Configuration.ConfigurationManager": "6.0.1"
         },
         "runtime": {
@@ -485,12 +485,12 @@
       "path": "mongodb.libmongocrypt/1.6.0",
       "hashPath": "mongodb.libmongocrypt.1.6.0.nupkg.sha512"
     },
-    "Newtonsoft.Json/13.0.1": {
+    "Newtonsoft.Json/13.0.2": {
       "type": "package",
       "serviceable": true,
-      "sha512": "sha512-ppPFpBcvxdsfUonNcvITKqLl3bqxWbDCZIzDWHzjpdAHRFfZe0Dw9HmA0+za13IdyrgJwpkDTDA9fHaxOrt20A==",
-      "path": "newtonsoft.json/13.0.1",
-      "hashPath": "newtonsoft.json.13.0.1.nupkg.sha512"
+      "sha512": "sha512-R2pZ3B0UjeyHShm9vG+Tu0EBb2lC8b0dFzV9gVn50ofHXh9Smjk6kTn7A/FdAsC8B5cKib1OnGYOXxRBz5XQDg==",
+      "path": "newtonsoft.json/13.0.2",
+      "hashPath": "newtonsoft.json.13.0.2.nupkg.sha512"
     },
     "Pipelines.Sockets.Unofficial/2.2.2": {
       "type": "package",

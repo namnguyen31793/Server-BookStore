@@ -29,7 +29,7 @@
   },
   "targets": {
     ".NETCoreApp,Version=v3.1": {
-      "ServerEventTet2023/1.0.0": {
+      "BookStore/1.0.0": {
         "dependencies": {
           "DAO": "1.0.0",
           "LoggerService": "1.0.0",
@@ -305,10 +305,10 @@
           "WindowsBase": "4.0.0.0"
         },
         "runtime": {
-          "ServerEventTet2023.dll": {}
+          "BookStore.dll": {}
         },
         "compile": {
-          "ServerEventTet2023.dll": {}
+          "BookStore.dll": {}
         }
       },
       "DnsClient/1.6.1": {
@@ -2815,7 +2815,7 @@
     }
   },
   "libraries": {
-    "ServerEventTet2023/1.0.0": {
+    "BookStore/1.0.0": {
       "type": "project",
       "serviceable": false,
       "sha512": ""

@@ -1,5 +1,4 @@
-﻿using ShareData.Billing;
-using ShareData.DataEnum;
+﻿using ShareData.DataEnum;
 using ShareData.ErrorCode;
 using ShareData.Language;
 using System;
@@ -131,9 +130,6 @@ namespace UtilsSystem.Utils
                     break;
                 case EStatusCode.TOKEN_INVALID:
                     message = "Tài khoản của bạn đã đăng nhập ở nơi khác!";
-                    break;
-                case EStatusCode.TOKEN_EXPIRES:
-                    message = "Token hết hạn!";
                     break;
             }
             return message;

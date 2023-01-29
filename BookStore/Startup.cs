@@ -1,4 +1,4 @@
-using ServerEventTet2023.Extensions;
+using BookStore.Extensions;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
@@ -53,7 +53,7 @@ namespace CoreWebApi
             NO_SQL_CONFIG.Initialize(Configuration.GetSection("Mongo")["IpAddress"]);
             RedisConfig.Initialize(Configuration.GetSection("RedisConfig")["RedisIp"], Configuration.GetSection("RedisConfig")["RedisPort"], Configuration.GetSection("RedisConfig")["RedisPassword"]);
             ConfigDb.Initialize(Configuration.GetSection("DbConfig")["CONNECTION"], Configuration.GetSection("DbConfig")["SQLPASS"]);
-            CONFIG.Initialize(Configuration.GetSection("CONFIG")["SecretTokenKey"]);
+            //CONFIG.Initialize(Configuration.GetSection("CONFIG")["SecretTokenKey"]);
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
