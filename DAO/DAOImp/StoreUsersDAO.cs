@@ -71,6 +71,8 @@ namespace DAO.DAOImp
         public int Register(int registerType, string accountName, string nickName, string passwordMd5, int merchantId, string remoteIp, string deviceId, int platfromId, string phoneNumber, string email, out int accountId)
         {
             if (string.IsNullOrEmpty(deviceId)) deviceId = "Webgl";
+            if (string.IsNullOrEmpty(phoneNumber)) phoneNumber = "";
+            if (string.IsNullOrEmpty(email)) email = "";
             DBHelper db = null;
             var response = -9999;
             accountId = 0;
@@ -112,7 +114,7 @@ namespace DAO.DAOImp
             try
             {
                 db = new DBHelper(ConfigDb.StoreUsersConnectionString);
-                var pars = new SqlParameter[12];
+                var pars = new SqlParameter[5];
                 pars[0] = new SqlParameter("@_AccountId", AccountId);
                 pars[1] = new SqlParameter("@_ResfreshToken", ResfreshToken);
                 pars[2] = new SqlParameter("@_ClientID", "BOOKSTORE");
@@ -138,7 +140,7 @@ namespace DAO.DAOImp
             try
             {
                 db = new DBHelper(ConfigDb.StoreUsersConnectionString);
-                var pars = new SqlParameter[12];
+                var pars = new SqlParameter[2];
                 pars[0] = new SqlParameter("@_ResfreshToken", ResfreshToken);
                 pars[1] = new SqlParameter("@_ResponseStatus", SqlDbType.BigInt) { Direction = ParameterDirection.Output };
                 db.ExecuteNonQuerySP("SP_Store_Users_CheckRefreshToken", 4, pars);
@@ -171,6 +173,64 @@ namespace DAO.DAOImp
             catch (Exception exception)
             {
                 Task.Run(async () => await _logger.LogError("SQL-GetAccountInfo()", exception.ToString()).ConfigureAwait(false));
+            }
+            finally
+            {
+                db?.Close();
+            }
+            return response;
+        }
+
+        public int UpdateEmail(long AccountId, string email)
+        {
+            DBHelper db = null;
+            var response = -9999;
+            try
+            {
+                db = new DBHelper(ConfigDb.StoreUsersConnectionString);
+                var pars = new SqlParameter[3];
+                pars[0] = new SqlParameter("@_AccountId", AccountId);
+                pars[1] = new SqlParameter("@_Email", email);
+                pars[2] = new SqlParameter("@_ResponseStatus", SqlDbType.BigInt) { Direction = ParameterDirection.Output };
+                db.ExecuteNonQuerySP("SP_Store_Users_CheckRefreshToken", 4, pars);
+                response = Convert.ToInt32(pars[2].Value);
+            }
+            catch (Exception exception)
+            {
+                Task.Run(async () => await _logger.LogError("SQL-UpdateEmail()", exception.ToString()).ConfigureAwait(false));
+            }
+            finally
+            {
+                db?.Close();
+            }
+            return response;
+        }
+        public int UpdateInfo(long AccountId, string NickName, string AvataId, string PhoneNumber, string BirthDay, string Adress)
+        {
+            DBHelper db = null;
+            var response = -9999;
+            if (string.IsNullOrEmpty(NickName)) NickName = "";
+            if (string.IsNullOrEmpty(AvataId)) AvataId = "";
+            if (string.IsNullOrEmpty(PhoneNumber)) PhoneNumber = "";
+            if (string.IsNullOrEmpty(BirthDay)) BirthDay = "";
+            if (string.IsNullOrEmpty(Adress)) Adress = "";
+            try
+            {
+                db = new DBHelper(ConfigDb.StoreUsersConnectionString);
+                var pars = new SqlParameter[7];
+                pars[0] = new SqlParameter("@_AccountId", AccountId);
+                pars[1] = new SqlParameter("@_Nickname", NickName);
+                pars[2] = new SqlParameter("@_AvatarId", AvataId);
+                pars[3] = new SqlParameter("@_PhoneNumber", PhoneNumber);
+                pars[4] = new SqlParameter("@_BirthDay", BirthDay);
+                pars[5] = new SqlParameter("@_Adress", Adress);
+                pars[6] = new SqlParameter("@_ResponseStatus", SqlDbType.BigInt) { Direction = ParameterDirection.Output };
+                db.ExecuteNonQuerySP("SP_Store_Users_Update_UserInfo", 4, pars);
+                response = Convert.ToInt32(pars[6].Value);
+            }
+            catch (Exception exception)
+            {
+                Task.Run(async () => await _logger.LogError("SQL-UpdateInfo()", exception.ToString()).ConfigureAwait(false));
             }
             finally
             {

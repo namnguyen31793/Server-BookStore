@@ -25,13 +25,15 @@ namespace ShareData.ErrorCode
         public const int TOKEN_INVALID = -59;
         public const int PASSNEW_SAME_OLD = -60;
         public const int TRANSACTION_SPAM = -61;
-        
         public const int ACCOUNT_BLOCK = -62;
         public const int USER_NOT_LOGIN = -63;
         public const int KOL_BLOCK = -64;
         public const int NOT_ENOUGH_RIGHTS = -65;
         public const int NOT_ENOUGH_MONEY = -66;
         public const int OUT_OF_EVENT_TIME = -67;
+        public const int USER_VALIDATE = -68;
+        public const int EMAIL_INVAILD = -69;
+        public const int PHONE_INVAILD = -70;
 
         public const int TOKEN_EXPIRES = -86;
 

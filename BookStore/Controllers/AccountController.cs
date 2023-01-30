@@ -62,6 +62,12 @@ namespace BookStore.Controllers
             if (!AccountUtils.IsLoginRequestTrue(requestLogin)){
                 return Ok(new ResponseApiLauncher<string>() { Status = EStatusCode.DATA_INVAILD, Messenger = UltilsHelper.GetMessageByErrorCode(EStatusCode.DATA_INVAILD) });
             }
+            if(!string.IsNullOrEmpty(requestLogin.Email))
+                if(!AccountUtils.IsValidEmail(requestLogin.Email)) 
+                    return Ok(new ResponseApiLauncher<string>() { Status = EStatusCode.EMAIL_INVAILD, Messenger = UltilsHelper.GetMessageByErrorCode(EStatusCode.EMAIL_INVAILD) });
+            if (!string.IsNullOrEmpty(requestLogin.PhoneNumber))
+                if (!AccountUtils.IsPhoneNumber(requestLogin.PhoneNumber))
+                    return Ok(new ResponseApiLauncher<string>() { Status = EStatusCode.PHONE_INVAILD, Messenger = UltilsHelper.GetMessageByErrorCode(EStatusCode.PHONE_INVAILD) });
 
             var clientInfo = new ClientRequestInfo(Request);
 
@@ -106,10 +112,16 @@ namespace BookStore.Controllers
         [ResponseCache(Duration = 5)]
         public async Task<IActionResult> Regis(RequestRegisterModel requestRegis)
         {
-            if (!AccountUtils.IsRegisterRequestTrue(requestRegis))
-            {
+            if (!AccountUtils.IsRegisterRequestTrue(requestRegis)) {
                 return Ok(new ResponseApiLauncher<string>() { Status = EStatusCode.DATA_INVAILD, Messenger = UltilsHelper.GetMessageByErrorCode(EStatusCode.DATA_INVAILD) });
             }
+            if (!string.IsNullOrEmpty(requestRegis.Email))
+                if (!AccountUtils.IsValidEmail(requestRegis.Email))
+                    return Ok(new ResponseApiLauncher<string>() { Status = EStatusCode.EMAIL_INVAILD, Messenger = UltilsHelper.GetMessageByErrorCode(EStatusCode.EMAIL_INVAILD) });
+            if (!string.IsNullOrEmpty(requestRegis.PhoneNumber))
+                if (!AccountUtils.IsPhoneNumber(requestRegis.PhoneNumber))
+                    return Ok(new ResponseApiLauncher<string>() { Status = EStatusCode.PHONE_INVAILD, Messenger = UltilsHelper.GetMessageByErrorCode(EStatusCode.PHONE_INVAILD) });
+
             var clientInfo = new ClientRequestInfo(Request);
             var responseCode = -99;
             try
@@ -247,6 +259,63 @@ namespace BookStore.Controllers
             }
 
             return Ok(new ResponseApiLauncher<AccountModel>() { Status = responseStatus, Messenger = UltilsHelper.GetMessageByErrorCode(responseStatus), DataResponse = response });
+        }
+
+        [HttpPost]
+        [Route("UpdateEmail")]
+        [ResponseCache(Duration = 5)]
+        public async Task<IActionResult> UpdateEmail(string Email)
+        {
+            int responseStatus = -99;
+            try
+            {
+                if (Request.Headers.TryGetValue("Authorization", out var values))
+                {
+                    token = values.FirstOrDefault();
+                }
+                if (string.IsNullOrEmpty(token))
+                    return Ok(new ResponseApiModel<string>() { Status = EStatusCode.USER_NOT_LOGIN, Messenger = UltilsHelper.GetMessageByErrorCode(EStatusCode.USER_NOT_LOGIN) });
+                long accountId = TokenManager.GetAccountIdByAccessToken(token);
+                if (accountId <= 0)
+                    return Ok(new ResponseApiModel<string>() { Status = EStatusCode.TOKEN_EXPIRES, Messenger = UltilsHelper.GetMessageByErrorCode(EStatusCode.TOKEN_EXPIRES) });
+                responseStatus = StoreUsersDAO.Inst.UpdateEmail(accountId, Email);
+                if (responseStatus == 0) {
+                    //send email
+                    //EmailInstance.Inst.SendGmailMail();
+                }
+            }
+            catch (Exception ex)
+            {
+                await _logger.LogError("Account-UpdateEmail{}", ex.ToString()).ConfigureAwait(false);
+            }
+
+            return Ok(new ResponseApiLauncher<AccountModel>() { Status = responseStatus, Messenger = UltilsHelper.GetMessageByErrorCode(responseStatus)});
+        }
+        [HttpPost]
+        [Route("UpdateInfo")]
+        [ResponseCache(Duration = 5)]
+        public async Task<IActionResult> UpdateInfo(RequestUpdateInfoModel model)
+        {
+            int responseStatus = -99;
+            try
+            {
+                if (Request.Headers.TryGetValue("Authorization", out var values))
+                {
+                    token = values.FirstOrDefault();
+                }
+                if (string.IsNullOrEmpty(token))
+                    return Ok(new ResponseApiModel<string>() { Status = EStatusCode.USER_NOT_LOGIN, Messenger = UltilsHelper.GetMessageByErrorCode(EStatusCode.USER_NOT_LOGIN) });
+                long accountId = TokenManager.GetAccountIdByAccessToken(token);
+                if (accountId <= 0)
+                    return Ok(new ResponseApiModel<string>() { Status = EStatusCode.TOKEN_EXPIRES, Messenger = UltilsHelper.GetMessageByErrorCode(EStatusCode.TOKEN_EXPIRES) });
+                responseStatus = StoreUsersDAO.Inst.UpdateInfo(accountId, model.Nickname, model.AvatarId, model.PhoneNumber, model.BirthDay, model.Adress);
+            }
+            catch (Exception ex)
+            {
+                await _logger.LogError("Account-UpdateInfo{}", ex.ToString()).ConfigureAwait(false);
+            }
+
+            return Ok(new ResponseApiLauncher<AccountModel>() { Status = responseStatus, Messenger = UltilsHelper.GetMessageByErrorCode(responseStatus) });
         }
 
     }

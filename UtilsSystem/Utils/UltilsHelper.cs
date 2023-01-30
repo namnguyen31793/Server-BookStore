@@ -131,6 +131,15 @@ namespace UtilsSystem.Utils
                 case EStatusCode.TOKEN_INVALID:
                     message = "Tài khoản của bạn đã đăng nhập ở nơi khác!";
                     break;
+                case EStatusCode.USER_VALIDATE:
+                    message = "Tài khoản của bạn đã kích hoạt!";
+                    break;
+                case EStatusCode.EMAIL_INVAILD:
+                    message = "Email không đúng định dạng!";
+                    break;
+                case EStatusCode.PHONE_INVAILD:
+                    message = "Số điện thoại không hợp lệ!";
+                    break;
             }
             return message;
         }
