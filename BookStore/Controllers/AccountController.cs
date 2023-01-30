@@ -26,9 +26,11 @@ namespace BookStore.Controllers
     {
         
         private ILoggerManager _logger;
-        public AccountController(ILoggerManager logger)
+        private IEmailSender _emailSender;
+        public AccountController(ILoggerManager logger, IEmailSender emailSender)
         {
             _logger = logger;
+            _emailSender = emailSender;
         }
         private string token = string.Empty;
 
@@ -281,7 +283,8 @@ namespace BookStore.Controllers
                 responseStatus = StoreUsersDAO.Inst.UpdateEmail(accountId, Email);
                 if (responseStatus == 0) {
                     //send email
-                    //EmailInstance.Inst.SendGmailMail();
+                    var message = new Message(new string[] { "codemazetest@mailinator.com" }, "Test email", "This is the content from our email.");
+                    _emailSender.SendEmail(message);
                 }
             }
             catch (Exception ex)
@@ -317,6 +320,23 @@ namespace BookStore.Controllers
 
             return Ok(new ResponseApiLauncher<AccountModel>() { Status = responseStatus, Messenger = UltilsHelper.GetMessageByErrorCode(responseStatus) });
         }
+        [HttpPost]
+        [Route("TestSendMail")]
+        [ResponseCache(Duration = 5)]
+        public async Task<IActionResult> TestSendMail(string toAdress)
+        {
+            int responseStatus = 0;
+            try
+            {
+                var message = new Message(new string[] { toAdress }, "Test email", "This is the content from our email. Tesst validate link: https://dev-launcherlogic.vplay.vn/test/v1/NotifyServices/GetNotifyAdmin ");
+                await _emailSender.SendEmailAsync(message).ConfigureAwait(false);
+            }
+            catch (Exception ex)
+            {
+                await _logger.LogError("Account-UpdateInfo{}", ex.ToString()).ConfigureAwait(false);
+            }
 
+            return Ok(new ResponseApiLauncher<AccountModel>() { Status = responseStatus, Messenger = UltilsHelper.GetMessageByErrorCode(responseStatus) });
+        }
     }
 }

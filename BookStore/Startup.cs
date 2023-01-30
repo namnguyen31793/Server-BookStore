@@ -19,6 +19,7 @@ using DAO.Utitlities;
 using ShareData.Helper;
 using LoggerService;
 using BookStore.Utils;
+using BookStore.Instance;
 
 namespace CoreWebApi
 {
@@ -40,6 +41,11 @@ namespace CoreWebApi
             services.ConfigureLoggerService();
             services.ConfigureVersioning();
             services.ConfigureResponseCaching();
+            var emailConfig = Configuration
+                .GetSection("EmailConfiguration")
+                .Get<EmailConfiguration>();
+            services.AddSingleton(emailConfig);
+            services.ConfigureMailService();
 
             services.AddControllers().AddJsonOptions(options =>
                 {

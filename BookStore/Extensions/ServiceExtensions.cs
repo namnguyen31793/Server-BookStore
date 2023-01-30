@@ -1,4 +1,5 @@
-﻿using LoggerService;
+﻿using BookStore.Instance;
+using LoggerService;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Versioning;
@@ -45,6 +46,8 @@ namespace BookStore.Extensions
                 opt.ApiVersionReader = new HeaderApiVersionReader("api-version");
             });
         }
+        public static void ConfigureMailService(this IServiceCollection services) =>
+         services.AddSingleton<IEmailSender, EmailSender>();
 
         public static void ConfigureResponseCaching(this IServiceCollection services) =>
             services.AddResponseCaching();
