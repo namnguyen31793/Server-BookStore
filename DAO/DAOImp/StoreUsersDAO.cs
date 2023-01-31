@@ -238,5 +238,29 @@ namespace DAO.DAOImp
             }
             return response;
         }
+
+        public int ValidateUser(long AccountId)
+        {
+            DBHelper db = null;
+            var response = -9999;
+            try
+            {
+                db = new DBHelper(ConfigDb.StoreUsersConnectionString);
+                var pars = new SqlParameter[2];
+                pars[0] = new SqlParameter("@_AccountId", AccountId);
+                pars[1] = new SqlParameter("@_ResponseStatus", SqlDbType.BigInt) { Direction = ParameterDirection.Output };
+                db.ExecuteNonQuerySP("SP_Store_Users_Update_Validate", 4, pars);
+                response = Convert.ToInt32(pars[1].Value);
+            }
+            catch (Exception exception)
+            {
+                Task.Run(async () => await _logger.LogError("SQL-ValidateUser()", exception.ToString()).ConfigureAwait(false));
+            }
+            finally
+            {
+                db?.Close();
+            }
+            return response;
+        }
     }
 }

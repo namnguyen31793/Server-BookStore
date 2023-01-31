@@ -3799,8 +3799,7 @@
     ]
   },
   "packageFolders": {
-    "C:\\Users\\nguye\\.nuget\\packages\\": {},
-    "C:\\Program Files\\dotnet\\sdk\\NuGetFallbackFolder": {}
+    "C:\\Users\\Nam PC\\.nuget\\packages\\": {}
   },
   "project": {
     "version": "1.0.0",
@@ -3808,14 +3807,11 @@
       "projectUniqueName": "D:\\Server\\Server-BookStore\\BookStore\\BookStore.csproj",
       "projectName": "BookStore",
       "projectPath": "D:\\Server\\Server-BookStore\\BookStore\\BookStore.csproj",
-      "packagesPath": "C:\\Users\\nguye\\.nuget\\packages\\",
+      "packagesPath": "C:\\Users\\Nam PC\\.nuget\\packages\\",
       "outputPath": "D:\\Server\\Server-BookStore\\BookStore\\obj\\",
       "projectStyle": "PackageReference",
-      "fallbackFolders": [
-        "C:\\Program Files\\dotnet\\sdk\\NuGetFallbackFolder"
-      ],
       "configFilePaths": [
-        "C:\\Users\\nguye\\AppData\\Roaming\\NuGet\\NuGet.Config",
+        "C:\\Users\\Nam PC\\AppData\\Roaming\\NuGet\\NuGet.Config",
         "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.Offline.config"
       ],
       "originalTargetFrameworks": [
@@ -3896,12 +3892,6 @@
         ],
         "assetTargetFallback": true,
         "warn": true,
-        "downloadDependencies": [
-          {
-            "name": "Microsoft.NETCore.App.Host.win-x64",
-            "version": "[3.1.23, 3.1.23]"
-          }
-        ],
         "frameworkReferences": {
           "Microsoft.AspNetCore.App": {
             "privateAssets": "none"
@@ -3910,7 +3900,7 @@
             "privateAssets": "all"
           }
         },
-        "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\6.0.201\\RuntimeIdentifierGraph.json"
+        "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\5.0.404\\RuntimeIdentifierGraph.json"
       }
     }
   }

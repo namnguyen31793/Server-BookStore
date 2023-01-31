@@ -34,6 +34,7 @@ namespace ShareData.ErrorCode
         public const int USER_VALIDATE = -68;
         public const int EMAIL_INVAILD = -69;
         public const int PHONE_INVAILD = -70;
+        public const int EMAIL_SEND = -71;
 
         public const int TOKEN_EXPIRES = -86;
 

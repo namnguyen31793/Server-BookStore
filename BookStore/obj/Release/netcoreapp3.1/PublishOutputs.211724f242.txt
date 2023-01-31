@@ -7,6 +7,7 @@ D:\Server\Server-BookStore\BookStore\obj\Release\netcoreapp3.1\PubTmp\Out\BookSt
 D:\Server\Server-BookStore\BookStore\obj\Release\netcoreapp3.1\PubTmp\Out\BookStore.runtimeconfig.json
 D:\Server\Server-BookStore\BookStore\obj\Release\netcoreapp3.1\PubTmp\Out\BookStore.pdb
 D:\Server\Server-BookStore\BookStore\obj\Release\netcoreapp3.1\PubTmp\Out\DnsClient.dll
+D:\Server\Server-BookStore\BookStore\obj\Release\netcoreapp3.1\PubTmp\Out\MailKit.dll
 D:\Server\Server-BookStore\BookStore\obj\Release\netcoreapp3.1\PubTmp\Out\Microsoft.AspNetCore.Mvc.Versioning.dll
 D:\Server\Server-BookStore\BookStore\obj\Release\netcoreapp3.1\PubTmp\Out\Microsoft.Extensions.Configuration.dll
 D:\Server\Server-BookStore\BookStore\obj\Release\netcoreapp3.1\PubTmp\Out\Microsoft.Extensions.Configuration.Abstractions.dll
@@ -22,12 +23,15 @@ D:\Server\Server-BookStore\BookStore\obj\Release\netcoreapp3.1\PubTmp\Out\Micros
 D:\Server\Server-BookStore\BookStore\obj\Release\netcoreapp3.1\PubTmp\Out\Microsoft.Extensions.Primitives.dll
 D:\Server\Server-BookStore\BookStore\obj\Release\netcoreapp3.1\PubTmp\Out\Microsoft.Win32.Registry.dll
 D:\Server\Server-BookStore\BookStore\obj\Release\netcoreapp3.1\PubTmp\Out\Microsoft.Win32.SystemEvents.dll
+D:\Server\Server-BookStore\BookStore\obj\Release\netcoreapp3.1\PubTmp\Out\MimeKit.dll
 D:\Server\Server-BookStore\BookStore\obj\Release\netcoreapp3.1\PubTmp\Out\MongoDB.Bson.dll
 D:\Server\Server-BookStore\BookStore\obj\Release\netcoreapp3.1\PubTmp\Out\MongoDB.Driver.dll
 D:\Server\Server-BookStore\BookStore\obj\Release\netcoreapp3.1\PubTmp\Out\MongoDB.Driver.Core.dll
 D:\Server\Server-BookStore\BookStore\obj\Release\netcoreapp3.1\PubTmp\Out\MongoDB.Libmongocrypt.dll
+D:\Server\Server-BookStore\BookStore\obj\Release\netcoreapp3.1\PubTmp\Out\NETCore.MailKit.dll
 D:\Server\Server-BookStore\BookStore\obj\Release\netcoreapp3.1\PubTmp\Out\Newtonsoft.Json.dll
 D:\Server\Server-BookStore\BookStore\obj\Release\netcoreapp3.1\PubTmp\Out\Pipelines.Sockets.Unofficial.dll
+D:\Server\Server-BookStore\BookStore\obj\Release\netcoreapp3.1\PubTmp\Out\BouncyCastle.Crypto.dll
 D:\Server\Server-BookStore\BookStore\obj\Release\netcoreapp3.1\PubTmp\Out\RestSharp.dll
 D:\Server\Server-BookStore\BookStore\obj\Release\netcoreapp3.1\PubTmp\Out\SharpCompress.dll
 D:\Server\Server-BookStore\BookStore\obj\Release\netcoreapp3.1\PubTmp\Out\Snappier.dll

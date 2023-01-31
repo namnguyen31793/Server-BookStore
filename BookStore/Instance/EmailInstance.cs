@@ -4,6 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using BookStore.Extensions;
+using BookStore.Utils;
 using MailKit.Net.Smtp;
 using MimeKit;
 
@@ -23,25 +24,6 @@ namespace BookStore.Instance
                         if (_inst == null) _inst = new EmailInstance();
                     }
                 return _inst;
-            }
-        }
-
-        public bool IsValidEmail(string email)
-        {
-            var trimmedEmail = email.Trim();
-
-            if (trimmedEmail.EndsWith("."))
-            {
-                return false; // suggested by @TK-421
-            }
-            try
-            {
-                var addr = new System.Net.Mail.MailAddress(email);
-                return addr.Address == trimmedEmail;
-            }
-            catch
-            {
-                return false;
             }
         }
 
@@ -94,11 +76,6 @@ namespace BookStore.Instance
 
     public class EmailSender : IEmailSender
     {
-        private readonly EmailConfiguration _emailConfig;
-        public EmailSender(EmailConfiguration emailConfig)
-        {
-            _emailConfig = emailConfig;
-        }
         public void SendEmail(Message message)
         {
             var emailMessage = CreateEmailMessage(message);
@@ -113,7 +90,7 @@ namespace BookStore.Instance
         private MimeMessage CreateEmailMessage(Message message)
         {
             var emailMessage = new MimeMessage();
-            emailMessage.From.Add(new MailboxAddress("email", _emailConfig.From));
+            emailMessage.From.Add(new MailboxAddress("email", CONFIG.EmailConfig.From));
             emailMessage.To.AddRange(message.To);
             emailMessage.Subject = message.Subject;
             emailMessage.Body = new TextPart(MimeKit.Text.TextFormat.Text) { Text = message.Content };
@@ -125,9 +102,9 @@ namespace BookStore.Instance
             {
                 try
                 {
-                    client.Connect(_emailConfig.SmtpServer, _emailConfig.Port, true);
+                    client.Connect(CONFIG.EmailConfig.SmtpServer, CONFIG.EmailConfig.Port, true);
                     client.AuthenticationMechanisms.Remove("XOAUTH2");
-                    client.Authenticate(_emailConfig.UserName, _emailConfig.Password);
+                    client.Authenticate(CONFIG.EmailConfig.UserName, CONFIG.EmailConfig.Password);
                     client.Send(mailMessage);
                 }
                 catch
@@ -148,9 +125,9 @@ namespace BookStore.Instance
             {
                 try
                 {
-                    await client.ConnectAsync(_emailConfig.SmtpServer, _emailConfig.Port, true);
+                    await client.ConnectAsync(CONFIG.EmailConfig.SmtpServer, CONFIG.EmailConfig.Port, true);
                     client.AuthenticationMechanisms.Remove("XOAUTH2");
-                    await client.AuthenticateAsync(_emailConfig.UserName, _emailConfig.Password);
+                    await client.AuthenticateAsync(CONFIG.EmailConfig.UserName, CONFIG.EmailConfig.Password);
                     await client.SendAsync(mailMessage);
                 }
                 catch

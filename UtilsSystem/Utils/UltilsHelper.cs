@@ -140,6 +140,9 @@ namespace UtilsSystem.Utils
                 case EStatusCode.PHONE_INVAILD:
                     message = "Số điện thoại không hợp lệ!";
                     break;
+                case EStatusCode.EMAIL_SEND:
+                    message = "Thông tin xác thực đã được gửi tới email của bạn, vui long đăng nhập để xác nhận!";
+                    break;
             }
             return message;
         }

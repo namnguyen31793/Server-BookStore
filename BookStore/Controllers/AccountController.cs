@@ -4,6 +4,7 @@ using DAO.DAOImp;
 using LoggerService;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using Newtonsoft.Json;
 using RedisSystem;
 using ShareData.API;
 using ShareData.DB.Users;
@@ -14,6 +15,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using System.Web;
 using UtilsSystem.SocialNetwork;
 using UtilsSystem.Utils;
 
@@ -24,7 +26,7 @@ namespace BookStore.Controllers
     [ApiController]
     public class AccountController : ControllerBase
     {
-        
+
         private ILoggerManager _logger;
         private IEmailSender _emailSender;
         public AccountController(ILoggerManager logger, IEmailSender emailSender)
@@ -61,11 +63,11 @@ namespace BookStore.Controllers
         [Route("LoginFacebook")]
         public async Task<IActionResult> LoginFacebook(RequestAuthenSocial requestLogin)
         {
-            if (!AccountUtils.IsLoginRequestTrue(requestLogin)){
+            if (!AccountUtils.IsLoginRequestTrue(requestLogin)) {
                 return Ok(new ResponseApiLauncher<string>() { Status = EStatusCode.DATA_INVAILD, Messenger = UltilsHelper.GetMessageByErrorCode(EStatusCode.DATA_INVAILD) });
             }
-            if(!string.IsNullOrEmpty(requestLogin.Email))
-                if(!AccountUtils.IsValidEmail(requestLogin.Email)) 
+            if (!string.IsNullOrEmpty(requestLogin.Email))
+                if (!AccountUtils.IsValidEmail(requestLogin.Email))
                     return Ok(new ResponseApiLauncher<string>() { Status = EStatusCode.EMAIL_INVAILD, Messenger = UltilsHelper.GetMessageByErrorCode(EStatusCode.EMAIL_INVAILD) });
             if (!string.IsNullOrEmpty(requestLogin.PhoneNumber))
                 if (!AccountUtils.IsPhoneNumber(requestLogin.PhoneNumber))
@@ -80,13 +82,19 @@ namespace BookStore.Controllers
                 return Ok(new ResponseApiLauncher<string>() { Status = EStatusCode.SYSTEM_ERROR, Messenger = UltilsHelper.GetMessageByErrorCode(EStatusCode.SYSTEM_ERROR) });
             var fbPassword = FacebookHelper.GetFacebookPassword(facebookUserName);
             var passMd5 = AccountUtils.EncryptPasswordMd5(fbPassword);
-            responseCode = await Task.Run(() =>
+            responseCode = await Task.Run(async () =>
             {
                 int accountId = 0;
                 var res = StoreUsersDAO.Inst.Register(REGISTER_TYPE.FACEBOOK_TYPE, facebookUserName, "", passMd5, clientInfo.MerchantId, clientInfo.TrueClientIp, clientInfo.DeviceId, (int)clientInfo.OsType,
                     requestLogin.PhoneNumber, requestLogin.Email, out accountId);
+
+                if (responseCode == (int)EStatusCode.SUCCESS)
+                {
+                    if (AccountUtils.IsValidEmail(requestLogin.Email))
+                        await SendMailAsync(requestLogin.Email, accountId).ConfigureAwait(false);
+                }
                 return res;
-            
+
             });
             if (responseCode == (int)EStatusCode.SUCCESS)
             {
@@ -128,18 +136,20 @@ namespace BookStore.Controllers
             var responseCode = -99;
             try
             {
-                responseCode = await Task.Run(() =>
+                responseCode = await Task.Run(async () =>
                 {
                     int accountId = 0;
                     var res = StoreUsersDAO.Inst.Register(REGISTER_TYPE.NORMAL_TYPE, requestRegis.AccountName, "", AccountUtils.EncryptPasswordMd5(requestRegis.Password), clientInfo.MerchantId, clientInfo.TrueClientIp, clientInfo.DeviceId, (int)clientInfo.OsType,
                         requestRegis.PhoneNumber, requestRegis.Email, out accountId);
+
+                    if (responseCode == (int)EStatusCode.SUCCESS)
+                    {
+                        if (AccountUtils.IsValidEmail(requestRegis.Email))
+                            await SendMailAsync(requestRegis.Email, accountId).ConfigureAwait(false);
+                    }
                     return res;
 
                 });
-                if (responseCode == (int)EStatusCode.SUCCESS)
-                {
-                    //TrackingDAO.Inst.TrackingRegis();
-                }
                 if (responseCode == (int)EStatusCode.ACCOUNT_EXITS || responseCode == (int)EStatusCode.SUCCESS)
                 {
                     //do login
@@ -220,7 +230,7 @@ namespace BookStore.Controllers
                     var model = new TokenInfo() { AccountId = data.AccountId, Access_token = accessToken, Refresh_token = data.Refresh_token };
                     return Ok(new ResponseApiModel<TokenInfo>() { Status = EStatusCode.SUCCESS, Messenger = UltilsHelper.GetMessageByErrorCode(EStatusCode.SUCCESS), DataResponse = model });
                 }
-                else if(response == EStatusCode.TOKEN_INVALID)
+                else if (response == EStatusCode.TOKEN_INVALID)
                 {
                     return Ok(new ResponseApiModel<TokenInfo>() { Status = EStatusCode.TOKEN_INVALID, Messenger = UltilsHelper.GetMessageByErrorCode(EStatusCode.TOKEN_INVALID) });
                 }
@@ -251,7 +261,7 @@ namespace BookStore.Controllers
                 if (string.IsNullOrEmpty(token))
                     return Ok(new ResponseApiModel<string>() { Status = EStatusCode.USER_NOT_LOGIN, Messenger = UltilsHelper.GetMessageByErrorCode(EStatusCode.USER_NOT_LOGIN) });
                 long accountId = TokenManager.GetAccountIdByAccessToken(token);
-                if ( accountId <= 0)
+                if (accountId <= 0)
                     return Ok(new ResponseApiModel<string>() { Status = EStatusCode.TOKEN_EXPIRES, Messenger = UltilsHelper.GetMessageByErrorCode(EStatusCode.TOKEN_EXPIRES) });
                 response = StoreUsersDAO.Inst.GetAccountInfo(accountId, ref responseStatus);
             }
@@ -282,9 +292,8 @@ namespace BookStore.Controllers
                     return Ok(new ResponseApiModel<string>() { Status = EStatusCode.TOKEN_EXPIRES, Messenger = UltilsHelper.GetMessageByErrorCode(EStatusCode.TOKEN_EXPIRES) });
                 responseStatus = StoreUsersDAO.Inst.UpdateEmail(accountId, Email);
                 if (responseStatus == 0) {
-                    //send email
-                    var message = new Message(new string[] { "codemazetest@mailinator.com" }, "Test email", "This is the content from our email.");
-                    _emailSender.SendEmail(message);
+                    await SendMailAsync(Email, accountId);
+                    responseStatus = EStatusCode.EMAIL_SEND;
                 }
             }
             catch (Exception ex)
@@ -292,7 +301,7 @@ namespace BookStore.Controllers
                 await _logger.LogError("Account-UpdateEmail{}", ex.ToString()).ConfigureAwait(false);
             }
 
-            return Ok(new ResponseApiLauncher<AccountModel>() { Status = responseStatus, Messenger = UltilsHelper.GetMessageByErrorCode(responseStatus)});
+            return Ok(new ResponseApiLauncher<AccountModel>() { Status = responseStatus, Messenger = UltilsHelper.GetMessageByErrorCode(responseStatus) });
         }
         [HttpPost]
         [Route("UpdateInfo")]
@@ -320,23 +329,31 @@ namespace BookStore.Controllers
 
             return Ok(new ResponseApiLauncher<AccountModel>() { Status = responseStatus, Messenger = UltilsHelper.GetMessageByErrorCode(responseStatus) });
         }
-        [HttpPost]
-        [Route("TestSendMail")]
-        [ResponseCache(Duration = 5)]
-        public async Task<IActionResult> TestSendMail(string toAdress)
-        {
-            int responseStatus = 0;
-            try
-            {
-                var message = new Message(new string[] { toAdress }, "Test email", "This is the content from our email. Tesst validate link: https://dev-launcherlogic.vplay.vn/test/v1/NotifyServices/GetNotifyAdmin ");
-                await _emailSender.SendEmailAsync(message).ConfigureAwait(false);
-            }
-            catch (Exception ex)
-            {
-                await _logger.LogError("Account-UpdateInfo{}", ex.ToString()).ConfigureAwait(false);
-            }
+        //[HttpPost]
+        //[Route("TestSendMail")]
+        //[ResponseCache(Duration = 5)]
+        //public async Task<IActionResult> TestSendMail(string toAdress)
+        //{
+        //    int responseStatus = 0;
+        //    try
+        //    {
+        //        var message = new Message(new string[] { toAdress }, "Test email", "This is the content from our email. Tesst validate link: https://dev-launcherlogic.vplay.vn/test/v1/NotifyServices/GetNotifyAdmin ");
+        //        await _emailSender.SendEmailAsync(message).ConfigureAwait(false);
+        //    }
+        //    catch (Exception ex)
+        //    {
+        //        await _logger.LogError("Account-UpdateInfo{}", JsonConvert.SerializeObject(CONFIG.EmailConfig) + " " + ex.ToString()).ConfigureAwait(false);
+        //    }
 
-            return Ok(new ResponseApiLauncher<AccountModel>() { Status = responseStatus, Messenger = UltilsHelper.GetMessageByErrorCode(responseStatus) });
+        //    return Ok(new ResponseApiLauncher<AccountModel>() { Status = responseStatus, Messenger = UltilsHelper.GetMessageByErrorCode(responseStatus) });
+        //}
+
+        private async Task SendMailAsync(string toAdress, long AccountId){
+            string key = HttpUtility.UrlEncode(TokenManager.GenerateKeyTokenValidate(AccountId, toAdress));
+            string url = CONFIG.BaseLink + CONFIG.FunctionValidateEmail+ key;
+
+            var message = new Message(new string[] { toAdress }, "Validate email", "This is the content from our email, token lifetime 10 min. Click with validate link: "+ url);
+            await _emailSender.SendEmailAsync(message).ConfigureAwait(false);
         }
     }
 }

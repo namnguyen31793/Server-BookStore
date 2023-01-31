@@ -1,4 +1,5 @@
 ﻿using RedisSystem;
+using ShareData.ErrorCode;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -47,6 +48,50 @@ namespace BookStore.Utils
             byte[] byteValue = System.Text.Encoding.UTF8.GetBytes(input);
             byte[] byteHash = hashAlgorithm.ComputeHash(byteValue);
             return Convert.ToBase64String(byteHash);
+        }
+
+        public static string GenerateKeyTokenValidate(long accountId, string email)
+        {
+            var response = string.Format("{0}|{1}|{2}",
+                                          DateTime.UtcNow.Ticks,
+                                          accountId,
+                                          email);
+            response = Security.Encrypt(CONFIG.SecretTokenKey, response);
+            string result = response.Replace("=", "_");
+
+            string keyRedis = "Token:" + result;
+            RedisGatewayCacheManager.Inst.SaveData(keyRedis, accountId.ToString(), 5);
+
+            return result;
+        }
+
+        public static long ReadKeyTokenValidate(string accountInfoTxtRaw, ref string email)
+        {
+            try
+            {
+                accountInfoTxtRaw = accountInfoTxtRaw.Replace("_", "=");
+                var accountInfoTxt = Security.Decrypt(CONFIG.SecretTokenKey, accountInfoTxtRaw);
+                if (!IsCookieExpired(accountInfoTxt)) 
+                    return EStatusCode.TOKEN_EXPIRES;
+                var data = accountInfoTxt.Split('|');
+                long accountId = Int64.Parse(data[1]);
+                email = data[2];
+                return accountId;
+            }
+            catch (Exception ex)
+            {
+                return EStatusCode.DATA_INVAILD;
+            }
+        }
+        private static bool IsCookieExpired(string accountInfoTxt)
+        {
+            var accounts = accountInfoTxt.Split('|');
+            var timeCreateTicks = Int64.Parse(accounts[0]);
+            var timeCreate = new DateTime(timeCreateTicks);
+            var dateTimeNow = DateTime.UtcNow;
+            var totalSecond = (dateTimeNow - timeCreate).TotalSeconds;
+            if (totalSecond > 600) return false; //cookie het han 10p
+            return true;
         }
     }
 }

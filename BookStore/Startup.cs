@@ -41,10 +41,6 @@ namespace CoreWebApi
             services.ConfigureLoggerService();
             services.ConfigureVersioning();
             services.ConfigureResponseCaching();
-            var emailConfig = Configuration
-                .GetSection("EmailConfiguration")
-                .Get<EmailConfiguration>();
-            services.AddSingleton(emailConfig);
             services.ConfigureMailService();
 
             services.AddControllers().AddJsonOptions(options =>
@@ -59,7 +55,8 @@ namespace CoreWebApi
             NO_SQL_CONFIG.Initialize(Configuration.GetSection("Mongo")["IpAddress"]);
             RedisConfig.Initialize(Configuration.GetSection("RedisConfig")["RedisIp"], Configuration.GetSection("RedisConfig")["RedisPort"], Configuration.GetSection("RedisConfig")["RedisPassword"]);
             ConfigDb.Initialize(Configuration.GetSection("DbConfig")["CONNECTION"], Configuration.GetSection("DbConfig")["SQLPASS"]);
-            //CONFIG.Initialize(Configuration.GetSection("CONFIG")["SecretTokenKey"]);
+            var emailConfig = Configuration.GetSection("EmailConfiguration").Get<EmailConfiguration>();
+            CONFIG.Initialize(Configuration.GetSection("CONFIG")["SecretTokenKey"], Configuration.GetSection("CONFIG")["BaseLink"], emailConfig);
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
