@@ -39,7 +39,7 @@ namespace BookStore.Controllers
                 await _logger.LogError("NotifyServices-GetNotifyAdmin{}", ex.ToString()).ConfigureAwait(false);
             }
 
-            return Ok(new ResponseApiLauncher<string>() { Status = EStatusCode.SUCCESS, Messenger = UtilsSystem.Utils.UltilsHelper.GetMessageByErrorCode(EStatusCode.SUCCESS), DataResponse = data });
+            return Ok(new ResponseApiModel<string>() { Status = EStatusCode.SUCCESS, Messenger = UtilsSystem.Utils.UltilsHelper.GetMessageByErrorCode(EStatusCode.SUCCESS), DataResponse = data });
         }
 
     }

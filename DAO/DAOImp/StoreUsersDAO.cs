@@ -156,10 +156,10 @@ namespace DAO.DAOImp
             }
             return response;
         }
-        public AccountModel GetAccountInfo(long accountId, ref int responseStatus)
+        public AccountModelDb GetAccountInfo(long accountId, ref int responseStatus)
         {
             DBHelper db = null;
-            var response = new AccountModel();
+            var response = new AccountModelDb();
             try
             {
 
@@ -167,7 +167,7 @@ namespace DAO.DAOImp
                 var pars = new SqlParameter[2];
                 pars[0] = new SqlParameter("@_AccountId", accountId);
                 pars[1] = new SqlParameter("@_ResponseStatus", SqlDbType.BigInt) { Direction = ParameterDirection.Output };
-                response = db.GetInstanceSP<AccountModel>("SP_UpdateNickName", 4, pars);
+                response = db.GetInstanceSP<AccountModelDb>("SP_UpdateNickName", 4, pars);
                 responseStatus = Convert.ToInt32(pars[1].Value);
             }
             catch (Exception exception)

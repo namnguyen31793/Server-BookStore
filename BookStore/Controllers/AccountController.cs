@@ -38,13 +38,12 @@ namespace BookStore.Controllers
 
         [HttpPost]
         [Route("Login")]
-        [ResponseCache(Duration = 5)]
         public async Task<IActionResult> Login(RequestAuthenModel requestLogin)
         {
             var response = new ResponseApiModel<TokenInfo>() { Status = EStatusCode.SYSTEM_ERROR, Messenger = UltilsHelper.GetMessageByErrorCode(EStatusCode.SYSTEM_ERROR) };
             if (!AccountUtils.IsLoginRequestTrue(requestLogin))
             {
-                return Ok(new ResponseApiLauncher<string>() { Status = EStatusCode.DATA_INVAILD, Messenger = UltilsHelper.GetMessageByErrorCode(EStatusCode.DATA_INVAILD) });
+                return Ok(new ResponseApiModel<string>() { Status = EStatusCode.DATA_INVAILD, Messenger = UltilsHelper.GetMessageByErrorCode(EStatusCode.DATA_INVAILD) });
             }
             try
             {
@@ -64,14 +63,14 @@ namespace BookStore.Controllers
         public async Task<IActionResult> LoginFacebook(RequestAuthenSocial requestLogin)
         {
             if (!AccountUtils.IsLoginRequestTrue(requestLogin)) {
-                return Ok(new ResponseApiLauncher<string>() { Status = EStatusCode.DATA_INVAILD, Messenger = UltilsHelper.GetMessageByErrorCode(EStatusCode.DATA_INVAILD) });
+                return Ok(new ResponseApiModel<string>() { Status = EStatusCode.DATA_INVAILD, Messenger = UltilsHelper.GetMessageByErrorCode(EStatusCode.DATA_INVAILD) });
             }
             if (!string.IsNullOrEmpty(requestLogin.Email))
                 if (!AccountUtils.IsValidEmail(requestLogin.Email))
-                    return Ok(new ResponseApiLauncher<string>() { Status = EStatusCode.EMAIL_INVAILD, Messenger = UltilsHelper.GetMessageByErrorCode(EStatusCode.EMAIL_INVAILD) });
+                    return Ok(new ResponseApiModel<string>() { Status = EStatusCode.EMAIL_INVAILD, Messenger = UltilsHelper.GetMessageByErrorCode(EStatusCode.EMAIL_INVAILD) });
             if (!string.IsNullOrEmpty(requestLogin.PhoneNumber))
                 if (!AccountUtils.IsPhoneNumber(requestLogin.PhoneNumber))
-                    return Ok(new ResponseApiLauncher<string>() { Status = EStatusCode.PHONE_INVAILD, Messenger = UltilsHelper.GetMessageByErrorCode(EStatusCode.PHONE_INVAILD) });
+                    return Ok(new ResponseApiModel<string>() { Status = EStatusCode.PHONE_INVAILD, Messenger = UltilsHelper.GetMessageByErrorCode(EStatusCode.PHONE_INVAILD) });
 
             var clientInfo = new ClientRequestInfo(Request);
 
@@ -79,7 +78,7 @@ namespace BookStore.Controllers
             await _logger.LogError("Account-Register{}", facebookUserName).ConfigureAwait(false);
             var responseCode = -99;
             if (string.IsNullOrEmpty(facebookUserName))
-                return Ok(new ResponseApiLauncher<string>() { Status = EStatusCode.SYSTEM_ERROR, Messenger = UltilsHelper.GetMessageByErrorCode(EStatusCode.SYSTEM_ERROR) });
+                return Ok(new ResponseApiModel<string>() { Status = EStatusCode.SYSTEM_ERROR, Messenger = UltilsHelper.GetMessageByErrorCode(EStatusCode.SYSTEM_ERROR) });
             var fbPassword = FacebookHelper.GetFacebookPassword(facebookUserName);
             var passMd5 = AccountUtils.EncryptPasswordMd5(fbPassword);
             responseCode = await Task.Run(async () =>
@@ -113,24 +112,23 @@ namespace BookStore.Controllers
             }
             else
             {
-                return Ok(new ResponseApiLauncher<string>() { Status = EStatusCode.SYSTEM_ERROR, Messenger = UltilsHelper.GetMessageByErrorCode(EStatusCode.SYSTEM_ERROR) });
+                return Ok(new ResponseApiModel<string>() { Status = EStatusCode.SYSTEM_ERROR, Messenger = UltilsHelper.GetMessageByErrorCode(EStatusCode.SYSTEM_ERROR) });
             }
         }
 
         [HttpPost]
         [Route("Register")]
-        [ResponseCache(Duration = 5)]
         public async Task<IActionResult> Regis(RequestRegisterModel requestRegis)
         {
             if (!AccountUtils.IsRegisterRequestTrue(requestRegis)) {
-                return Ok(new ResponseApiLauncher<string>() { Status = EStatusCode.DATA_INVAILD, Messenger = UltilsHelper.GetMessageByErrorCode(EStatusCode.DATA_INVAILD) });
+                return Ok(new ResponseApiModel<string>() { Status = EStatusCode.DATA_INVAILD, Messenger = UltilsHelper.GetMessageByErrorCode(EStatusCode.DATA_INVAILD) });
             }
             if (!string.IsNullOrEmpty(requestRegis.Email))
                 if (!AccountUtils.IsValidEmail(requestRegis.Email))
-                    return Ok(new ResponseApiLauncher<string>() { Status = EStatusCode.EMAIL_INVAILD, Messenger = UltilsHelper.GetMessageByErrorCode(EStatusCode.EMAIL_INVAILD) });
+                    return Ok(new ResponseApiModel<string>() { Status = EStatusCode.EMAIL_INVAILD, Messenger = UltilsHelper.GetMessageByErrorCode(EStatusCode.EMAIL_INVAILD) });
             if (!string.IsNullOrEmpty(requestRegis.PhoneNumber))
                 if (!AccountUtils.IsPhoneNumber(requestRegis.PhoneNumber))
-                    return Ok(new ResponseApiLauncher<string>() { Status = EStatusCode.PHONE_INVAILD, Messenger = UltilsHelper.GetMessageByErrorCode(EStatusCode.PHONE_INVAILD) });
+                    return Ok(new ResponseApiModel<string>() { Status = EStatusCode.PHONE_INVAILD, Messenger = UltilsHelper.GetMessageByErrorCode(EStatusCode.PHONE_INVAILD) });
 
             var clientInfo = new ClientRequestInfo(Request);
             var responseCode = -99;
@@ -163,13 +161,13 @@ namespace BookStore.Controllers
                 }
                 else
                 {
-                    return Ok(new ResponseApiLauncher<string>() { Status = EStatusCode.SYSTEM_ERROR, Messenger = UltilsHelper.GetMessageByErrorCode(EStatusCode.SYSTEM_ERROR) });
+                    return Ok(new ResponseApiModel<string>() { Status = EStatusCode.SYSTEM_ERROR, Messenger = UltilsHelper.GetMessageByErrorCode(EStatusCode.SYSTEM_ERROR) });
                 }
             }
             catch (Exception ex)
             {
                 await _logger.LogError("Account-Register{}", ex.ToString()).ConfigureAwait(false);
-                return Ok(new ResponseApiLauncher<string>() { Status = EStatusCode.SUCCESS, Messenger = UtilsSystem.Utils.UltilsHelper.GetMessageByErrorCode(EStatusCode.SUCCESS) });
+                return Ok(new ResponseApiModel<string>() { Status = EStatusCode.SUCCESS, Messenger = UtilsSystem.Utils.UltilsHelper.GetMessageByErrorCode(EStatusCode.SUCCESS) });
             }
         }
 
@@ -243,7 +241,7 @@ namespace BookStore.Controllers
             {
                 await _logger.LogError("Account-RefreshToken{}", ex.ToString()).ConfigureAwait(false);
             }
-            return Ok(new ResponseApiLauncher<string>() { Status = EStatusCode.SYSTEM_ERROR, Messenger = UltilsHelper.GetMessageByErrorCode(EStatusCode.SYSTEM_ERROR) });
+            return Ok(new ResponseApiModel<string>() { Status = EStatusCode.SYSTEM_ERROR, Messenger = UltilsHelper.GetMessageByErrorCode(EStatusCode.SYSTEM_ERROR) });
         }
 
         [HttpGet]
@@ -252,7 +250,7 @@ namespace BookStore.Controllers
         public async Task<IActionResult> GetAccountInfo()
         {
             int responseStatus = -99;
-            AccountModel response = null;
+            AccountModelDb response = null;
             try
             {
                 if (Request.Headers.TryGetValue("Authorization", out var values)) {
@@ -270,14 +268,14 @@ namespace BookStore.Controllers
                 await _logger.LogError("Account-GetAccountInfo{}", ex.ToString()).ConfigureAwait(false);
             }
 
-            return Ok(new ResponseApiLauncher<AccountModel>() { Status = responseStatus, Messenger = UltilsHelper.GetMessageByErrorCode(responseStatus), DataResponse = response });
+            return Ok(new ResponseApiModel<AccountModel>() { Status = responseStatus, Messenger = UltilsHelper.GetMessageByErrorCode(responseStatus), DataResponse = new AccountModel(response) });
         }
 
         [HttpPost]
         [Route("UpdateEmail")]
-        [ResponseCache(Duration = 5)]
         public async Task<IActionResult> UpdateEmail(string Email)
         {
+            string message = "";
             int responseStatus = -99;
             try
             {
@@ -291,9 +289,13 @@ namespace BookStore.Controllers
                 if (accountId <= 0)
                     return Ok(new ResponseApiModel<string>() { Status = EStatusCode.TOKEN_EXPIRES, Messenger = UltilsHelper.GetMessageByErrorCode(EStatusCode.TOKEN_EXPIRES) });
                 responseStatus = StoreUsersDAO.Inst.UpdateEmail(accountId, Email);
-                if (responseStatus == 0) {
+                if (responseStatus == 0)
+                {
                     await SendMailAsync(Email, accountId);
-                    responseStatus = EStatusCode.EMAIL_SEND;
+                    message = UltilsHelper.GetMessageByErrorCode(EStatusCode.EMAIL_SEND);
+                }
+                else {
+                    message = UltilsHelper.GetMessageByErrorCode(responseStatus);
                 }
             }
             catch (Exception ex)
@@ -301,11 +303,10 @@ namespace BookStore.Controllers
                 await _logger.LogError("Account-UpdateEmail{}", ex.ToString()).ConfigureAwait(false);
             }
 
-            return Ok(new ResponseApiLauncher<AccountModel>() { Status = responseStatus, Messenger = UltilsHelper.GetMessageByErrorCode(responseStatus) });
+            return Ok(new ResponseApiModel<string>() { Status = responseStatus, Messenger = message });
         }
         [HttpPost]
         [Route("UpdateInfo")]
-        [ResponseCache(Duration = 5)]
         public async Task<IActionResult> UpdateInfo(RequestUpdateInfoModel model)
         {
             int responseStatus = -99;
@@ -327,7 +328,7 @@ namespace BookStore.Controllers
                 await _logger.LogError("Account-UpdateInfo{}", ex.ToString()).ConfigureAwait(false);
             }
 
-            return Ok(new ResponseApiLauncher<AccountModel>() { Status = responseStatus, Messenger = UltilsHelper.GetMessageByErrorCode(responseStatus) });
+            return Ok(new ResponseApiModel<string>() { Status = responseStatus, Messenger = UltilsHelper.GetMessageByErrorCode(responseStatus) });
         }
         //[HttpPost]
         //[Route("TestSendMail")]

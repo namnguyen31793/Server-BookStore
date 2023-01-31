@@ -42,7 +42,7 @@ namespace BookStore.Controllers
             {
                 await _logger.LogError("Account-Login{}", ex.ToString()).ConfigureAwait(false);
             }
-            return Content(UltilsHelper.GetMessageByErrorCode(EStatusCode.SUCCESS);
+            return Content(UltilsHelper.GetMessageByErrorCode(EStatusCode.SUCCESS));
         }
     }
 }
