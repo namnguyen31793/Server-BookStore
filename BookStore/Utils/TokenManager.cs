@@ -1,4 +1,5 @@
-﻿using RedisSystem;
+﻿using Microsoft.AspNetCore.Http;
+using RedisSystem;
 using ShareData.ErrorCode;
 using System;
 using System.Collections.Generic;
@@ -25,6 +26,23 @@ namespace BookStore.Utils
             RedisGatewayCacheManager.Inst.SaveData(keyRedis, accountId.ToString(), 5);
 
             return result;
+        }
+        public static long GetAccountIdByAccessToken(HttpRequest request)
+        {
+            string accessToken = "";
+            if (request.Headers.TryGetValue("Authorization", out var values)) {
+                accessToken = values.FirstOrDefault();
+            }
+            if (string.IsNullOrEmpty(accessToken))
+                return EStatusCode.USER_NOT_LOGIN;
+
+            string keyRedis = "Token:" + accessToken;
+            long accountId = -1;
+            var data = RedisGatewayCacheManager.Inst.GetDataFromCache(keyRedis);
+            long.TryParse(data, out accountId);
+            if (accountId <= 0)
+                return EStatusCode.TOKEN_EXPIRES;
+            return accountId;
         }
 
         public static long GetAccountIdByAccessToken(string accessToken) {

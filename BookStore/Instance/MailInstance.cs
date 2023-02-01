@@ -5,25 +5,44 @@ using System.Text;
 using System.Threading.Tasks;
 using BookStore.Extensions;
 using BookStore.Utils;
+using DAO.DAOImp;
+using LoggerService;
 using MailKit.Net.Smtp;
 using MimeKit;
 
 namespace BookStore.Instance
 {
-    public class EmailInstance
+    public class MailInstance
     {
         private static object _syncObject = new object();
-        private static EmailInstance _inst { get; set; }
-        public static EmailInstance Inst
+        private static MailInstance _inst { get; set; }
+        public static MailInstance Inst
         {
             get
             {
                 if (_inst == null)
                     lock (_syncObject)
                     {
-                        if (_inst == null) _inst = new EmailInstance();
+                        if (_inst == null) {
+                            _inst = new MailInstance();
+                            _logger = new LoggerManager();
+                        }
                     }
                 return _inst;
+            }
+        }
+        private static ILoggerManager _logger;
+
+        public void SendMailRegis(long accountId)
+        {
+            string nickNameSend = "admin@gmail.com";
+            string mailHeader = "Chào mừng bạn đến với Gammma!";
+            string mailContent = "Chúc bạn có các trải nghiệm tốt đẹp với chúng tôi.";
+            int responseStatus = -99;
+            string _Description = "";//json khuyen mai
+            StoreMailSqlInstance.Inst.SendMail(accountId, nickNameSend, mailHeader, mailContent, out responseStatus, 0, _Description);
+            if (responseStatus < 0){
+                Task.Run(async () => await _logger.LogError("SQL-SendMailRegis()", "SendMailRegis "+accountId).ConfigureAwait(false));
             }
         }
 

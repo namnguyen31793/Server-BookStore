@@ -35,9 +35,11 @@ namespace ShareData.ErrorCode
         public const int EMAIL_INVAILD = -69;
         public const int PHONE_INVAILD = -70;
         public const int EMAIL_SEND = -71;
+        public const int MAIL_NOT_EXIST = -72;
 
         public const int TOKEN_EXPIRES = -86;
 
+        public const int DATABASE_ERROR = -99;
         public const int CONNECT_ERROR = -100;
         public const int CAPTCHA_INVALID = -101;
 

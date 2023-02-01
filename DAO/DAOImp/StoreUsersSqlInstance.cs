@@ -10,15 +10,15 @@ using System.Threading.Tasks;
 
 namespace DAO.DAOImp
 {
-    public class StoreUsersDAO
+    public class StoreUsersSqlInstance
     {
         private static ILoggerManager _logger;
 
         private static object _syncObject = new object();
 
-        private static StoreUsersDAO _inst;
+        private static StoreUsersSqlInstance _inst;
 
-        public static StoreUsersDAO Inst
+        public static StoreUsersSqlInstance Inst
         {
             get
             {
@@ -28,7 +28,7 @@ namespace DAO.DAOImp
                     {
                         if (_inst == null)
                         {
-                            _inst = new StoreUsersDAO();
+                            _inst = new StoreUsersSqlInstance();
                             _logger = new LoggerManager();
                         }
                     }
@@ -167,7 +167,7 @@ namespace DAO.DAOImp
                 var pars = new SqlParameter[2];
                 pars[0] = new SqlParameter("@_AccountId", accountId);
                 pars[1] = new SqlParameter("@_ResponseStatus", SqlDbType.BigInt) { Direction = ParameterDirection.Output };
-                response = db.GetInstanceSP<AccountModelDb>("SP_UpdateNickName", 4, pars);
+                response = db.GetInstanceSP<AccountModelDb>("SP_Store_Users_Get_UserInfo", 4, pars);
                 responseStatus = Convert.ToInt32(pars[1].Value);
             }
             catch (Exception exception)
@@ -181,10 +181,10 @@ namespace DAO.DAOImp
             return response;
         }
 
-        public int UpdateEmail(long AccountId, string email)
+        public AccountModelDb UpdateEmail(long AccountId, string email, ref int responseStatus)
         {
             DBHelper db = null;
-            var response = -9999;
+            var response = new AccountModelDb();
             try
             {
                 db = new DBHelper(ConfigDb.StoreUsersConnectionString);
@@ -193,7 +193,8 @@ namespace DAO.DAOImp
                 pars[1] = new SqlParameter("@_Email", email);
                 pars[2] = new SqlParameter("@_ResponseStatus", SqlDbType.BigInt) { Direction = ParameterDirection.Output };
                 db.ExecuteNonQuerySP("SP_Store_Users_CheckRefreshToken", 4, pars);
-                response = Convert.ToInt32(pars[2].Value);
+                response = db.GetInstanceSP<AccountModelDb>("SP_Store_Users_CheckRefreshToken", 4, pars);
+                responseStatus = Convert.ToInt32(pars[2].Value);
             }
             catch (Exception exception)
             {
@@ -205,10 +206,10 @@ namespace DAO.DAOImp
             }
             return response;
         }
-        public int UpdateInfo(long AccountId, string NickName, string AvataId, string PhoneNumber, string BirthDay, string Adress)
+        public AccountModelDb UpdateInfo(long AccountId, string NickName, string AvataId, string PhoneNumber, string BirthDay, string Adress, ref int responseStatus)
         {
             DBHelper db = null;
-            var response = -9999;
+            var response = new AccountModelDb();
             if (string.IsNullOrEmpty(NickName)) NickName = "";
             if (string.IsNullOrEmpty(AvataId)) AvataId = "";
             if (string.IsNullOrEmpty(PhoneNumber)) PhoneNumber = "";
@@ -225,8 +226,8 @@ namespace DAO.DAOImp
                 pars[4] = new SqlParameter("@_BirthDay", BirthDay);
                 pars[5] = new SqlParameter("@_Adress", Adress);
                 pars[6] = new SqlParameter("@_ResponseStatus", SqlDbType.BigInt) { Direction = ParameterDirection.Output };
-                db.ExecuteNonQuerySP("SP_Store_Users_Update_UserInfo", 4, pars);
-                response = Convert.ToInt32(pars[6].Value);
+                response = db.GetInstanceSP<AccountModelDb>("SP_Store_Users_Update_UserInfo", 4, pars);
+                responseStatus = Convert.ToInt32(pars[6].Value);
             }
             catch (Exception exception)
             {

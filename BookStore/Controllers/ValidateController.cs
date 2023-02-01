@@ -36,7 +36,7 @@ namespace BookStore.Controllers
             }
             try
             {
-                var responseStatus = StoreUsersDAO.Inst.ValidateUser(accountid);
+                var responseStatus = StoreUsersSqlInstance.Inst.ValidateUser(accountid);
             }
             catch (Exception ex)
             {

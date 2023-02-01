@@ -126,22 +126,25 @@ namespace UtilsSystem.Utils
                     message = "Mật khẩu không chính xác!";
                     break;
                 case EStatusCode.ACCOUNT_EXITS:
-                    message = "Tài khoản đã tồn tại!";
+                    message = "Tài khoản đã tồn tại";
                     break;
                 case EStatusCode.TOKEN_INVALID:
-                    message = "Tài khoản của bạn đã đăng nhập ở nơi khác!";
+                    message = "Tài khoản của bạn đã đăng nhập ở nơi khác";
                     break;
                 case EStatusCode.USER_VALIDATE:
-                    message = "Tài khoản của bạn đã kích hoạt!";
+                    message = "Tài khoản của bạn đã kích hoạt";
                     break;
                 case EStatusCode.EMAIL_INVAILD:
-                    message = "Email không đúng định dạng!";
+                    message = "Email không đúng định dạng";
                     break;
                 case EStatusCode.PHONE_INVAILD:
-                    message = "Số điện thoại không hợp lệ!";
+                    message = "Số điện thoại không hợp lệ";
                     break;
                 case EStatusCode.EMAIL_SEND:
                     message = "Thông tin xác thực đã được gửi tới email của bạn, vui long đăng nhập để xác nhận!";
+                    break;
+                case EStatusCode.MAIL_NOT_EXIST:
+                    message = "Mail không tồn tại";
                     break;
             }
             return message;

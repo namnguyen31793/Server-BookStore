@@ -84,11 +84,12 @@ namespace BookStore.Controllers
             responseCode = await Task.Run(async () =>
             {
                 int accountId = 0;
-                var res = StoreUsersDAO.Inst.Register(REGISTER_TYPE.FACEBOOK_TYPE, facebookUserName, "", passMd5, clientInfo.MerchantId, clientInfo.TrueClientIp, clientInfo.DeviceId, (int)clientInfo.OsType,
+                var res = StoreUsersSqlInstance.Inst.Register(REGISTER_TYPE.FACEBOOK_TYPE, facebookUserName, "", passMd5, clientInfo.MerchantId, clientInfo.TrueClientIp, clientInfo.DeviceId, (int)clientInfo.OsType,
                     requestLogin.PhoneNumber, requestLogin.Email, out accountId);
 
                 if (responseCode == (int)EStatusCode.SUCCESS)
                 {
+                    MailInstance.Inst.SendMailRegis(accountId);
                     if (AccountUtils.IsValidEmail(requestLogin.Email))
                         await SendMailAsync(requestLogin.Email, accountId).ConfigureAwait(false);
                 }
@@ -137,11 +138,12 @@ namespace BookStore.Controllers
                 responseCode = await Task.Run(async () =>
                 {
                     int accountId = 0;
-                    var res = StoreUsersDAO.Inst.Register(REGISTER_TYPE.NORMAL_TYPE, requestRegis.AccountName, "", AccountUtils.EncryptPasswordMd5(requestRegis.Password), clientInfo.MerchantId, clientInfo.TrueClientIp, clientInfo.DeviceId, (int)clientInfo.OsType,
+                    var res = StoreUsersSqlInstance.Inst.Register(REGISTER_TYPE.NORMAL_TYPE, requestRegis.AccountName, "", AccountUtils.EncryptPasswordMd5(requestRegis.Password), clientInfo.MerchantId, clientInfo.TrueClientIp, clientInfo.DeviceId, (int)clientInfo.OsType,
                         requestRegis.PhoneNumber, requestRegis.Email, out accountId);
 
                     if (responseCode == (int)EStatusCode.SUCCESS)
                     {
+                        MailInstance.Inst.SendMailRegis(accountId);
                         if (AccountUtils.IsValidEmail(requestRegis.Email))
                             await SendMailAsync(requestRegis.Email, accountId).ConfigureAwait(false);
                     }
@@ -179,12 +181,12 @@ namespace BookStore.Controllers
                 var res = EStatusCode.SUCCESS;
                 res = await Task.Run(() =>
                 {
-                    var accountId = StoreUsersDAO.Inst.DoLogin(requestLogin.AccountName, AccountUtils.EncryptPasswordMd5(requestLogin.Password), clientInfo.MerchantId, clientInfo.TrueClientIp, (int)clientInfo.OsType, ref res);
+                    var accountId = StoreUsersSqlInstance.Inst.DoLogin(requestLogin.AccountName, AccountUtils.EncryptPasswordMd5(requestLogin.Password), clientInfo.MerchantId, clientInfo.TrueClientIp, (int)clientInfo.OsType, ref res);
                     if (accountId >= 0)
                     {
                         //create refresh token -> save db
                         var refreshToken = TokenManager.GenerateRefreshToken();
-                        var responseToken = StoreUsersDAO.Inst.AddToken(accountId, refreshToken);
+                        var responseToken = StoreUsersSqlInstance.Inst.AddToken(accountId, refreshToken);
                         if (responseToken >= 0)
                         {
                             var accessToken = TokenManager.GenerateAccessToken(accountId, clientInfo);
@@ -220,7 +222,7 @@ namespace BookStore.Controllers
             try
             {
                 //check token
-                var response = StoreUsersDAO.Inst.CheckRefreshToken(data.Refresh_token);
+                var response = StoreUsersSqlInstance.Inst.CheckRefreshToken(data.Refresh_token);
                 if (response >= 0)
                 {
                     var clientInfo = new ClientRequestInfo(Request);
@@ -253,15 +255,10 @@ namespace BookStore.Controllers
             AccountModelDb response = null;
             try
             {
-                if (Request.Headers.TryGetValue("Authorization", out var values)) {
-                    token = values.FirstOrDefault();
-                }
-                if (string.IsNullOrEmpty(token))
-                    return Ok(new ResponseApiModel<string>() { Status = EStatusCode.USER_NOT_LOGIN, Messenger = UltilsHelper.GetMessageByErrorCode(EStatusCode.USER_NOT_LOGIN) });
-                long accountId = TokenManager.GetAccountIdByAccessToken(token);
+                long accountId = TokenManager.GetAccountIdByAccessToken(Request);
                 if (accountId <= 0)
-                    return Ok(new ResponseApiModel<string>() { Status = EStatusCode.TOKEN_EXPIRES, Messenger = UltilsHelper.GetMessageByErrorCode(EStatusCode.TOKEN_EXPIRES) });
-                response = StoreUsersDAO.Inst.GetAccountInfo(accountId, ref responseStatus);
+                    return Ok(new ResponseApiModel<string>() { Status = accountId, Messenger = UltilsHelper.GetMessageByErrorCode((int)accountId) });
+                response = StoreUsersSqlInstance.Inst.GetAccountInfo(accountId, ref responseStatus);
             }
             catch (Exception ex)
             {
@@ -277,18 +274,13 @@ namespace BookStore.Controllers
         {
             string message = "";
             int responseStatus = -99;
+            AccountModelDb response = null;
             try
             {
-                if (Request.Headers.TryGetValue("Authorization", out var values))
-                {
-                    token = values.FirstOrDefault();
-                }
-                if (string.IsNullOrEmpty(token))
-                    return Ok(new ResponseApiModel<string>() { Status = EStatusCode.USER_NOT_LOGIN, Messenger = UltilsHelper.GetMessageByErrorCode(EStatusCode.USER_NOT_LOGIN) });
-                long accountId = TokenManager.GetAccountIdByAccessToken(token);
+                long accountId = TokenManager.GetAccountIdByAccessToken(Request);
                 if (accountId <= 0)
-                    return Ok(new ResponseApiModel<string>() { Status = EStatusCode.TOKEN_EXPIRES, Messenger = UltilsHelper.GetMessageByErrorCode(EStatusCode.TOKEN_EXPIRES) });
-                responseStatus = StoreUsersDAO.Inst.UpdateEmail(accountId, Email);
+                    return Ok(new ResponseApiModel<string>() { Status = accountId, Messenger = UltilsHelper.GetMessageByErrorCode((int)accountId) });
+                response = StoreUsersSqlInstance.Inst.UpdateEmail(accountId, Email, ref responseStatus);
                 if (responseStatus == 0)
                 {
                     await SendMailAsync(Email, accountId);
@@ -303,32 +295,27 @@ namespace BookStore.Controllers
                 await _logger.LogError("Account-UpdateEmail{}", ex.ToString()).ConfigureAwait(false);
             }
 
-            return Ok(new ResponseApiModel<string>() { Status = responseStatus, Messenger = message });
+            return Ok(new ResponseApiModel<AccountModel>() { Status = responseStatus, Messenger = message, DataResponse = new AccountModel(response) });
         }
         [HttpPost]
         [Route("UpdateInfo")]
         public async Task<IActionResult> UpdateInfo(RequestUpdateInfoModel model)
         {
             int responseStatus = -99;
+            AccountModelDb response = null;
             try
             {
-                if (Request.Headers.TryGetValue("Authorization", out var values))
-                {
-                    token = values.FirstOrDefault();
-                }
-                if (string.IsNullOrEmpty(token))
-                    return Ok(new ResponseApiModel<string>() { Status = EStatusCode.USER_NOT_LOGIN, Messenger = UltilsHelper.GetMessageByErrorCode(EStatusCode.USER_NOT_LOGIN) });
-                long accountId = TokenManager.GetAccountIdByAccessToken(token);
+                long accountId = TokenManager.GetAccountIdByAccessToken(Request);
                 if (accountId <= 0)
-                    return Ok(new ResponseApiModel<string>() { Status = EStatusCode.TOKEN_EXPIRES, Messenger = UltilsHelper.GetMessageByErrorCode(EStatusCode.TOKEN_EXPIRES) });
-                responseStatus = StoreUsersDAO.Inst.UpdateInfo(accountId, model.Nickname, model.AvatarId, model.PhoneNumber, model.BirthDay, model.Adress);
+                    return Ok(new ResponseApiModel<string>() { Status = accountId, Messenger = UltilsHelper.GetMessageByErrorCode((int)accountId) });
+                response = StoreUsersSqlInstance.Inst.UpdateInfo(accountId, model.Nickname, model.AvatarId, model.PhoneNumber, model.BirthDay, model.Adress, ref responseStatus);
             }
             catch (Exception ex)
             {
                 await _logger.LogError("Account-UpdateInfo{}", ex.ToString()).ConfigureAwait(false);
             }
 
-            return Ok(new ResponseApiModel<string>() { Status = responseStatus, Messenger = UltilsHelper.GetMessageByErrorCode(responseStatus) });
+            return Ok(new ResponseApiModel<AccountModel>() { Status = responseStatus, Messenger = UltilsHelper.GetMessageByErrorCode(responseStatus), DataResponse = new AccountModel(response) });
         }
         //[HttpPost]
         //[Route("TestSendMail")]
