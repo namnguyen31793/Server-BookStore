@@ -337,6 +337,7 @@ namespace BookStore.Controllers
         //}
 
         private async Task SendMailAsync(string toAdress, long AccountId){
+            return;
             string key = HttpUtility.UrlEncode(TokenManager.GenerateKeyTokenValidate(AccountId, toAdress));
             string url = CONFIG.BaseLink + CONFIG.FunctionValidateEmail+ key;
 

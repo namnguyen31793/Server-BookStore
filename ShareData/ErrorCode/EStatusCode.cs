@@ -36,6 +36,10 @@ namespace ShareData.ErrorCode
         public const int PHONE_INVAILD = -70;
         public const int EMAIL_SEND = -71;
         public const int MAIL_NOT_EXIST = -72;
+        public const int BARCODE_EXIST = -73;
+        public const int ACOUNT_EXIST_BARCODE = -74;
+        public const int BARCODE_NOT_EXIST = -75;
+        public const int ACOUNT_NOT_EXIST_BARCODE = -76;
 
         public const int TOKEN_EXPIRES = -86;
 

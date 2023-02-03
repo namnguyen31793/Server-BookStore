@@ -88,6 +88,17 @@ namespace RedisSystem
         {
             return Connection.GetDatabase().StringGet(key);
         }
+        public void DeleteDataFromCache(string key)
+        {
+            try
+            {
+                var _database = Connection.GetDatabase();
+                _database.KeyDelete(key);
+            }
+            catch ()
+            {
+            }
+        }
 
         public List<T> GetArrayKey(string forderName)
         {

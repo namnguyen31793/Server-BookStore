@@ -16,6 +16,11 @@ namespace UtilsSystem.Utils
         {
             return true;
         }
+        public static string FormatTime(DateTime time)
+        {
+            var res =time.ToString("dd/mm/YYYY hh:mm:ss", CultureInfo.InvariantCulture);
+            return res;
+        }
 
         public static string formatMoney(long number, bool skip = true, string name = "", string sign = "")
         {
@@ -145,6 +150,15 @@ namespace UtilsSystem.Utils
                     break;
                 case EStatusCode.MAIL_NOT_EXIST:
                     message = "Mail không tồn tại";
+                    break;
+                case EStatusCode.BARCODE_EXIST:
+                    message = "Barcode đã tồn tại";
+                    break;
+                case EStatusCode.ACOUNT_EXIST_BARCODE:
+                    message = "Tài khoản đã tồn tại barcode này.";
+                    break;
+                case EStatusCode.BARCODE_NOT_EXIST:
+                    message = "Barcode không tồn tại";
                     break;
             }
             return message;
