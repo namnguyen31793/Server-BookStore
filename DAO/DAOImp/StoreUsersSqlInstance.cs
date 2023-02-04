@@ -92,7 +92,7 @@ namespace DAO.DAOImp
                 pars[9] = new SqlParameter("@_Email", email);
                 pars[10] = new SqlParameter("@_AccountId", SqlDbType.BigInt) { Direction = ParameterDirection.Output };
                 pars[11] = new SqlParameter("@_ResponseStatus", SqlDbType.BigInt) { Direction = ParameterDirection.Output };
-                db.ExecuteNonQuerySP("SP_RegisterAccount", 4, pars);
+                db.ExecuteNonQuerySP("SP_Store_Users_Register", 4, pars);
                 response = Convert.ToInt32(pars[11].Value);
                 accountId = Convert.ToInt32(pars[10].Value);
             }

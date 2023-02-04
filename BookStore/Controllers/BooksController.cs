@@ -123,6 +123,92 @@ namespace BookStore.Controllers
             }
             return Ok(response);
         }
+
+        [HttpGet]
+        [Route("{barcode}/GetListSimpleBook")]
+        [ResponseCache(Duration = 60)]
+        public async Task<IActionResult> GetListSimpleBookBarCode(string barcode)
+        {
+            var response = new ResponseApiModel<string>() { Status = EStatusCode.SYSTEM_ERROR, Messenger = UltilsHelper.GetMessageByErrorCode(EStatusCode.SYSTEM_ERROR) };
+            int responseStatus = EStatusCode.DATABASE_ERROR;
+            try
+            {
+                string keyRedis = "CacheSimpleBook:" + barcode;
+                string jsonListSimpleBook = RedisGatewayManager<string>.Inst.GetDataFromCache(keyRedis);
+                if (string.IsNullOrEmpty(jsonListSimpleBook))
+                {
+                    var listBook = StoreBookSqlInstance.Inst.GetListSimpleBookByBarcode(barcode, out responseStatus);
+                    if (responseStatus == EStatusCode.SUCCESS)
+                    {
+                        jsonListSimpleBook = JsonConvert.SerializeObject(listBook);
+                        RedisGatewayManager<string>.Inst.SaveData(keyRedis, jsonListSimpleBook, 600);
+                    }
+                }
+                response = new ResponseApiModel<string>() { Status = responseStatus, Messenger = UltilsHelper.GetMessageByErrorCode(responseStatus), DataResponse = jsonListSimpleBook };
+            }
+            catch (Exception ex)
+            {
+                await _logger.LogError("Books-GetListSimpleBookbyTag{}", ex.ToString()).ConfigureAwait(false);
+            }
+            return Ok(response);
+        }
+        [HttpGet]
+        [Route("{barcode}/GetBookDemo")]
+        [ResponseCache(Duration = 60)]
+        public async Task<IActionResult> GetBookDemo(string barcode)
+        {
+            var response = new ResponseApiModel<string>() { Status = EStatusCode.SYSTEM_ERROR, Messenger = UltilsHelper.GetMessageByErrorCode(EStatusCode.SYSTEM_ERROR) };
+            int responseStatus = EStatusCode.DATABASE_ERROR;
+            try
+            {
+                string keyRedis = "CacheSimpleBookDemo:" + barcode;
+                string jsonListSimpleBook = RedisGatewayManager<string>.Inst.GetDataFromCache(keyRedis);
+                if (string.IsNullOrEmpty(jsonListSimpleBook))
+                {
+                    var listBook = StoreBookSqlInstance.Inst.GetFullBookDemoByBarcode(barcode, out responseStatus);
+                    if (responseStatus == EStatusCode.SUCCESS)
+                    {
+                        jsonListSimpleBook = JsonConvert.SerializeObject(listBook);
+                        RedisGatewayManager<string>.Inst.SaveData(keyRedis, jsonListSimpleBook, 600);
+                    }
+                }
+                response = new ResponseApiModel<string>() { Status = responseStatus, Messenger = UltilsHelper.GetMessageByErrorCode(responseStatus), DataResponse = jsonListSimpleBook };
+            }
+            catch (Exception ex)
+            {
+                await _logger.LogError("Books-GetListSimpleBookbyTag{}", ex.ToString()).ConfigureAwait(false);
+            }
+            return Ok(response);
+        }
+
+        [HttpGet]
+        [Route("{barcode}/GetLinkDownload")]
+        [ResponseCache(Duration = 16)]
+        public async Task<IActionResult> GetLinkDownload(string barcode)
+        {
+            var response = new ResponseApiModel<string>() { Status = EStatusCode.SYSTEM_ERROR, Messenger = UltilsHelper.GetMessageByErrorCode(EStatusCode.SYSTEM_ERROR) };
+            int responseStatus = EStatusCode.DATABASE_ERROR;
+
+            long accountId = TokenManager.GetAccountIdByAccessToken(Request);
+            if (accountId <= 0)
+                return Ok(new ResponseApiModel<string>() { Status = accountId, Messenger = UltilsHelper.GetMessageByErrorCode((int)accountId) });
+            try
+            {
+                string ìnoDownload = "";
+                var downloadInfoModel = StoreBookSqlInstance.Inst.GetDownloadBookByBarcode(accountId, barcode, out responseStatus);
+                if (responseStatus == EStatusCode.SUCCESS)
+                {
+                    ìnoDownload = JsonConvert.SerializeObject(downloadInfoModel);
+                }
+                response = new ResponseApiModel<string>() { Status = responseStatus, Messenger = UltilsHelper.GetMessageByErrorCode(responseStatus), DataResponse = ìnoDownload };
+            }
+            catch (Exception ex)
+            {
+                await _logger.LogError("Books-GetLinkDownload{}", ex.ToString()).ConfigureAwait(false);
+            }
+            return Ok(response);
+        }
+
         [HttpGet]
         [Route("GetListSimpleBook")]
         [ResponseCache(Duration = 60)]
@@ -213,5 +299,34 @@ namespace BookStore.Controllers
             }
             return Ok(response);
         }
+        [HttpGet]
+        [Route("GetListColorConfig")]
+        [ResponseCache(Duration = 60)]
+        public async Task<IActionResult> GetListColorConfig()
+        {
+            var response = new ResponseApiModel<string>() { Status = EStatusCode.SYSTEM_ERROR, Messenger = UltilsHelper.GetMessageByErrorCode(EStatusCode.SYSTEM_ERROR) };
+            int responseStatus = EStatusCode.DATABASE_ERROR;
+            try
+            {
+                string keyRedis = "CacheListColorConfig" ;
+                string jsonListSimpleBook = RedisGatewayManager<string>.Inst.GetDataFromCache(keyRedis);
+                if (string.IsNullOrEmpty(jsonListSimpleBook))
+                {
+                    var listBook = StoreBookSqlInstance.Inst.GetListColorConfig(out responseStatus);
+                    if (responseStatus == EStatusCode.SUCCESS)
+                    {
+                        jsonListSimpleBook = JsonConvert.SerializeObject(listBook);
+                        RedisGatewayManager<string>.Inst.SaveData(keyRedis, jsonListSimpleBook, 600);
+                    }
+                }
+                response = new ResponseApiModel<string>() { Status = responseStatus, Messenger = UltilsHelper.GetMessageByErrorCode(responseStatus), DataResponse = jsonListSimpleBook };
+            }
+            catch (Exception ex)
+            {
+                await _logger.LogError("Books-GetListSimpleBookSameName{}", ex.ToString()).ConfigureAwait(false);
+            }
+            return Ok(response);
+        }
+
     }
 }

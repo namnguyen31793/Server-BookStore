@@ -502,7 +502,8 @@
     ]
   },
   "packageFolders": {
-    "C:\\Users\\Nam PC\\.nuget\\packages\\": {}
+    "C:\\Users\\nguye\\.nuget\\packages\\": {},
+    "C:\\Program Files\\dotnet\\sdk\\NuGetFallbackFolder": {}
   },
   "project": {
     "version": "1.0.0",
@@ -510,11 +511,14 @@
       "projectUniqueName": "D:\\Server\\Server-BookStore\\ShareData\\ShareData.csproj",
       "projectName": "ShareData",
       "projectPath": "D:\\Server\\Server-BookStore\\ShareData\\ShareData.csproj",
-      "packagesPath": "C:\\Users\\Nam PC\\.nuget\\packages\\",
+      "packagesPath": "C:\\Users\\nguye\\.nuget\\packages\\",
       "outputPath": "D:\\Server\\Server-BookStore\\ShareData\\obj\\",
       "projectStyle": "PackageReference",
+      "fallbackFolders": [
+        "C:\\Program Files\\dotnet\\sdk\\NuGetFallbackFolder"
+      ],
       "configFilePaths": [
-        "C:\\Users\\Nam PC\\AppData\\Roaming\\NuGet\\NuGet.Config",
+        "C:\\Users\\nguye\\AppData\\Roaming\\NuGet\\NuGet.Config",
         "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.Offline.config"
       ],
       "originalTargetFrameworks": [
@@ -564,7 +568,7 @@
             "privateAssets": "all"
           }
         },
-        "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\5.0.404\\RuntimeIdentifierGraph.json"
+        "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\6.0.201\\RuntimeIdentifierGraph.json"
       }
     }
   }

@@ -317,6 +317,61 @@ namespace BookStore.Controllers
 
             return Ok(new ResponseApiModel<AccountModel>() { Status = responseStatus, Messenger = UltilsHelper.GetMessageByErrorCode(responseStatus), DataResponse = new AccountModel(response) });
         }
+
+        [HttpGet]
+        [Route("GetBookBuy")]
+        [ResponseCache(Duration = 60)]
+        public async Task<IActionResult> GetBookBuy()
+        {
+            var response = new ResponseApiModel<string>() { Status = EStatusCode.SYSTEM_ERROR, Messenger = UltilsHelper.GetMessageByErrorCode(EStatusCode.SYSTEM_ERROR) };
+            int responseStatus = EStatusCode.DATABASE_ERROR;
+            try
+            {
+                long accountId = TokenManager.GetAccountIdByAccessToken(Request);
+                if (accountId <= 0)
+                    return Ok(new ResponseApiModel<string>() { Status = accountId, Messenger = UltilsHelper.GetMessageByErrorCode((int)accountId) });
+                string keyRedis = "CacheBookBuy:" + accountId;
+                string jsonListSimpleBook = RedisGatewayManager<string>.Inst.GetDataFromCache(keyRedis);
+                if (string.IsNullOrEmpty(jsonListSimpleBook))
+                {
+                    var listBook = StoreBookSqlInstance.Inst.GetBookBuyAccount(accountId, out responseStatus);
+                    if (responseStatus == EStatusCode.SUCCESS)
+                    {
+                        jsonListSimpleBook = JsonConvert.SerializeObject(listBook);
+                        RedisGatewayManager<string>.Inst.SaveData(keyRedis, jsonListSimpleBook, 600);
+                    }
+                }
+                response = new ResponseApiModel<string>() { Status = responseStatus, Messenger = UltilsHelper.GetMessageByErrorCode(responseStatus), DataResponse = jsonListSimpleBook };
+            }
+            catch (Exception ex)
+            {
+                await _logger.LogError("Books-GetBookBuy{}", ex.ToString()).ConfigureAwait(false);
+            }
+            return Ok(response);
+        }
+
+        [HttpPost]
+        [Route("BuyBook")]
+        [ResponseCache(Duration = 60)]
+        public async Task<IActionResult> BuyBook(string barcode)
+        {
+            var response = new ResponseApiModel<string>() { Status = EStatusCode.SYSTEM_ERROR, Messenger = UltilsHelper.GetMessageByErrorCode(EStatusCode.SYSTEM_ERROR) };
+            int responseStatus = EStatusCode.DATABASE_ERROR;
+            try
+            {
+                long accountId = TokenManager.GetAccountIdByAccessToken(Request);
+                if (accountId <= 0)
+                    return Ok(new ResponseApiModel<string>() { Status = accountId, Messenger = UltilsHelper.GetMessageByErrorCode((int)accountId) });
+
+                responseStatus = StoreBookSqlInstance.Inst.AccountBuyBarcode(accountId, barcode);
+                response = new ResponseApiModel<string>() { Status = responseStatus, Messenger = UltilsHelper.GetMessageByErrorCode(responseStatus) };
+            }
+            catch (Exception ex)
+            {
+                await _logger.LogError("Books-BuyBook{}", ex.ToString()).ConfigureAwait(false);
+            }
+            return Ok(response);
+        }
         //[HttpPost]
         //[Route("TestSendMail")]
         //[ResponseCache(Duration = 5)]

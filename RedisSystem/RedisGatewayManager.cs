@@ -95,7 +95,7 @@ namespace RedisSystem
                 var _database = Connection.GetDatabase();
                 _database.KeyDelete(key);
             }
-            catch ()
+            catch 
             {
             }
         }
