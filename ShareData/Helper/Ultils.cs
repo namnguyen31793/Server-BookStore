@@ -99,58 +99,5 @@ namespace ShareData.Helper
             return result;
         }
 
-        public static string GetMessageByErrorCode(int errorCode)
-        {
-            string message = "";
-            switch (errorCode)
-            {
-                case EStatusCode.SUCCESS:
-                    message = "Thành công";
-                    break;
-                case EStatusCode.ACCOUNT_BLOCK:
-                    message = "Tài khoản của bạn đã bị khóa!";
-                    break;
-                case EStatusCode.SYSTEM_ERROR:
-                    message = "Đã có lỗi xảy ra!";
-                    break;
-                case EStatusCode.DATA_INVAILD:
-                    message = "Dữ liệu không hợp lệ!";
-                    break;
-                case EStatusCode.USER_NOT_LOGIN:
-                    message = "Bạn cần đăng nhập để sử dụng chức năng này!";
-                    break;
-                case EStatusCode.SYSTEM_MAINTAIN:
-                    message = "Hệ thống đang bảo trì, vui lòng quay lại sau ít phút!";
-                    break;
-                case EStatusCode.NICKNAME_INVAILD:
-                    message = "Nickname không hợp lệ";
-                    break;
-                case EStatusCode.LOGIN_EXPIRED:
-                    message = "Phiên đăng nhập hết hạn";
-                    break;
-                case EStatusCode.KOL_BLOCK:
-                    message = "Idol đã được mời đi uống nước!";
-                    break;
-                case EStatusCode.CONNECT_ERROR:
-                    message = "Kết nối thất bại!";
-                    break;
-                case EStatusCode.NOT_ENOUGH_RIGHTS:
-                    message = "Không đủ quyền";
-                    break;
-                case EStatusCode.HAVE_ADD_FRIEND:
-                    message = "Đã kết bạn!";
-                    break;
-                case EStatusCode.TOKEN_EXPIRES:
-                    message = "Token hết hạn!";
-                    break;
-                case EStatusCode.SYSTEM_EXCEPTION:
-                    message = "Đã có lỗi xảy ra!";
-                    break;
-                case EStatusCode.NOT_ENOUGH_MONEY:
-                    message = "Số dư không đủ!";
-                    break;
-            }
-            return message;
-        }
     }
 }

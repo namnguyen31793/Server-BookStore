@@ -1,0 +1,175 @@
+{
+  "format": 1,
+  "restore": {
+    "D:\\Project\\NetCoreApi\\NetCoreApi\\CoreWebApi\\CoreWebApi.csproj": {}
+  },
+  "projects": {
+    "D:\\Project\\NetCoreApi\\NetCoreApi\\CoreWebApi\\CoreWebApi.csproj": {
+      "version": "1.0.0",
+      "restore": {
+        "projectUniqueName": "D:\\Project\\NetCoreApi\\NetCoreApi\\CoreWebApi\\CoreWebApi.csproj",
+        "projectName": "CoreWebApi",
+        "projectPath": "D:\\Project\\NetCoreApi\\NetCoreApi\\CoreWebApi\\CoreWebApi.csproj",
+        "packagesPath": "C:\\Users\\Nam PC\\.nuget\\packages\\",
+        "outputPath": "D:\\Project\\NetCoreApi\\NetCoreApi\\CoreWebApi\\obj\\",
+        "projectStyle": "PackageReference",
+        "configFilePaths": [
+          "C:\\Users\\Nam PC\\AppData\\Roaming\\NuGet\\NuGet.Config",
+          "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.Offline.config"
+        ],
+        "originalTargetFrameworks": [
+          "netcoreapp3.1"
+        ],
+        "sources": {
+          "C:\\Program Files (x86)\\Microsoft SDKs\\NuGetPackages\\": {},
+          "https://api.nuget.org/v3/index.json": {}
+        },
+        "frameworks": {
+          "netcoreapp3.1": {
+            "targetAlias": "netcoreapp3.1",
+            "projectReferences": {
+              "D:\\Project\\NetCoreApi\\NetCoreApi\\DAO\\DAO.csproj": {
+                "projectPath": "D:\\Project\\NetCoreApi\\NetCoreApi\\DAO\\DAO.csproj"
+              },
+              "D:\\Project\\NetCoreApi\\NetCoreApi\\LoggerService\\LoggerService.csproj": {
+                "projectPath": "D:\\Project\\NetCoreApi\\NetCoreApi\\LoggerService\\LoggerService.csproj"
+              },
+              "D:\\Project\\NetCoreApi\\NetCoreApi\\ShareData\\ShareData.csproj": {
+                "projectPath": "D:\\Project\\NetCoreApi\\NetCoreApi\\ShareData\\ShareData.csproj"
+              }
+            }
+          }
+        },
+        "warningProperties": {
+          "warnAsError": [
+            "NU1605"
+          ]
+        }
+      },
+      "frameworks": {
+        "netcoreapp3.1": {
+          "targetAlias": "netcoreapp3.1",
+          "dependencies": {
+            "RestSharp": {
+              "target": "Package",
+              "version": "[108.0.2, )"
+            }
+          },
+          "imports": [
+            "net461",
+            "net462",
+            "net47",
+            "net471",
+            "net472",
+            "net48"
+          ],
+          "assetTargetFallback": true,
+          "warn": true,
+          "frameworkReferences": {
+            "Microsoft.AspNetCore.App": {
+              "privateAssets": "none"
+            },
+            "Microsoft.NETCore.App": {
+              "privateAssets": "all"
+            }
+          },
+          "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\5.0.404\\RuntimeIdentifierGraph.json"
+        }
+      }
+    },
+    "D:\\Project\\NetCoreApi\\NetCoreApi\\DAO\\DAO.csproj": {
+      "restore": {
+        "projectUniqueName": "D:\\Project\\NetCoreApi\\NetCoreApi\\DAO\\DAO.csproj",
+        "projectName": "DAO",
+        "projectPath": "D:\\Project\\NetCoreApi\\NetCoreApi\\DAO\\DAO.csproj",
+        "frameworks": {
+          "net471": {
+            "projectReferences": {
+              "D:\\Project\\NetCoreApi\\NetCoreApi\\ShareData\\ShareData.csproj": {
+                "projectPath": "D:\\Project\\NetCoreApi\\NetCoreApi\\ShareData\\ShareData.csproj"
+              }
+            }
+          }
+        }
+      },
+      "frameworks": {
+        "net471": {}
+      }
+    },
+    "D:\\Project\\NetCoreApi\\NetCoreApi\\LoggerService\\LoggerService.csproj": {
+      "version": "1.0.0",
+      "restore": {
+        "projectUniqueName": "D:\\Project\\NetCoreApi\\NetCoreApi\\LoggerService\\LoggerService.csproj",
+        "projectName": "LoggerService",
+        "projectPath": "D:\\Project\\NetCoreApi\\NetCoreApi\\LoggerService\\LoggerService.csproj",
+        "packagesPath": "C:\\Users\\Nam PC\\.nuget\\packages\\",
+        "outputPath": "D:\\Project\\NetCoreApi\\NetCoreApi\\LoggerService\\obj\\",
+        "projectStyle": "PackageReference",
+        "configFilePaths": [
+          "C:\\Users\\Nam PC\\AppData\\Roaming\\NuGet\\NuGet.Config",
+          "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.Offline.config"
+        ],
+        "originalTargetFrameworks": [
+          "netcoreapp3.1"
+        ],
+        "sources": {
+          "C:\\Program Files (x86)\\Microsoft SDKs\\NuGetPackages\\": {},
+          "https://api.nuget.org/v3/index.json": {}
+        },
+        "frameworks": {
+          "netcoreapp3.1": {
+            "targetAlias": "netcoreapp3.1",
+            "projectReferences": {}
+          }
+        },
+        "warningProperties": {
+          "warnAsError": [
+            "NU1605"
+          ]
+        }
+      },
+      "frameworks": {
+        "netcoreapp3.1": {
+          "targetAlias": "netcoreapp3.1",
+          "dependencies": {
+            "MongoDB.Driver": {
+              "target": "Package",
+              "version": "[2.18.0, )"
+            }
+          },
+          "imports": [
+            "net461",
+            "net462",
+            "net47",
+            "net471",
+            "net472",
+            "net48"
+          ],
+          "assetTargetFallback": true,
+          "warn": true,
+          "frameworkReferences": {
+            "Microsoft.NETCore.App": {
+              "privateAssets": "all"
+            }
+          },
+          "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\5.0.404\\RuntimeIdentifierGraph.json"
+        }
+      }
+    },
+    "D:\\Project\\NetCoreApi\\NetCoreApi\\ShareData\\ShareData.csproj": {
+      "restore": {
+        "projectUniqueName": "D:\\Project\\NetCoreApi\\NetCoreApi\\ShareData\\ShareData.csproj",
+        "projectName": "ShareData",
+        "projectPath": "D:\\Project\\NetCoreApi\\NetCoreApi\\ShareData\\ShareData.csproj",
+        "frameworks": {
+          "net471": {
+            "projectReferences": {}
+          }
+        }
+      },
+      "frameworks": {
+        "net471": {}
+      }
+    }
+  }
+}

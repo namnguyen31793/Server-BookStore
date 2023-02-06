@@ -160,6 +160,9 @@ namespace UtilsSystem.Utils
                 case EStatusCode.BARCODE_NOT_EXIST:
                     message = "Barcode không tồn tại";
                     break;
+                case EStatusCode.ACCOUNT_NOT_ENOUGH_ROLE:
+                    message = "Tài khoản không đủ quyền";
+                    break;
             }
             return message;
         }

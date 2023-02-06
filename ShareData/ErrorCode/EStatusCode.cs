@@ -13,6 +13,7 @@ namespace ShareData.ErrorCode
         public const int ID_EXITS = -2;
         public const int ID_NOT_EXITS = -3;
 
+        public const int ACCOUNT_NOT_ENOUGH_ROLE = -49;
         public const int LOGIN_EXPIRED = -50;
         public const int ACCOUNT_NOT_EXITS = -51;
         public const int INVALID_PASSWORD = -52;
