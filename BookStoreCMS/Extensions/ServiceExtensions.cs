@@ -1,4 +1,4 @@
-﻿using BookStore.Instance;
+﻿using BookStoreCMS.Instance;
 using LoggerService;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Mvc;

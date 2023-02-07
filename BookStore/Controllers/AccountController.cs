@@ -221,13 +221,14 @@ namespace BookStore.Controllers
         {
             try
             {
+                long accountId = 0;
                 //check token
-                var response = StoreUsersSqlInstance.Inst.CheckRefreshToken(data.Refresh_token);
+                var response = StoreUsersSqlInstance.Inst.CheckRefreshToken(data.Refresh_token, ref accountId);
                 if (response >= 0)
                 {
                     var clientInfo = new ClientRequestInfo(Request);
-                    var accessToken = TokenManager.GenerateAccessToken(data.AccountId, clientInfo);
-                    var model = new TokenInfo() { AccountId = data.AccountId, Access_token = accessToken, Refresh_token = data.Refresh_token };
+                    var accessToken = TokenManager.GenerateAccessToken(accountId, clientInfo);
+                    var model = new TokenInfo() { AccountId = accountId, Access_token = accessToken, Refresh_token = data.Refresh_token };
                     return Ok(new ResponseApiModel<TokenInfo>() { Status = EStatusCode.SUCCESS, Messenger = UltilsHelper.GetMessageByErrorCode(EStatusCode.SUCCESS), DataResponse = model });
                 }
                 else if (response == EStatusCode.TOKEN_INVALID)

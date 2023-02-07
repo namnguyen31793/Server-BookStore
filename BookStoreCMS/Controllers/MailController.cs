@@ -1,5 +1,5 @@
-﻿using BookStore.Instance;
-using BookStore.Utils;
+﻿using BookStoreCMS.Instance;
+using BookStoreCMS.Utils;
 using DAO.DAOImp;
 using LoggerService;
 using Microsoft.AspNetCore.Http;
@@ -37,7 +37,8 @@ namespace BookStoreCMS.Controllers
         public async Task<IActionResult> GetUserMail()
         {
             var response = new ResponseApiModel<string>() { Status = EStatusCode.SYSTEM_ERROR, Messenger = UltilsHelper.GetMessageByErrorCode(EStatusCode.SYSTEM_ERROR) };
-            long accountId = TokenManager.GetAccountIdByAccessToken(Request);
+            int role = 0;
+            long accountId = TokenCMSManager.GetAccountIdByAccessToken(Request, ref role);
             if (accountId <= 0)
                 return Ok(new ResponseApiModel<string>() { Status = accountId, Messenger = UltilsHelper.GetMessageByErrorCode((int)accountId) });
             try
@@ -59,7 +60,8 @@ namespace BookStoreCMS.Controllers
         {
             var response = new ResponseApiModel<string>() { Status = EStatusCode.SYSTEM_ERROR, Messenger = UltilsHelper.GetMessageByErrorCode(EStatusCode.SYSTEM_ERROR) };
 
-            long accountId = TokenManager.GetAccountIdByAccessToken(Request);
+            int role = 0;
+            long accountId = TokenCMSManager.GetAccountIdByAccessToken(Request, ref role);
             if (accountId <= 0)
                 return Ok(new ResponseApiModel<string>() { Status = accountId, Messenger = UltilsHelper.GetMessageByErrorCode((int)accountId) });
             try
@@ -87,7 +89,8 @@ namespace BookStoreCMS.Controllers
         {
             var response = new ResponseApiModel<string>() { Status = EStatusCode.SYSTEM_ERROR, Messenger = UltilsHelper.GetMessageByErrorCode(EStatusCode.SYSTEM_ERROR) };
 
-            long accountId = TokenManager.GetAccountIdByAccessToken(Request);
+            int role = 0;
+            long accountId = TokenCMSManager.GetAccountIdByAccessToken(Request, ref role);
             if (accountId <= 0)
                 return Ok(new ResponseApiModel<string>() { Status = accountId, Messenger = UltilsHelper.GetMessageByErrorCode((int)accountId) });
             try

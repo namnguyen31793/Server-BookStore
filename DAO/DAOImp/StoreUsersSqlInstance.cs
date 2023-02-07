@@ -36,7 +36,7 @@ namespace DAO.DAOImp
                 return _inst;
             }
         }
-
+        #region APP
         public long DoLogin(string accountName, string passwordMd5, int merchantId, string remoteIp, int ostype, ref int responseStatus)
         {
             DBHelper db = null;
@@ -50,7 +50,7 @@ namespace DAO.DAOImp
                 pars[2] = new SqlParameter("@_RemoteIP", remoteIp);
                 pars[3] = new SqlParameter("@_PlatformId", ostype);
                 pars[4] = new SqlParameter("@_SourceId", merchantId);
-                pars[5] = new SqlParameter("@_AccountId", SqlDbType.Int) { Direction = ParameterDirection.Output };
+                pars[5] = new SqlParameter("@_AccountId", SqlDbType.BigInt) { Direction = ParameterDirection.Output };
                 pars[6] = new SqlParameter("@_ResponseStatus", SqlDbType.BigInt) { Direction = ParameterDirection.Output };
                 db.ExecuteNonQuerySP("SP_Store_Users_DoLogin", 4, pars);
                 responseStatus = Convert.ToInt32(pars[6].Value.ToString());
@@ -133,18 +133,23 @@ namespace DAO.DAOImp
             }
             return response;
         }
-        public int CheckRefreshToken(string ResfreshToken)
+        public int CheckRefreshToken(string ResfreshToken, ref long accountId)
         {
             DBHelper db = null;
             var response = -9999;
+            accountId = 0;
             try
             {
                 db = new DBHelper(ConfigDb.StoreUsersConnectionString);
-                var pars = new SqlParameter[2];
+                var pars = new SqlParameter[3];
                 pars[0] = new SqlParameter("@_ResfreshToken", ResfreshToken);
-                pars[1] = new SqlParameter("@_ResponseStatus", SqlDbType.BigInt) { Direction = ParameterDirection.Output };
+                pars[1] = new SqlParameter("@_AccountId", SqlDbType.BigInt) { Direction = ParameterDirection.Output };
+                pars[2] = new SqlParameter("@_ResponseStatus", SqlDbType.BigInt) { Direction = ParameterDirection.Output };
                 db.ExecuteNonQuerySP("SP_Store_Users_CheckRefreshToken", 4, pars);
-                response = Convert.ToInt32(pars[1].Value);
+                response = Convert.ToInt32(pars[2].Value);
+                if (response == 0) {
+                    accountId = Convert.ToInt64(pars[1].Value);
+                }
             }
             catch (Exception exception)
             {
@@ -263,5 +268,75 @@ namespace DAO.DAOImp
             }
             return response;
         }
+        #endregion
+
+        #region CMS
+        public long DoLoginCms(string accountName, string passwordMd5, int merchantId, string remoteIp, int ostype, ref int userRole, ref int responseStatus)
+        {
+            DBHelper db = null;
+            long accountId = -1;
+            try
+            {
+                db = new DBHelper(ConfigDb.StoreUsersConnectionString);
+                var pars = new SqlParameter[8];
+                pars[0] = new SqlParameter("@_UserName", accountName);
+                pars[1] = new SqlParameter("@_PasswordMD5", passwordMd5);
+                pars[2] = new SqlParameter("@_RemoteIP", remoteIp);
+                pars[3] = new SqlParameter("@_PlatformId", ostype);
+                pars[4] = new SqlParameter("@_SourceId", merchantId);
+                pars[5] = new SqlParameter("@_AccountId", SqlDbType.BigInt) { Direction = ParameterDirection.Output };
+                pars[6] = new SqlParameter("@_UserRole", SqlDbType.Int) { Direction = ParameterDirection.Output };
+                pars[7] = new SqlParameter("@_ResponseStatus", SqlDbType.BigInt) { Direction = ParameterDirection.Output };
+                db.ExecuteNonQuerySP("SP_Store_Users_DoLogin", 4, pars);
+                responseStatus = Convert.ToInt32(pars[7].Value.ToString());
+                if (responseStatus == 0)
+                {
+                    accountId = Convert.ToInt64(pars[5].Value.ToString());
+                    userRole = Convert.ToInt32(pars[6].Value.ToString());
+                }
+            }
+            catch (Exception exception)
+            {
+                responseStatus = -9999;
+                Task.Run(async () => await _logger.LogError("SQL-DoLoginCms()", exception.ToString()).ConfigureAwait(false));
+            }
+            finally
+            {
+                db?.Close();
+            }
+            return accountId;
+        }
+        public int CheckRefreshTokenCms(string ResfreshToken, ref int role, ref long accountId)
+        {
+            DBHelper db = null;
+            var response = -9999;
+            accountId = 0;
+            try
+            {
+                db = new DBHelper(ConfigDb.StoreUsersConnectionString);
+                var pars = new SqlParameter[4];
+                pars[0] = new SqlParameter("@_ResfreshToken", ResfreshToken);
+                pars[1] = new SqlParameter("@_RoleUser", SqlDbType.Int) { Direction = ParameterDirection.Output };
+                pars[2] = new SqlParameter("@_AccountId", SqlDbType.BigInt) { Direction = ParameterDirection.Output };
+                pars[3] = new SqlParameter("@_ResponseStatus", SqlDbType.BigInt) { Direction = ParameterDirection.Output };
+                db.ExecuteNonQuerySP("SP_Store_Users_CMS_CheckRefreshToken", 4, pars);
+                response = Convert.ToInt32(pars[3].Value);
+                if (response == 0)
+                {
+                    role = Convert.ToInt32(pars[1].Value);
+                    accountId = Convert.ToInt64(pars[2].Value);
+                }
+            }
+            catch (Exception exception)
+            {
+                Task.Run(async () => await _logger.LogError("SQL-CheckRefreshTokenCms()", exception.ToString()).ConfigureAwait(false));
+            }
+            finally
+            {
+                db?.Close();
+            }
+            return response;
+        }
+        #endregion
     }
 }

@@ -1,4 +1,4 @@
-﻿using BookStore.Utils;
+﻿using BookStoreCMS.Utils;
 using DAO.DAOImp;
 using LoggerService;
 using Microsoft.AspNetCore.Http;
@@ -98,8 +98,8 @@ namespace BookStoreCMS.Controllers
         {
             if (string.IsNullOrEmpty(barcode))
                 return Ok(new ResponseApiModel<string>() { Status = EStatusCode.DATA_INVAILD, Messenger = UltilsHelper.GetMessageByErrorCode(EStatusCode.DATA_INVAILD) });
-
-            long accountId = TokenManager.GetAccountIdByAccessToken(Request);
+            int role = 0;
+            long accountId = TokenCMSManager.GetAccountIdByAccessToken(Request, ref role);
             if (accountId <= 0)
                 return Ok(new ResponseApiModel<string>() { Status = accountId, Messenger = UltilsHelper.GetMessageByErrorCode((int)accountId) });
 
@@ -188,8 +188,8 @@ namespace BookStoreCMS.Controllers
         {
             var response = new ResponseApiModel<string>() { Status = EStatusCode.SYSTEM_ERROR, Messenger = UltilsHelper.GetMessageByErrorCode(EStatusCode.SYSTEM_ERROR) };
             int responseStatus = EStatusCode.DATABASE_ERROR;
-
-            long accountId = TokenManager.GetAccountIdByAccessToken(Request);
+            int role = 0;
+            long accountId = TokenCMSManager.GetAccountIdByAccessToken(Request, ref role);
             if (accountId <= 0)
                 return Ok(new ResponseApiModel<string>() { Status = accountId, Messenger = UltilsHelper.GetMessageByErrorCode((int)accountId) });
             try

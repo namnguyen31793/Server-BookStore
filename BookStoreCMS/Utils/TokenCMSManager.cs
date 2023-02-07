@@ -10,25 +10,27 @@ using UtilsSystem.Utils;
 
 namespace BookStoreCMS.Utils
 {
-    public class TokenManager
+    public class TokenCMSManager
     {
-        public static string GenerateAccessToken(long accountId, ClientRequestInfo clientInfo)
+        public static string GenerateAccessToken(long accountId, int role, ClientRequestInfo clientInfo)
         {
-            var response = string.Format("{0}|{1}|{2}|{3}",
+            var response = string.Format("{0}|{1}|{2}|{3}|{4}",
                                           DateTime.UtcNow.Ticks,
                                           accountId,
+                                          role,
                                           clientInfo.MerchantId,
                                           clientInfo.DeviceId);
             response = Security.Encrypt(CONFIG.SecretTokenKey, response);
             string result = response.Replace("=", "_");
 
-            string keyRedis = "Token:" + result;
-            RedisGatewayCacheManager.Inst.SaveData(keyRedis, accountId.ToString(), 5);
+            string keyRedis = "TokenCMS:" + result;
+            RedisGatewayCacheManager.Inst.SaveData(keyRedis, accountId.ToString() +"-"+role, 5);
 
             return result;
         }
-        public static long GetAccountIdByAccessToken(HttpRequest request)
+        public static long GetAccountIdByAccessToken(HttpRequest request, ref int role)
         {
+            role = 0;
             string accessToken = "";
             if (request.Headers.TryGetValue("Authorization", out var values)) {
                 accessToken = values.FirstOrDefault();
@@ -36,13 +38,51 @@ namespace BookStoreCMS.Utils
             if (string.IsNullOrEmpty(accessToken))
                 return EStatusCode.USER_NOT_LOGIN;
 
-            string keyRedis = "Token:" + accessToken;
+            string keyRedis = "TokenCMS:" + accessToken;
             long accountId = -1;
             var data = RedisGatewayCacheManager.Inst.GetDataFromCache(keyRedis);
-            long.TryParse(data, out accountId);
-            if (accountId <= 0)
-                return EStatusCode.TOKEN_EXPIRES;
+            if (string.IsNullOrEmpty(data))
+            {
+                var listdata = data.Split("-");
+                long.TryParse(listdata[0], out accountId);
+                if (accountId <= 0)
+                    return EStatusCode.TOKEN_EXPIRES;
+                int.TryParse(listdata[1], out role);
+            }
             return accountId;
+        }
+
+        public static int CheckRoleAction(int rolePermission, HttpRequest request) {
+            int response = EStatusCode.SYSTEM_ERROR;
+            string accessToken = "";
+            if (request.Headers.TryGetValue("Authorization", out var values))
+            {
+                accessToken = values.FirstOrDefault();
+            }
+            if (string.IsNullOrEmpty(accessToken))
+                return EStatusCode.USER_NOT_LOGIN;
+
+            string keyRedis = "TokenCMS:" + accessToken;
+            long accountId = -1;
+            int role = 0;
+            var data = RedisGatewayCacheManager.Inst.GetDataFromCache(keyRedis);
+            if (string.IsNullOrEmpty(data))
+            {
+                var listdata = data.Split("-");
+                long.TryParse(listdata[0], out accountId);
+                if (accountId <= 0)
+                    return EStatusCode.TOKEN_EXPIRES;
+                int.TryParse(listdata[1], out role);
+                if (role > rolePermission)
+                {
+                    response = EStatusCode.ACCOUNT_NOT_ENOUGH_ROLE;
+                }
+                else {
+                    response = EStatusCode.SUCCESS;
+                }
+            }
+
+            return response;
         }
 
         public static long GetAccountIdByAccessToken(string accessToken) {

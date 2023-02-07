@@ -29,7 +29,7 @@
   },
   "targets": {
     ".NETCoreApp,Version=v3.1": {
-      "BookStore/1.0.0": {
+      "BookStoreCMS/1.0.0": {
         "dependencies": {
           "DAO": "1.0.0",
           "LoggerService": "1.0.0",
@@ -306,10 +306,10 @@
           "WindowsBase": "4.0.0.0"
         },
         "runtime": {
-          "BookStore.dll": {}
+          "BookStoreCMS.dll": {}
         },
         "compile": {
-          "BookStore.dll": {}
+          "BookStoreCMS.dll": {}
         }
       },
       "DnsClient/1.6.1": {
@@ -2889,7 +2889,7 @@
     }
   },
   "libraries": {
-    "BookStore/1.0.0": {
+    "BookStoreCMS/1.0.0": {
       "type": "project",
       "serviceable": false,
       "sha512": ""
