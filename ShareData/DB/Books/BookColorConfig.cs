@@ -10,7 +10,6 @@ namespace ShareData.DB.Books
         public int ColorId {get; set; }
         public string Cover { get; set; }
         public string Media { get; set; }
-        [JsonIgnore]
         public bool Status { get; set; }
     }
 }

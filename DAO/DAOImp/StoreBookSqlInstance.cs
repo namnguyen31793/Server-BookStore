@@ -279,10 +279,156 @@ namespace DAO.DAOImp
             }
             return modelData;
         }
+        public AddBookModel AddNewBook(AddBookModel model, out int reponseStatus)
+        {
+            DBHelper db = null;
+            AddBookModel data = null;
+            reponseStatus = EStatusCode.DATABASE_ERROR;
+            try
+            {
+                db = new DBHelper(ConfigDb.StoreBookConnectionString);
+                var pars = new SqlParameter[15];
+                pars[0] = new SqlParameter("@_Barcode", model.Barcode);
+                pars[1] = new SqlParameter("@_ImageLink", model.ImageLink);
+                pars[2] = new SqlParameter("@_BookName", model.BookName);
+                pars[3] = new SqlParameter("@_AuthorId", model.AuthorId);
+                pars[4] = new SqlParameter("@_AmountBase", model.AmountBase);
+                pars[5] = new SqlParameter("@_AmountSale", model.AmountSale);
+                pars[6] = new SqlParameter("@_TrialReadLink", model.TrialReadLink);
+                pars[7] = new SqlParameter("@_KeyLink", model.KeyLink);
+                pars[8] = new SqlParameter("@_NumberPage", model.NumberPage);
+                pars[9] = new SqlParameter("@_ContentBook", model.ContentBook);
+                pars[10] = new SqlParameter("@_Tags", model.Tags);
+                pars[11] = new SqlParameter("@_RelatedBooks", model.RelatedBooks);
+                pars[12] = new SqlParameter("@_ColorId", model.ColorId);
+                pars[13] = new SqlParameter("@_Status", model.Status);
+                pars[14] = new SqlParameter("@_ResponseStatus", SqlDbType.Int) { Direction = ParameterDirection.Output };
+                data = db.GetInstanceSP<AddBookModel>("SP_Store_Book_CMS_Book_Add", 4, pars);
+                reponseStatus = Convert.ToInt32(pars[14].Value);
+            }
+            catch (Exception exception)
+            {
+                Task.Run(async () => await _logger.LogError("SQL-AddNewBook()", exception.ToString()).ConfigureAwait(false));
+            }
+            finally
+            {
+                db?.Close();
+            }
+            return data;
+        }
+        public AddBookModel UpdateBook(AddBookModel model, out int reponseStatus)
+        {
+            DBHelper db = null;
+            AddBookModel data = null;
+            reponseStatus = EStatusCode.DATABASE_ERROR;
+            try
+            {
+                db = new DBHelper(ConfigDb.StoreBookConnectionString);
+                var pars = new SqlParameter[15];
+                pars[0] = new SqlParameter("@_Barcode", model.Barcode);
+                pars[1] = new SqlParameter("@_ImageLink", model.ImageLink);
+                pars[2] = new SqlParameter("@_BookName", model.BookName);
+                pars[3] = new SqlParameter("@_AuthorId", model.AuthorId);
+                pars[4] = new SqlParameter("@_AmountBase", model.AmountBase);
+                pars[5] = new SqlParameter("@_AmountSale", model.AmountSale);
+                pars[6] = new SqlParameter("@_TrialReadLink", model.TrialReadLink);
+                pars[7] = new SqlParameter("@_KeyLink", model.KeyLink);
+                pars[8] = new SqlParameter("@_NumberPage", model.NumberPage);
+                pars[9] = new SqlParameter("@_ContentBook", model.ContentBook);
+                pars[10] = new SqlParameter("@_Tags", model.Tags);
+                pars[11] = new SqlParameter("@_RelatedBooks", model.RelatedBooks);
+                pars[12] = new SqlParameter("@_ColorId", model.ColorId);
+                pars[13] = new SqlParameter("@_Status", model.Status);
+                pars[14] = new SqlParameter("@_ResponseStatus", SqlDbType.Int) { Direction = ParameterDirection.Output };
+                data = db.GetInstanceSP<AddBookModel>("SP_Store_Book_CMS_Book_Update", 4, pars);
+                reponseStatus = Convert.ToInt32(pars[14].Value);
+            }
+            catch (Exception exception)
+            {
+                Task.Run(async () => await _logger.LogError("SQL-UpdateBook()", exception.ToString()).ConfigureAwait(false));
+            }
+            finally
+            {
+                db?.Close();
+            }
+            return data;
+        }
+        public AddBookModel GetBookCmsByBarcode(string barcode, out int reponseStatus)
+        {
+            DBHelper db = null;
+            AddBookModel modelData = null;
+            reponseStatus = EStatusCode.DATABASE_ERROR;
+            try
+            {
+                db = new DBHelper(ConfigDb.StoreBookConnectionString);
+                var pars = new SqlParameter[2];
+                pars[0] = new SqlParameter("@_Barcode", barcode);
+                pars[1] = new SqlParameter("@_ResponseStatus", SqlDbType.Int) { Direction = ParameterDirection.Output };
+                modelData = db.GetInstanceSP<AddBookModel>("SP_Store_Book_CMS_Book_Get_By_BarCode", 4, pars);
+                reponseStatus = Convert.ToInt32(pars[1].Value);
+            }
+            catch (Exception exception)
+            {
+                Task.Run(async () => await _logger.LogError("SQL-GetBookCmsByBarcode()", exception.ToString()).ConfigureAwait(false));
+            }
+            finally
+            {
+                db?.Close();
+            }
+            return modelData;
+        }
+        public List<AddBookModel> GetListBookCms(int page, int row, out int reponseStatus)
+        {
+            DBHelper db = null;
+            List<AddBookModel> modelData = null;
+            reponseStatus = EStatusCode.DATABASE_ERROR;
+            try
+            {
+                db = new DBHelper(ConfigDb.StoreBookConnectionString);
+                var pars = new SqlParameter[3];
+                pars[0] = new SqlParameter("@_Index", page);
+                pars[1] = new SqlParameter("@_NUMBER_GET", row);
+                pars[2] = new SqlParameter("@_ResponseStatus", SqlDbType.Int) { Direction = ParameterDirection.Output };
+                modelData = db.GetListSP<AddBookModel>("SP_Store_Book_CMS_Book_Get_List", 4, pars);
+                reponseStatus = Convert.ToInt32(pars[2].Value);
+            }
+            catch (Exception exception)
+            {
+                Task.Run(async () => await _logger.LogError("SQL-GetListSimpleBook()", exception.ToString()).ConfigureAwait(false));
+            }
+            finally
+            {
+                db?.Close();
+            }
+            return modelData;
+        }
         #endregion
 
         #region AUTHOR
 
+        public List<AuthorInfoModel> GetListAuthorConfigAll(out int reponseStatus)
+        {
+            DBHelper db = null;
+            List<AuthorInfoModel> listConfig = null;
+            reponseStatus = EStatusCode.DATABASE_ERROR;
+            try
+            {
+                db = new DBHelper(ConfigDb.StoreBookConnectionString);
+                var pars = new SqlParameter[1];
+                pars[0] = new SqlParameter("@_ResponseStatus", SqlDbType.Int) { Direction = ParameterDirection.Output };
+                listConfig = db.GetListSP<AuthorInfoModel>("SP_Store_Book_Author_Get_All", 4, pars);
+                reponseStatus = Convert.ToInt32(pars[0].Value);
+            }
+            catch (Exception exception)
+            {
+                Task.Run(async () => await _logger.LogError("SQL-GetListAuthorConfigAll()", exception.ToString()).ConfigureAwait(false));
+            }
+            finally
+            {
+                db?.Close();
+            }
+            return listConfig;
+        }
         public AuthorInfoModel GetAuthorById(int authorId, out int reponseStatus)
         {
             DBHelper db = null;
@@ -294,7 +440,7 @@ namespace DAO.DAOImp
                 var pars = new SqlParameter[2];
                 pars[0] = new SqlParameter("@_AuthorId", authorId);
                 pars[1] = new SqlParameter("@_ResponseStatus", SqlDbType.Int) { Direction = ParameterDirection.Output };
-                modelData = db.GetInstanceSP<AuthorInfoModel>("SP_Store_Book_Get_Info_Author", 4, pars);
+                modelData = db.GetInstanceSP<AuthorInfoModel>("SP_Store_Book_Author_Get_Info", 4, pars);
                 reponseStatus = Convert.ToInt32(pars[1].Value);
             }
             catch (Exception exception)
@@ -321,7 +467,7 @@ namespace DAO.DAOImp
                 pars[2] = new SqlParameter("@_AuthorAdress", model.AuthorAdress);
                 pars[3] = new SqlParameter("@_AuthorIntroduction", model.AuthorIntroduction);
                 pars[4] = new SqlParameter("@_ResponseStatus", SqlDbType.Int) { Direction = ParameterDirection.Output };
-                data = db.GetInstanceSP<AuthorInfoModel>("SP_Store_Book_CMS_Add_Author", 4, pars);
+                data = db.GetInstanceSP<AuthorInfoModel>("SP_Store_Book_Author_Add", 4, pars);
                 reponseStatus = Convert.ToInt32(pars[4].Value);
             }
             catch (Exception exception)
@@ -333,6 +479,33 @@ namespace DAO.DAOImp
                 db?.Close();
             }
             return data;
+        }
+        public int UpdateAuthorCònig(AuthorInfoModel model)
+        {
+            DBHelper db = null;
+            int reponseStatus = EStatusCode.DATABASE_ERROR;
+            try
+            {
+                db = new DBHelper(ConfigDb.StoreBookConnectionString);
+                var pars = new SqlParameter[6];
+                pars[0] = new SqlParameter("@_AuthorId", model.AuthorId);
+                pars[1] = new SqlParameter("@_AuthorName", model.AuthorName);
+                pars[2] = new SqlParameter("@_AuthorBirday", model.AuthorBirday);
+                pars[3] = new SqlParameter("@_AuthorAdress", model.AuthorAdress);
+                pars[4] = new SqlParameter("@_AuthorIntroduction", model.AuthorIntroduction);
+                pars[5] = new SqlParameter("@_ResponseStatus", SqlDbType.Int) { Direction = ParameterDirection.Output };
+                db.ExecuteNonQuerySP("SP_Store_Book_Author_Update", 4, pars);
+                reponseStatus = Convert.ToInt32(pars[5].Value);
+            }
+            catch (Exception exception)
+            {
+                Task.Run(async () => await _logger.LogError("SQL-UpdateNewAuthor()", exception.ToString()).ConfigureAwait(false));
+            }
+            finally
+            {
+                db?.Close();
+            }
+            return reponseStatus;
         }
         #endregion
 
@@ -486,6 +659,83 @@ namespace DAO.DAOImp
                 db?.Close();
             }
             return reponseStatus;
+        }
+        #endregion
+        #region TAG
+        public BookTagModel AddTagConfig(BookTagModel model, out int reponseStatus)
+        {
+            DBHelper db = null;
+            BookTagModel data = null;
+            reponseStatus = EStatusCode.DATABASE_ERROR;
+            try
+            {
+                db = new DBHelper(ConfigDb.StoreBookConnectionString);
+                var pars = new SqlParameter[3];
+                pars[0] = new SqlParameter("@_TagName", model.TagName);
+                pars[1] = new SqlParameter("@_LinkIcon", model.ImageLink);
+                pars[2] = new SqlParameter("@_ResponseStatus", SqlDbType.Int) { Direction = ParameterDirection.Output };
+                data = db.GetInstanceSP<BookTagModel>("SP_Store_Book_Tag_Add", 4, pars);
+                reponseStatus = Convert.ToInt32(pars[2].Value);
+            }
+            catch (Exception exception)
+            {
+                Task.Run(async () => await _logger.LogError("SQL-AddTagConfig()", exception.ToString()).ConfigureAwait(false));
+            }
+            finally
+            {
+                db?.Close();
+            }
+            return data;
+        }
+
+        public BookTagModel UpdateTagConfig(BookTagModel model, out int reponseStatus)
+        {
+            DBHelper db = null;
+            BookTagModel data = null;
+            reponseStatus = EStatusCode.DATABASE_ERROR;
+            try
+            {
+                db = new DBHelper(ConfigDb.StoreBookConnectionString);
+                var pars = new SqlParameter[4];
+                pars[0] = new SqlParameter("@_TagId", model.TagId);
+                pars[1] = new SqlParameter("@_TagName", model.TagName);
+                pars[2] = new SqlParameter("@_LinkIcon", model.ImageLink);
+                pars[3] = new SqlParameter("@_ResponseStatus", SqlDbType.Int) { Direction = ParameterDirection.Output };
+                data = db.GetInstanceSP<BookTagModel>("SP_Store_Book_Tag_Update", 4, pars);
+                reponseStatus = Convert.ToInt32(pars[3].Value);
+            }
+            catch (Exception exception)
+            {
+                Task.Run(async () => await _logger.LogError("SQL-UpdateTagConfig()", exception.ToString()).ConfigureAwait(false));
+            }
+            finally
+            {
+                db?.Close();
+            }
+            return data;
+        }
+        public List<BookTagModel> GetAllTagConfig(out int reponseStatus)
+        {
+            DBHelper db = null;
+            List<BookTagModel> listConfig = null;
+            reponseStatus = EStatusCode.DATABASE_ERROR;
+            try
+            {
+                db = new DBHelper(ConfigDb.StoreBookConnectionString);
+                var pars = new SqlParameter[1];
+                pars[0] = new SqlParameter("@_ResponseStatus", SqlDbType.Int) { Direction = ParameterDirection.Output };
+                listConfig = db.GetListSP<BookTagModel>("SP_Store_Book_Tag_Get_All", 4, pars);
+                reponseStatus = Convert.ToInt32(pars[0].Value);
+            }
+            catch (Exception exception)
+            {
+                Task.Run(async () => await _logger.LogError("SQL-GetAllTagConfig()", exception.ToString()).ConfigureAwait(false));
+            }
+            finally
+            {
+                db?.Close();
+            }
+            return listConfig;
         }
         #endregion
     }

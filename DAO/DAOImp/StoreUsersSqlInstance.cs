@@ -337,6 +337,32 @@ namespace DAO.DAOImp
             }
             return response;
         }
+
+        public int UpdateRole(long accountId, int role)
+        {
+            DBHelper db = null;
+            var response = -9999;
+            accountId = 0;
+            try
+            {
+                db = new DBHelper(ConfigDb.StoreUsersConnectionString);
+                var pars = new SqlParameter[3];
+                pars[0] = new SqlParameter("@_AccountId", accountId);
+                pars[1] = new SqlParameter("@_RoleUser", role);
+                pars[2] = new SqlParameter("@_ResponseStatus", SqlDbType.BigInt) { Direction = ParameterDirection.Output };
+                db.ExecuteNonQuerySP("SP_Store_Users_Update_Role", 4, pars);
+                response = Convert.ToInt32(pars[2].Value);
+            }
+            catch (Exception exception)
+            {
+                Task.Run(async () => await _logger.LogError("SQL-UpdateRole()", exception.ToString()).ConfigureAwait(false));
+            }
+            finally
+            {
+                db?.Close();
+            }
+            return response;
+        }
         #endregion
     }
 }

@@ -172,7 +172,6 @@ namespace BookStoreCMS.Controllers
             AccountModelDb response = null;
             try
             {
-                int role = 0;
                 int checkRole = TokenCMSManager.CheckRoleAction(ERole.Administrator, Request);
                 if(checkRole < 0)
                     return Ok(new ResponseApiModel<string>() { Status = checkRole, Messenger = UltilsHelper.GetMessageByErrorCode(checkRole) });
@@ -184,6 +183,62 @@ namespace BookStoreCMS.Controllers
             }
 
             return Ok(new ResponseApiModel<AccountModel>() { Status = responseStatus, Messenger = UltilsHelper.GetMessageByErrorCode(responseStatus), DataResponse = new AccountModel(response) });
+        }
+        [HttpPost]
+        [Route("GetBookBuy")]
+        [ResponseCache(Duration = 60)]
+        public async Task<IActionResult> GetBookBuy(long accountId)
+        {
+            int checkRole = TokenCMSManager.CheckRoleAction(ERole.Administrator, Request);
+            if (checkRole < 0)
+                return Ok(new ResponseApiModel<string>() { Status = checkRole, Messenger = UltilsHelper.GetMessageByErrorCode(checkRole) });
+
+            var response = new ResponseApiModel<string>() { Status = EStatusCode.SYSTEM_ERROR, Messenger = UltilsHelper.GetMessageByErrorCode(EStatusCode.SYSTEM_ERROR) };
+            try
+            {
+                int responseStatus = EStatusCode.DATABASE_ERROR;
+                string keyRedis = "CacheBookBuy:" + accountId;
+                string jsonListSimpleBook = RedisGatewayManager<string>.Inst.GetDataFromCache(keyRedis);
+                if (string.IsNullOrEmpty(jsonListSimpleBook))
+                {
+                    var listBook = StoreBookSqlInstance.Inst.GetBookBuyAccount(accountId, out responseStatus);
+                    if (responseStatus == EStatusCode.SUCCESS)
+                    {
+                        jsonListSimpleBook = JsonConvert.SerializeObject(listBook);
+                        RedisGatewayManager<string>.Inst.SaveData(keyRedis, jsonListSimpleBook, 600);
+                    }
+                }
+                response = new ResponseApiModel<string>() { Status = responseStatus, Messenger = UltilsHelper.GetMessageByErrorCode(responseStatus), DataResponse = jsonListSimpleBook };
+            }
+            catch (Exception ex)
+            {
+                await _logger.LogError("Books-GetBookBuy{}", ex.ToString()).ConfigureAwait(false);
+            }
+            return Ok(response);
+        }
+
+        [HttpPost]
+        [Route("UpdateRoleUser")]
+        [ResponseCache(Duration = 60)]
+        public async Task<IActionResult> UpdateRoleUser(long accountId, int role)
+        {
+            if (role <= 1)
+                return Ok(new ResponseApiModel<string>() { Status = EStatusCode.ACCOUNT_NOT_ENOUGH_ROLE, Messenger = UltilsHelper.GetMessageByErrorCode(EStatusCode.ACCOUNT_NOT_ENOUGH_ROLE) });
+            int checkRole = TokenCMSManager.CheckRoleAction(ERole.GM, Request);
+            if (checkRole < 0)
+                return Ok(new ResponseApiModel<string>() { Status = checkRole, Messenger = UltilsHelper.GetMessageByErrorCode(checkRole) });
+
+            var response = new ResponseApiModel<string>() { Status = EStatusCode.SYSTEM_ERROR, Messenger = UltilsHelper.GetMessageByErrorCode(EStatusCode.SYSTEM_ERROR) };
+            try
+            {
+                var responseStatus = StoreUsersSqlInstance.Inst.UpdateRole(accountId, role);
+                response = new ResponseApiModel<string>() { Status = responseStatus, Messenger = UltilsHelper.GetMessageByErrorCode(responseStatus)};
+            }
+            catch (Exception ex)
+            {
+                await _logger.LogError("Books-UpdateRoleUser{}", ex.ToString()).ConfigureAwait(false);
+            }
+            return Ok(response);
         }
     }
 }

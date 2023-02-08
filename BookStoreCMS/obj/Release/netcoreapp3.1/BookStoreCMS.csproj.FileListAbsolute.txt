@@ -89,8 +89,6 @@ D:\Server\Server-BookStore\BookStoreCMS\bin\Release\netcoreapp3.1\RedisSystem.pd
 D:\Server\Server-BookStore\BookStoreCMS\bin\Release\netcoreapp3.1\ShareData.pdb
 D:\Server\Server-BookStore\BookStoreCMS\bin\Release\netcoreapp3.1\UtilsSystem.pdb
 D:\Server\Server-BookStore\BookStoreCMS\obj\Release\netcoreapp3.1\staticwebassets\BookStoreCMS.StaticWebAssets.Manifest.cache
-D:\Server\Server-BookStore\BookStoreCMS\obj\Release\netcoreapp3.1\staticwebassets\BookStoreCMS.StaticWebAssets.xml
-D:\Server\Server-BookStore\BookStoreCMS\obj\Release\netcoreapp3.1\scopedcss\bundle\BookStoreCMS.styles.css
 D:\Server\Server-BookStore\BookStoreCMS\obj\Release\netcoreapp3.1\BookStoreCMS.RazorTargetAssemblyInfo.cache
 D:\Server\Server-BookStore\BookStoreCMS\obj\Release\netcoreapp3.1\BookStoreCMS.csproj.CopyComplete
 D:\Server\Server-BookStore\BookStoreCMS\obj\Release\netcoreapp3.1\BookStoreCMS.dll

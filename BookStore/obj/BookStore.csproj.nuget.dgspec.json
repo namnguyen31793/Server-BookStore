@@ -10,11 +10,14 @@
         "projectUniqueName": "D:\\Server\\Server-BookStore\\BookStore\\BookStore.csproj",
         "projectName": "BookStore",
         "projectPath": "D:\\Server\\Server-BookStore\\BookStore\\BookStore.csproj",
-        "packagesPath": "C:\\Users\\Nam PC\\.nuget\\packages\\",
+        "packagesPath": "C:\\Users\\nguye\\.nuget\\packages\\",
         "outputPath": "D:\\Server\\Server-BookStore\\BookStore\\obj\\",
         "projectStyle": "PackageReference",
+        "fallbackFolders": [
+          "C:\\Program Files\\dotnet\\sdk\\NuGetFallbackFolder"
+        ],
         "configFilePaths": [
-          "C:\\Users\\Nam PC\\AppData\\Roaming\\NuGet\\NuGet.Config",
+          "C:\\Users\\nguye\\AppData\\Roaming\\NuGet\\NuGet.Config",
           "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.Offline.config"
         ],
         "originalTargetFrameworks": [
@@ -95,6 +98,12 @@
           ],
           "assetTargetFallback": true,
           "warn": true,
+          "downloadDependencies": [
+            {
+              "name": "Microsoft.NETCore.App.Host.win-x64",
+              "version": "[3.1.23, 3.1.23]"
+            }
+          ],
           "frameworkReferences": {
             "Microsoft.AspNetCore.App": {
               "privateAssets": "none"
@@ -103,7 +112,7 @@
               "privateAssets": "all"
             }
           },
-          "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\5.0.404\\RuntimeIdentifierGraph.json"
+          "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\6.0.201\\RuntimeIdentifierGraph.json"
         }
       }
     },
@@ -113,11 +122,14 @@
         "projectUniqueName": "D:\\Server\\Server-BookStore\\DAO\\DAO.csproj",
         "projectName": "DAO",
         "projectPath": "D:\\Server\\Server-BookStore\\DAO\\DAO.csproj",
-        "packagesPath": "C:\\Users\\Nam PC\\.nuget\\packages\\",
+        "packagesPath": "C:\\Users\\nguye\\.nuget\\packages\\",
         "outputPath": "D:\\Server\\Server-BookStore\\DAO\\obj\\",
         "projectStyle": "PackageReference",
+        "fallbackFolders": [
+          "C:\\Program Files\\dotnet\\sdk\\NuGetFallbackFolder"
+        ],
         "configFilePaths": [
-          "C:\\Users\\Nam PC\\AppData\\Roaming\\NuGet\\NuGet.Config",
+          "C:\\Users\\nguye\\AppData\\Roaming\\NuGet\\NuGet.Config",
           "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.Offline.config"
         ],
         "originalTargetFrameworks": [
@@ -174,7 +186,7 @@
               "privateAssets": "all"
             }
           },
-          "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\5.0.404\\RuntimeIdentifierGraph.json"
+          "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\6.0.201\\RuntimeIdentifierGraph.json"
         }
       }
     },
@@ -184,11 +196,14 @@
         "projectUniqueName": "D:\\Server\\Server-BookStore\\LoggerService\\LoggerService.csproj",
         "projectName": "LoggerService",
         "projectPath": "D:\\Server\\Server-BookStore\\LoggerService\\LoggerService.csproj",
-        "packagesPath": "C:\\Users\\Nam PC\\.nuget\\packages\\",
+        "packagesPath": "C:\\Users\\nguye\\.nuget\\packages\\",
         "outputPath": "D:\\Server\\Server-BookStore\\LoggerService\\obj\\",
         "projectStyle": "PackageReference",
+        "fallbackFolders": [
+          "C:\\Program Files\\dotnet\\sdk\\NuGetFallbackFolder"
+        ],
         "configFilePaths": [
-          "C:\\Users\\Nam PC\\AppData\\Roaming\\NuGet\\NuGet.Config",
+          "C:\\Users\\nguye\\AppData\\Roaming\\NuGet\\NuGet.Config",
           "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.Offline.config"
         ],
         "originalTargetFrameworks": [
@@ -242,7 +257,7 @@
               "privateAssets": "all"
             }
           },
-          "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\5.0.404\\RuntimeIdentifierGraph.json"
+          "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\6.0.201\\RuntimeIdentifierGraph.json"
         }
       }
     },
@@ -252,11 +267,14 @@
         "projectUniqueName": "D:\\Server\\Server-BookStore\\RedisSystem\\RedisSystem.csproj",
         "projectName": "RedisSystem",
         "projectPath": "D:\\Server\\Server-BookStore\\RedisSystem\\RedisSystem.csproj",
-        "packagesPath": "C:\\Users\\Nam PC\\.nuget\\packages\\",
+        "packagesPath": "C:\\Users\\nguye\\.nuget\\packages\\",
         "outputPath": "D:\\Server\\Server-BookStore\\RedisSystem\\obj\\",
         "projectStyle": "PackageReference",
+        "fallbackFolders": [
+          "C:\\Program Files\\dotnet\\sdk\\NuGetFallbackFolder"
+        ],
         "configFilePaths": [
-          "C:\\Users\\Nam PC\\AppData\\Roaming\\NuGet\\NuGet.Config",
+          "C:\\Users\\nguye\\AppData\\Roaming\\NuGet\\NuGet.Config",
           "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.Offline.config"
         ],
         "originalTargetFrameworks": [
@@ -313,7 +331,7 @@
               "privateAssets": "all"
             }
           },
-          "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\5.0.404\\RuntimeIdentifierGraph.json"
+          "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\6.0.201\\RuntimeIdentifierGraph.json"
         }
       }
     },
@@ -323,11 +341,14 @@
         "projectUniqueName": "D:\\Server\\Server-BookStore\\ShareData\\ShareData.csproj",
         "projectName": "ShareData",
         "projectPath": "D:\\Server\\Server-BookStore\\ShareData\\ShareData.csproj",
-        "packagesPath": "C:\\Users\\Nam PC\\.nuget\\packages\\",
+        "packagesPath": "C:\\Users\\nguye\\.nuget\\packages\\",
         "outputPath": "D:\\Server\\Server-BookStore\\ShareData\\obj\\",
         "projectStyle": "PackageReference",
+        "fallbackFolders": [
+          "C:\\Program Files\\dotnet\\sdk\\NuGetFallbackFolder"
+        ],
         "configFilePaths": [
-          "C:\\Users\\Nam PC\\AppData\\Roaming\\NuGet\\NuGet.Config",
+          "C:\\Users\\nguye\\AppData\\Roaming\\NuGet\\NuGet.Config",
           "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.Offline.config"
         ],
         "originalTargetFrameworks": [
@@ -377,7 +398,7 @@
               "privateAssets": "all"
             }
           },
-          "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\5.0.404\\RuntimeIdentifierGraph.json"
+          "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\6.0.201\\RuntimeIdentifierGraph.json"
         }
       }
     },
@@ -387,11 +408,14 @@
         "projectUniqueName": "D:\\Server\\Server-BookStore\\UtilsSystem\\UtilsSystem.csproj",
         "projectName": "UtilsSystem",
         "projectPath": "D:\\Server\\Server-BookStore\\UtilsSystem\\UtilsSystem.csproj",
-        "packagesPath": "C:\\Users\\Nam PC\\.nuget\\packages\\",
+        "packagesPath": "C:\\Users\\nguye\\.nuget\\packages\\",
         "outputPath": "D:\\Server\\Server-BookStore\\UtilsSystem\\obj\\",
         "projectStyle": "PackageReference",
+        "fallbackFolders": [
+          "C:\\Program Files\\dotnet\\sdk\\NuGetFallbackFolder"
+        ],
         "configFilePaths": [
-          "C:\\Users\\Nam PC\\AppData\\Roaming\\NuGet\\NuGet.Config",
+          "C:\\Users\\nguye\\AppData\\Roaming\\NuGet\\NuGet.Config",
           "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.Offline.config"
         ],
         "originalTargetFrameworks": [
@@ -451,7 +475,7 @@
               "privateAssets": "all"
             }
           },
-          "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\5.0.404\\RuntimeIdentifierGraph.json"
+          "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\6.0.201\\RuntimeIdentifierGraph.json"
         }
       }
     }

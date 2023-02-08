@@ -365,6 +365,11 @@ namespace BookStore.Controllers
                     return Ok(new ResponseApiModel<string>() { Status = accountId, Messenger = UltilsHelper.GetMessageByErrorCode((int)accountId) });
 
                 responseStatus = StoreBookSqlInstance.Inst.AccountBuyBarcode(accountId, barcode);
+                if (responseStatus == EStatusCode.SUCCESS)
+                {
+                    string keyRedis = "CacheBookBuy:" + accountId; 
+                    RedisGatewayManager<string>.Inst.DeleteDataFromCache(keyRedis);
+                }
                 response = new ResponseApiModel<string>() { Status = responseStatus, Messenger = UltilsHelper.GetMessageByErrorCode(responseStatus) };
             }
             catch (Exception ex)
