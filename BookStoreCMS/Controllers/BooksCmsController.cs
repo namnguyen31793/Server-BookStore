@@ -74,7 +74,7 @@ namespace BookStoreCMS.Controllers
             int responseStatus = EStatusCode.DATABASE_ERROR;
             try
             {
-                var commentObj = StoreBookSqlInstance.Inst.AddColorConfig(data);
+                responseStatus = StoreBookSqlInstance.Inst.AddColorConfig(data);
                 if (responseStatus  == EStatusCode.SUCCESS) {
                     string keyRedis = "CacheListColorConfig";
                     RedisGatewayManager<string>.Inst.DeleteDataFromCache(keyRedis);
@@ -123,9 +123,9 @@ namespace BookStoreCMS.Controllers
                 return Ok(new ResponseApiModel<string>() { Status = checkRole, Messenger = UltilsHelper.GetMessageByErrorCode(checkRole) });
 
             var response = new ResponseApiModel<string>() { Status = EStatusCode.SYSTEM_ERROR, Messenger = UltilsHelper.GetMessageByErrorCode(EStatusCode.SYSTEM_ERROR) };
-            int responseStatus = EStatusCode.DATABASE_ERROR;
             try
             {
+                int responseStatus = EStatusCode.DATABASE_ERROR;
                 var listColor = StoreBookSqlInstance.Inst.GetListColorConfigAll(out responseStatus);
                 response = new ResponseApiModel<string>() { Status = responseStatus, Messenger = UltilsHelper.GetMessageByErrorCode(responseStatus), DataResponse = JsonConvert.SerializeObject(listColor) };
             }
@@ -200,7 +200,7 @@ namespace BookStoreCMS.Controllers
             }
             catch (Exception ex)
             {
-                await _logger.LogError("Books-GetAllColorConfig{}", ex.ToString()).ConfigureAwait(false);
+                await _logger.LogError("Books-GetAllTag{}", ex.ToString()).ConfigureAwait(false);
             }
             return Ok(response);
         }
@@ -261,7 +261,7 @@ namespace BookStoreCMS.Controllers
             int responseStatus = EStatusCode.DATABASE_ERROR;
             try
             {
-                responseStatus = StoreBookSqlInstance.Inst.UpdateAuthorCònig(model);
+                responseStatus = StoreBookSqlInstance.Inst.UpdateAuthorConfig(model);
                 response = new ResponseApiModel<string>() { Status = responseStatus, Messenger = UltilsHelper.GetMessageByErrorCode(responseStatus) };
             }
             catch (Exception ex)
@@ -338,9 +338,9 @@ namespace BookStoreCMS.Controllers
             return Ok(response);
         }
         [HttpGet]
-        [Route("GetBook")]
+        [Route("GetBooks")]
         [ResponseCache(Duration = 5)]
-        public async Task<IActionResult> GetBook(int page, int row)
+        public async Task<IActionResult> GetBooks(int page, int row)
         {
             if (page > 100)
                 page = 100;

@@ -287,7 +287,7 @@ namespace DAO.DAOImp
                 pars[5] = new SqlParameter("@_AccountId", SqlDbType.BigInt) { Direction = ParameterDirection.Output };
                 pars[6] = new SqlParameter("@_UserRole", SqlDbType.Int) { Direction = ParameterDirection.Output };
                 pars[7] = new SqlParameter("@_ResponseStatus", SqlDbType.BigInt) { Direction = ParameterDirection.Output };
-                db.ExecuteNonQuerySP("SP_Store_Users_DoLogin", 4, pars);
+                db.ExecuteNonQuerySP("SP_Store_Users_CMS_DoLogin", 4, pars);
                 responseStatus = Convert.ToInt32(pars[7].Value.ToString());
                 if (responseStatus == 0)
                 {

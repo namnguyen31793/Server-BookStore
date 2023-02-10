@@ -97,7 +97,7 @@ namespace BookStoreCMS.Controllers
                     var accountId = StoreUsersSqlInstance.Inst.DoLoginCms(requestLogin.AccountName, AccountUtils.EncryptPasswordMd5(requestLogin.Password), clientInfo.MerchantId, clientInfo.TrueClientIp, (int)clientInfo.OsType, ref role, ref res);
                     if (accountId >= 0)
                     {
-                        if (role != ERole.GM || role != ERole.Administrator)
+                        if (role != ERole.GM && role != ERole.Administrator)
                             return res = EStatusCode.ACCOUNT_NOT_ENOUGH_ROLE;
                         //create refresh token -> save db
                         var refreshToken = TokenCMSManager.GenerateRefreshToken();
@@ -187,7 +187,7 @@ namespace BookStoreCMS.Controllers
         [HttpPost]
         [Route("GetBookBuy")]
         [ResponseCache(Duration = 60)]
-        public async Task<IActionResult> GetBookBuy(long accountId)
+        public async Task<IActionResult> GetBookBuy(long accountId, int page = 0, int row = 100)
         {
             int checkRole = TokenCMSManager.CheckRoleAction(ERole.Administrator, Request);
             if (checkRole < 0)
@@ -197,11 +197,11 @@ namespace BookStoreCMS.Controllers
             try
             {
                 int responseStatus = EStatusCode.DATABASE_ERROR;
-                string keyRedis = "CacheBookBuy:" + accountId;
+                string keyRedis = "CacheBookBuy:" + accountId + "-" + page + "-" + row;
                 string jsonListSimpleBook = RedisGatewayManager<string>.Inst.GetDataFromCache(keyRedis);
                 if (string.IsNullOrEmpty(jsonListSimpleBook))
                 {
-                    var listBook = StoreBookSqlInstance.Inst.GetBookBuyAccount(accountId, out responseStatus);
+                    var listBook = StoreBookSqlInstance.Inst.GetBookBuyAccount(accountId, page, row, out responseStatus);
                     if (responseStatus == EStatusCode.SUCCESS)
                     {
                         jsonListSimpleBook = JsonConvert.SerializeObject(listBook);
