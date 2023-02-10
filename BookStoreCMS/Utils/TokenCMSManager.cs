@@ -66,7 +66,7 @@ namespace BookStoreCMS.Utils
             long accountId = -1;
             int role = 0;
             var data = RedisGatewayCacheManager.Inst.GetDataFromCache(keyRedis);
-            if (string.IsNullOrEmpty(data))
+            if (!string.IsNullOrEmpty(data))
             {
                 var listdata = data.Split("-");
                 long.TryParse(listdata[0], out accountId);
@@ -80,6 +80,8 @@ namespace BookStoreCMS.Utils
                 else {
                     response = EStatusCode.SUCCESS;
                 }
+            } else {
+                response = EStatusCode.TOKEN_EXPIRES;
             }
 
             return response;

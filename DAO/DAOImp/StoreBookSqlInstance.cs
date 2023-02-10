@@ -287,24 +287,25 @@ namespace DAO.DAOImp
             try
             {
                 db = new DBHelper(ConfigDb.StoreBookConnectionString);
-                var pars = new SqlParameter[15];
+                var pars = new SqlParameter[16];
                 pars[0] = new SqlParameter("@_Barcode", model.Barcode);
-                pars[1] = new SqlParameter("@_ImageLink", model.ImageLink);
-                pars[2] = new SqlParameter("@_BookName", model.BookName);
+                pars[1] = new SqlParameter("@_ImageLink", GetDataString(model.ImageLink));
+                pars[2] = new SqlParameter("@_BookName", GetDataString(model.BookName));
                 pars[3] = new SqlParameter("@_AuthorId", model.AuthorId);
                 pars[4] = new SqlParameter("@_AmountBase", model.AmountBase);
                 pars[5] = new SqlParameter("@_AmountSale", model.AmountSale);
-                pars[6] = new SqlParameter("@_TrialReadLink", model.TrialReadLink);
-                pars[7] = new SqlParameter("@_KeyLink", model.KeyLink);
-                pars[8] = new SqlParameter("@_NumberPage", model.NumberPage);
-                pars[9] = new SqlParameter("@_ContentBook", model.ContentBook);
-                pars[10] = new SqlParameter("@_Tags", model.Tags);
-                pars[11] = new SqlParameter("@_RelatedBooks", model.RelatedBooks);
-                pars[12] = new SqlParameter("@_ColorId", model.ColorId);
-                pars[13] = new SqlParameter("@_Status", model.Status);
-                pars[14] = new SqlParameter("@_ResponseStatus", SqlDbType.Int) { Direction = ParameterDirection.Output };
+                pars[6] = new SqlParameter("@_TrialReadLink", GetDataString(model.TrialReadLink));
+                pars[7] = new SqlParameter("@_AudioLink", GetDataString(model.AudioLink));
+                pars[8] = new SqlParameter("@_KeyLink", GetDataString(model.KeyLink));
+                pars[9] = new SqlParameter("@_NumberPage", model.NumberPage);
+                pars[10] = new SqlParameter("@_ContentBook", GetDataString(model.ContentBook));
+                pars[11] = new SqlParameter("@_Tags", GetDataString(model.Tags));
+                pars[12] = new SqlParameter("@_RelatedBooks", GetDataString(model.RelatedBooks));
+                pars[13] = new SqlParameter("@_ColorId", model.ColorId);
+                pars[14] = new SqlParameter("@_Status", model.Status);
+                pars[15] = new SqlParameter("@_ResponseStatus", SqlDbType.Int) { Direction = ParameterDirection.Output };
                 data = db.GetInstanceSP<AddBookModel>("SP_Store_Book_CMS_Book_Add", 4, pars);
-                reponseStatus = Convert.ToInt32(pars[14].Value);
+                reponseStatus = Convert.ToInt32(pars[15].Value);
             }
             catch (Exception exception)
             {
@@ -324,24 +325,25 @@ namespace DAO.DAOImp
             try
             {
                 db = new DBHelper(ConfigDb.StoreBookConnectionString);
-                var pars = new SqlParameter[15];
+                var pars = new SqlParameter[16];
                 pars[0] = new SqlParameter("@_Barcode", model.Barcode);
-                pars[1] = new SqlParameter("@_ImageLink", model.ImageLink);
-                pars[2] = new SqlParameter("@_BookName", model.BookName);
+                pars[1] = new SqlParameter("@_ImageLink", GetDataString(model.ImageLink));
+                pars[2] = new SqlParameter("@_BookName", GetDataString(model.BookName));
                 pars[3] = new SqlParameter("@_AuthorId", model.AuthorId);
                 pars[4] = new SqlParameter("@_AmountBase", model.AmountBase);
                 pars[5] = new SqlParameter("@_AmountSale", model.AmountSale);
-                pars[6] = new SqlParameter("@_TrialReadLink", model.TrialReadLink);
-                pars[7] = new SqlParameter("@_KeyLink", model.KeyLink);
-                pars[8] = new SqlParameter("@_NumberPage", model.NumberPage);
-                pars[9] = new SqlParameter("@_ContentBook", model.ContentBook);
-                pars[10] = new SqlParameter("@_Tags", model.Tags);
-                pars[11] = new SqlParameter("@_RelatedBooks", model.RelatedBooks);
-                pars[12] = new SqlParameter("@_ColorId", model.ColorId);
-                pars[13] = new SqlParameter("@_Status", model.Status);
-                pars[14] = new SqlParameter("@_ResponseStatus", SqlDbType.Int) { Direction = ParameterDirection.Output };
+                pars[6] = new SqlParameter("@_TrialReadLink", GetDataString(model.TrialReadLink));
+                pars[7] = new SqlParameter("@_AudioLink", GetDataString(model.AudioLink));
+                pars[8] = new SqlParameter("@_KeyLink", GetDataString(model.KeyLink));
+                pars[9] = new SqlParameter("@_NumberPage", model.NumberPage);
+                pars[10] = new SqlParameter("@_ContentBook", GetDataString(model.ContentBook));
+                pars[11] = new SqlParameter("@_Tags", GetDataString(model.Tags));
+                pars[12] = new SqlParameter("@_RelatedBooks", GetDataString(model.RelatedBooks));
+                pars[13] = new SqlParameter("@_ColorId", model.ColorId);
+                pars[14] = new SqlParameter("@_Status", model.Status);
+                pars[15] = new SqlParameter("@_ResponseStatus", SqlDbType.Int) { Direction = ParameterDirection.Output };
                 data = db.GetInstanceSP<AddBookModel>("SP_Store_Book_CMS_Book_Update", 4, pars);
-                reponseStatus = Convert.ToInt32(pars[14].Value);
+                reponseStatus = Convert.ToInt32(pars[15].Value);
             }
             catch (Exception exception)
             {
@@ -461,7 +463,7 @@ namespace DAO.DAOImp
             try
             {
                 db = new DBHelper(ConfigDb.StoreBookConnectionString);
-                var pars = new SqlParameter[4];
+                var pars = new SqlParameter[5];
                 pars[0] = new SqlParameter("@_AuthorName", model.AuthorName);
                 pars[1] = new SqlParameter("@_AuthorBirday", model.AuthorBirday);
                 pars[2] = new SqlParameter("@_AuthorAdress", model.AuthorAdress);
@@ -480,7 +482,7 @@ namespace DAO.DAOImp
             }
             return data;
         }
-        public int UpdateAuthorCònig(AuthorInfoModel model)
+        public int UpdateAuthorConfig(AuthorInfoModel model)
         {
             DBHelper db = null;
             int reponseStatus = EStatusCode.DATABASE_ERROR;
@@ -612,7 +614,7 @@ namespace DAO.DAOImp
         #endregion
 
         #region TRANSACTION
-        public List<BookBuyModel> GetBookBuyAccount(long accountId, out int reponseStatus)
+        public List<BookBuyModel> GetBookBuyAccount(long accountId, int page, int row, out int reponseStatus)
         {
             DBHelper db = null;
             List<BookBuyModel> listConfig = null;
@@ -620,11 +622,13 @@ namespace DAO.DAOImp
             try
             {
                 db = new DBHelper(ConfigDb.StoreBookConnectionString);
-                var pars = new SqlParameter[2];
+                var pars = new SqlParameter[4];
                 pars[0] = new SqlParameter("@_AccountId", accountId);
-                pars[1] = new SqlParameter("@_ResponseStatus", SqlDbType.Int) { Direction = ParameterDirection.Output };
-                listConfig = db.GetListSP<BookBuyModel>("SP_Store_Book_Color_Get", 4, pars);
-                reponseStatus = Convert.ToInt32(pars[1].Value);
+                pars[1] = new SqlParameter("@_Index", page);
+                pars[2] = new SqlParameter("@_NUMBER_GET", row);
+                pars[3] = new SqlParameter("@_ResponseStatus", SqlDbType.Int) { Direction = ParameterDirection.Output };
+                listConfig = db.GetListSP<BookBuyModel>("SP_Store_Book_CMS_Account_Get_Barcodes", 4, pars);
+                reponseStatus = Convert.ToInt32(pars[3].Value);
             }
             catch (Exception exception)
             {
@@ -636,18 +640,20 @@ namespace DAO.DAOImp
             }
             return listConfig;
         }
-        public int AccountBuyBarcode(long accountId, string barcode)
+        public SimpleBookModel AccountBuyBarcode(long accountId, string barcode, out int reponseStatus)
         {
             DBHelper db = null;
-            int reponseStatus = EStatusCode.DATABASE_ERROR;
+            SimpleBookModel data = null;
+            reponseStatus = EStatusCode.DATABASE_ERROR;
             try
             {
                 db = new DBHelper(ConfigDb.StoreBookConnectionString);
-                var pars = new SqlParameter[5];
+                var pars = new SqlParameter[3];
                 pars[0] = new SqlParameter("@_AccountId", accountId);
                 pars[1] = new SqlParameter("@_Barcode", barcode);
                 pars[2] = new SqlParameter("@_ResponseStatus", SqlDbType.Int) { Direction = ParameterDirection.Output };
                 db.ExecuteNonQuerySP("SP_Store_Book_Set_Account_Buy_Barcode", 4, pars);
+                data = db.GetInstanceSP<SimpleBookModel>("SP_Store_Book_Set_Account_Buy_Barcode", 4, pars);
                 reponseStatus = Convert.ToInt32(pars[2].Value);
             }
             catch (Exception exception)
@@ -658,7 +664,7 @@ namespace DAO.DAOImp
             {
                 db?.Close();
             }
-            return reponseStatus;
+            return data;
         }
         #endregion
         #region TAG
@@ -738,5 +744,42 @@ namespace DAO.DAOImp
             return listConfig;
         }
         #endregion
+
+        #region LIKE
+        public LikeBookModel LikeBook(long accountId, string barcode, bool status, string actionTime, out int reponseStatus)
+        {
+            DBHelper db = null;
+            LikeBookModel data = null;
+            reponseStatus = EStatusCode.DATABASE_ERROR;
+            try
+            {
+                db = new DBHelper(ConfigDb.StoreBookConnectionString);
+                var pars = new SqlParameter[5];
+                pars[0] = new SqlParameter("@_AccountId", accountId);
+                pars[1] = new SqlParameter("@_Barcode", barcode);
+                pars[2] = new SqlParameter("@_ActionTime", actionTime);
+                pars[3] = new SqlParameter("@_Status", status);
+                pars[4] = new SqlParameter("@_ResponseStatus", SqlDbType.Int) { Direction = ParameterDirection.Output };
+                data = db.GetInstanceSP<LikeBookModel>("SP_Store_Book_Like_Add", 4, pars);
+                reponseStatus = Convert.ToInt32(pars[4].Value);
+            }
+            catch (Exception exception)
+            {
+                Task.Run(async () => await _logger.LogError("SQL-AddTagConfig()", exception.ToString()).ConfigureAwait(false));
+            }
+            finally
+            {
+                db?.Close();
+            }
+            return data;
+        }
+        #endregion
+
+        private string GetDataString(string data) {
+            if (!string.IsNullOrEmpty(data))
+                return data;
+            else
+                return "";
+        }
     }
 }

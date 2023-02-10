@@ -328,5 +328,55 @@ namespace BookStore.Controllers
             return Ok(response);
         }
 
+        [HttpGet]
+        [Route("GetLikeBook")]
+        [ResponseCache(Duration = 16)]
+        public async Task<IActionResult> GetLikeBook(int page, int row)
+        {
+            var response = new ResponseApiModel<string>() { Status = EStatusCode.SYSTEM_ERROR, Messenger = UltilsHelper.GetMessageByErrorCode(EStatusCode.SYSTEM_ERROR) };
+            int responseStatus = EStatusCode.DATABASE_ERROR;
+            bool like = false;
+
+            long accountId = TokenManager.GetAccountIdByAccessToken(Request);
+            if (accountId <= 0)
+                return Ok(new ResponseApiModel<string>() { Status = accountId, Messenger = UltilsHelper.GetMessageByErrorCode((int)accountId) });
+            try
+            {
+                //var downloadInfoModel = StoreBookSqlInstance.Inst.LikeBook(accountId, barcode, like, UltilsHelper.FormatTime(DateTime.Now), out responseStatus);
+
+                response = new ResponseApiModel<string>() { Status = responseStatus, Messenger = UltilsHelper.GetMessageByErrorCode(responseStatus) };
+            }
+            catch (Exception ex)
+            {
+                await _logger.LogError("Books-LikeBook{}", ex.ToString()).ConfigureAwait(false);
+            }
+            return Ok(response);
+        }
+
+        [HttpPost]
+        [Route("{barcode}/LikeBook")]
+        [ResponseCache(Duration = 16)]
+        public async Task<IActionResult> LikeBook(string barcode, int status = 0)
+        {
+            var response = new ResponseApiModel<string>() { Status = EStatusCode.SYSTEM_ERROR, Messenger = UltilsHelper.GetMessageByErrorCode(EStatusCode.SYSTEM_ERROR) };
+            int responseStatus = EStatusCode.DATABASE_ERROR;
+            bool like = false;
+            if (status == 1)
+                like = true;
+            long accountId = TokenManager.GetAccountIdByAccessToken(Request);
+            if (accountId <= 0)
+                return Ok(new ResponseApiModel<string>() { Status = accountId, Messenger = UltilsHelper.GetMessageByErrorCode((int)accountId) });
+            try
+            {
+                var downloadInfoModel = StoreBookSqlInstance.Inst.LikeBook(accountId, barcode, like, UltilsHelper.FormatTime(DateTime.Now), out responseStatus);
+
+                response = new ResponseApiModel<string>() { Status = responseStatus, Messenger = UltilsHelper.GetMessageByErrorCode(responseStatus) };
+            }
+            catch (Exception ex)
+            {
+                await _logger.LogError("Books-LikeBook{}", ex.ToString()).ConfigureAwait(false);
+            }
+            return Ok(response);
+        }
     }
 }
