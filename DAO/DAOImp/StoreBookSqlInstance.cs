@@ -640,6 +640,32 @@ namespace DAO.DAOImp
             }
             return listConfig;
         }
+        public long GetCountBuyAccount(long accountId, out int reponseStatus)
+        {
+            DBHelper db = null;
+            long countBuy = 0;
+            reponseStatus = EStatusCode.DATABASE_ERROR;
+            try
+            {
+                db = new DBHelper(ConfigDb.StoreBookConnectionString);
+                var pars = new SqlParameter[3];
+                pars[0] = new SqlParameter("@_AccountId", accountId);
+                pars[1] = new SqlParameter("@_CountBookBuy", SqlDbType.BigInt) { Direction = ParameterDirection.Output };
+                pars[2] = new SqlParameter("@_ResponseStatus", SqlDbType.Int) { Direction = ParameterDirection.Output };
+                db.ExecuteNonQuerySP("SP_Store_Book_CMS_Account_Count_Barcodes", 4, pars);
+                reponseStatus = Convert.ToInt32(pars[2].Value);
+                countBuy = Convert.ToInt64(pars[1].Value);
+            }
+            catch (Exception exception)
+            {
+                Task.Run(async () => await _logger.LogError("SQL-GetCountBuyAccount()", exception.ToString()).ConfigureAwait(false));
+            }
+            finally
+            {
+                db?.Close();
+            }
+            return countBuy;
+        }
         public SimpleBookModel AccountBuyBarcode(long accountId, string barcode, out int reponseStatus)
         {
             DBHelper db = null;
@@ -652,7 +678,6 @@ namespace DAO.DAOImp
                 pars[0] = new SqlParameter("@_AccountId", accountId);
                 pars[1] = new SqlParameter("@_Barcode", barcode);
                 pars[2] = new SqlParameter("@_ResponseStatus", SqlDbType.Int) { Direction = ParameterDirection.Output };
-                db.ExecuteNonQuerySP("SP_Store_Book_Set_Account_Buy_Barcode", 4, pars);
                 data = db.GetInstanceSP<SimpleBookModel>("SP_Store_Book_Set_Account_Buy_Barcode", 4, pars);
                 reponseStatus = Convert.ToInt32(pars[2].Value);
             }
@@ -772,6 +797,85 @@ namespace DAO.DAOImp
                 db?.Close();
             }
             return data;
+        }
+        public List<LikeBookModel> GetLikeBook(long accountId, int page, int row, out int reponseStatus)
+        {
+            DBHelper db = null;
+            List<LikeBookModel> modelData = null;
+            reponseStatus = EStatusCode.DATABASE_ERROR;
+            try
+            {
+                db = new DBHelper(ConfigDb.StoreBookConnectionString);
+                var pars = new SqlParameter[4];
+                pars[0] = new SqlParameter("@_AccountId", accountId);
+                pars[1] = new SqlParameter("@_Index", page);
+                pars[2] = new SqlParameter("@_NUMBER_GET", row);
+                pars[3] = new SqlParameter("@_ResponseStatus", SqlDbType.Int) { Direction = ParameterDirection.Output };
+                modelData = db.GetListSP<LikeBookModel>("SP_Store_Book_Like_Account_Get", 4, pars);
+                reponseStatus = Convert.ToInt32(pars[3].Value);
+            }
+            catch (Exception exception)
+            {
+                Task.Run(async () => await _logger.LogError("SQL-GetLikeBook()", exception.ToString()).ConfigureAwait(false));
+            }
+            finally
+            {
+                db?.Close();
+            }
+            return modelData;
+        }
+        public List<LikeBookModel> GetLikeBookAll(long accountId, int page, int row, out int reponseStatus)
+        {
+            DBHelper db = null;
+            List<LikeBookModel> modelData = null;
+            reponseStatus = EStatusCode.DATABASE_ERROR;
+            try
+            {
+                db = new DBHelper(ConfigDb.StoreBookConnectionString);
+                var pars = new SqlParameter[4];
+                pars[0] = new SqlParameter("@_AccountId", accountId);
+                pars[1] = new SqlParameter("@_Index", page);
+                pars[2] = new SqlParameter("@_NUMBER_GET", row);
+                pars[3] = new SqlParameter("@_ResponseStatus", SqlDbType.Int) { Direction = ParameterDirection.Output };
+                modelData = db.GetListSP<LikeBookModel>("SP_Store_Book_Like_Account_Get_All", 4, pars);
+                reponseStatus = Convert.ToInt32(pars[3].Value);
+            }
+            catch (Exception exception)
+            {
+                Task.Run(async () => await _logger.LogError("SQL-GetLikeBookAll()", exception.ToString()).ConfigureAwait(false));
+            }
+            finally
+            {
+                db?.Close();
+            }
+            return modelData;
+        }
+
+        public long GetCountBookLike(long accountId, out int reponseStatus)
+        {
+            DBHelper db = null;
+            long countLike = 0;
+            reponseStatus = EStatusCode.DATABASE_ERROR;
+            try
+            {
+                db = new DBHelper(ConfigDb.StoreBookConnectionString);
+                var pars = new SqlParameter[3];
+                pars[0] = new SqlParameter("@_AccountId", accountId);
+                pars[1] = new SqlParameter("@_CountLike", SqlDbType.BigInt) { Direction = ParameterDirection.Output };
+                pars[2] = new SqlParameter("@_ResponseStatus", SqlDbType.Int) { Direction = ParameterDirection.Output };
+                db.ExecuteNonQuerySP("SP_Store_Book_Like_Account_Count", 4, pars);
+                reponseStatus = Convert.ToInt32(pars[2].Value);
+                countLike = Convert.ToInt64(pars[1].Value);
+            }
+            catch (Exception exception)
+            {
+                Task.Run(async () => await _logger.LogError("SQL-GetCountBookLike()", exception.ToString()).ConfigureAwait(false));
+            }
+            finally
+            {
+                db?.Close();
+            }
+            return countLike;
         }
         #endregion
 

@@ -197,7 +197,7 @@ namespace BookStoreCMS.Controllers
             try
             {
                 int responseStatus = EStatusCode.DATABASE_ERROR;
-                string keyRedis = "CacheBookBuy:" + accountId + "-" + page + "-" + row;
+                string keyRedis = "CacheBookBuy:" + accountId + ":" + page + "-" + row;
                 string jsonListSimpleBook = RedisGatewayManager<string>.Inst.GetDataFromCache(keyRedis);
                 if (string.IsNullOrEmpty(jsonListSimpleBook))
                 {

@@ -50,6 +50,10 @@ namespace BookStore.Controllers
                         RedisGatewayManager<string>.Inst.SaveData(keyRedis, jsonListMail, 600);
                     }
                 }
+                else
+                {
+                    responseStatus = EStatusCode.SUCCESS;
+                }
                 response = new ResponseApiModel<string>() { Status = responseStatus, Messenger = UltilsHelper.GetMessageByErrorCode(responseStatus), DataResponse = jsonListMail };
             }
             catch (Exception ex)
@@ -81,6 +85,10 @@ namespace BookStore.Controllers
                         jsonListMail = JsonConvert.SerializeObject(starRate.ToString());
                         RedisGatewayManager<string>.Inst.SaveData(keyRedis, jsonListMail, 600);
                     }
+                }
+                else
+                {
+                    responseStatus = EStatusCode.SUCCESS;
                 }
                 response = new ResponseApiModel<string>() { Status = responseStatus, Messenger = UltilsHelper.GetMessageByErrorCode(responseStatus), DataResponse = jsonListMail };
             }
@@ -144,6 +152,9 @@ namespace BookStore.Controllers
                         RedisGatewayManager<string>.Inst.SaveData(keyRedis, jsonListSimpleBook, 600);
                     }
                 }
+                else {
+                    responseStatus = EStatusCode.SUCCESS;
+                }
                 response = new ResponseApiModel<string>() { Status = responseStatus, Messenger = UltilsHelper.GetMessageByErrorCode(responseStatus), DataResponse = jsonListSimpleBook };
             }
             catch (Exception ex)
@@ -171,6 +182,9 @@ namespace BookStore.Controllers
                         jsonListSimpleBook = JsonConvert.SerializeObject(listBook);
                         RedisGatewayManager<string>.Inst.SaveData(keyRedis, jsonListSimpleBook, 600);
                     }
+                }
+                else {
+                    responseStatus = EStatusCode.SUCCESS;
                 }
                 response = new ResponseApiModel<string>() { Status = responseStatus, Messenger = UltilsHelper.GetMessageByErrorCode(responseStatus), DataResponse = jsonListSimpleBook };
             }
@@ -232,6 +246,10 @@ namespace BookStore.Controllers
                         RedisGatewayManager<string>.Inst.SaveData(keyRedis, jsonListSimpleBook, 600);
                     }
                 }
+                else
+                {
+                    responseStatus = EStatusCode.SUCCESS;
+                }
                 response = new ResponseApiModel<string>() { Status = responseStatus, Messenger = UltilsHelper.GetMessageByErrorCode(responseStatus), DataResponse = jsonListSimpleBook };
             }
             catch (Exception ex)
@@ -260,6 +278,10 @@ namespace BookStore.Controllers
                         jsonListSimpleBook = JsonConvert.SerializeObject(listBook);
                         RedisGatewayManager<string>.Inst.SaveData(keyRedis, jsonListSimpleBook, 600);
                     }
+                }
+                else
+                {
+                    responseStatus = EStatusCode.SUCCESS;
                 }
                 response = new ResponseApiModel<string>() { Status = responseStatus, Messenger = UltilsHelper.GetMessageByErrorCode(responseStatus), DataResponse = jsonListSimpleBook };
             }
@@ -291,6 +313,10 @@ namespace BookStore.Controllers
                         RedisGatewayManager<string>.Inst.SaveData(keyRedis, jsonListSimpleBook, 600);
                     }
                 }
+                else
+                {
+                    responseStatus = EStatusCode.SUCCESS;
+                }
                 response = new ResponseApiModel<string>() { Status = responseStatus, Messenger = UltilsHelper.GetMessageByErrorCode(responseStatus), DataResponse = jsonListSimpleBook };
             }
             catch (Exception ex)
@@ -319,36 +345,15 @@ namespace BookStore.Controllers
                         RedisGatewayManager<string>.Inst.SaveData(keyRedis, jsonListSimpleBook, 600);
                     }
                 }
+                else
+                {
+                    responseStatus = EStatusCode.SUCCESS;
+                }
                 response = new ResponseApiModel<string>() { Status = responseStatus, Messenger = UltilsHelper.GetMessageByErrorCode(responseStatus), DataResponse = jsonListSimpleBook };
             }
             catch (Exception ex)
             {
                 await _logger.LogError("Books-GetListSimpleBookSameName{}", ex.ToString()).ConfigureAwait(false);
-            }
-            return Ok(response);
-        }
-
-        [HttpGet]
-        [Route("GetLikeBook")]
-        [ResponseCache(Duration = 16)]
-        public async Task<IActionResult> GetLikeBook(int page, int row)
-        {
-            var response = new ResponseApiModel<string>() { Status = EStatusCode.SYSTEM_ERROR, Messenger = UltilsHelper.GetMessageByErrorCode(EStatusCode.SYSTEM_ERROR) };
-            int responseStatus = EStatusCode.DATABASE_ERROR;
-            bool like = false;
-
-            long accountId = TokenManager.GetAccountIdByAccessToken(Request);
-            if (accountId <= 0)
-                return Ok(new ResponseApiModel<string>() { Status = accountId, Messenger = UltilsHelper.GetMessageByErrorCode((int)accountId) });
-            try
-            {
-                //var downloadInfoModel = StoreBookSqlInstance.Inst.LikeBook(accountId, barcode, like, UltilsHelper.FormatTime(DateTime.Now), out responseStatus);
-
-                response = new ResponseApiModel<string>() { Status = responseStatus, Messenger = UltilsHelper.GetMessageByErrorCode(responseStatus) };
-            }
-            catch (Exception ex)
-            {
-                await _logger.LogError("Books-LikeBook{}", ex.ToString()).ConfigureAwait(false);
             }
             return Ok(response);
         }
@@ -369,7 +374,13 @@ namespace BookStore.Controllers
             try
             {
                 var downloadInfoModel = StoreBookSqlInstance.Inst.LikeBook(accountId, barcode, like, UltilsHelper.FormatTime(DateTime.Now), out responseStatus);
-
+                if (responseStatus == EStatusCode.SUCCESS)
+                {
+                    string keyRedis = "CacheLikeBook:" + accountId;
+                    RedisGatewayManager<string>.Inst.DeleteArrayKey(keyRedis);
+                    keyRedis = "CacheCountLikeBook:" + accountId;
+                    RedisGatewayManager<string>.Inst.DeleteDataFromCache(keyRedis);
+                }
                 response = new ResponseApiModel<string>() { Status = responseStatus, Messenger = UltilsHelper.GetMessageByErrorCode(responseStatus) };
             }
             catch (Exception ex)
