@@ -12,7 +12,7 @@ namespace BookStore.Utils
 {
     public class TokenManager
     {
-        public static string GenerateAccessToken(long accountId, ClientRequestInfo clientInfo)
+        public static async Task<string> GenerateAccessTokenAsync(long accountId, ClientRequestInfo clientInfo)
         {
             var response = string.Format("{0}|{1}|{2}|{3}",
                                           DateTime.UtcNow.Ticks,
@@ -23,11 +23,11 @@ namespace BookStore.Utils
             string result = response.Replace("=", "_");
 
             string keyRedis = "Token:" + result;
-            RedisGatewayCacheManager.Inst.SaveData(keyRedis, accountId.ToString(), 5);
+            await RedisGatewayCacheManager.Inst.SaveDataAsync(keyRedis, accountId.ToString(), 5);
 
             return result;
         }
-        public static long GetAccountIdByAccessToken(HttpRequest request)
+        public static async Task<long> GetAccountIdByAccessTokenAsync(HttpRequest request)
         {
             string accessToken = "";
             if (request.Headers.TryGetValue("Authorization", out var values)) {
@@ -38,17 +38,17 @@ namespace BookStore.Utils
 
             string keyRedis = "Token:" + accessToken;
             long accountId = -1;
-            var data = RedisGatewayCacheManager.Inst.GetDataFromCache(keyRedis);
+            var data = await RedisGatewayCacheManager.Inst.GetDataFromCacheAsync(keyRedis);
             long.TryParse(data, out accountId);
             if (accountId <= 0)
                 return EStatusCode.TOKEN_EXPIRES;
             return accountId;
         }
 
-        public static long GetAccountIdByAccessToken(string accessToken) {
+        public static async Task<long> GetAccountIdByAccessTokenAsync(string accessToken) {
             string keyRedis = "Token:" + accessToken;
             long accountId = -1;
-            var data = RedisGatewayCacheManager.Inst.GetDataFromCache(keyRedis);
+            var data = await RedisGatewayCacheManager.Inst.GetDataFromCacheAsync(keyRedis);
             long.TryParse(data, out accountId);
             return accountId;
         }
@@ -68,7 +68,7 @@ namespace BookStore.Utils
             return Convert.ToBase64String(byteHash);
         }
 
-        public static string GenerateKeyTokenValidate(long accountId, string email)
+        public static async Task<string> GenerateKeyTokenValidateAsync(long accountId, string email)
         {
             var response = string.Format("{0}|{1}|{2}",
                                           DateTime.UtcNow.Ticks,
@@ -78,7 +78,7 @@ namespace BookStore.Utils
             string result = response.Replace("=", "_");
 
             string keyRedis = "Token:" + result;
-            RedisGatewayCacheManager.Inst.SaveData(keyRedis, accountId.ToString(), 5);
+            await RedisGatewayCacheManager.Inst.SaveDataAsync(keyRedis, accountId.ToString(), 5);
 
             return result;
         }

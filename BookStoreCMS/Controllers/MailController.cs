@@ -37,13 +37,13 @@ namespace BookStoreCMS.Controllers
         public async Task<IActionResult> GetUserMail()
         {
             var response = new ResponseApiModel<string>() { Status = EStatusCode.SYSTEM_ERROR, Messenger = UltilsHelper.GetMessageByErrorCode(EStatusCode.SYSTEM_ERROR) };
-            int role = 0;
-            long accountId = TokenCMSManager.GetAccountIdByAccessToken(Request, ref role);
+            
+            long accountId = await TokenCMSManager.GetAccountIdByAccessTokenAsync(Request);
             if (accountId <= 0)
                 return Ok(new ResponseApiModel<string>() { Status = accountId, Messenger = UltilsHelper.GetMessageByErrorCode((int)accountId) });
             try
             {
-                string valueString = GetListMailById(accountId);
+                string valueString = await GetListMailByIdAsync(accountId);
                 response = new ResponseApiModel<string>() { Status = EStatusCode.SUCCESS, Messenger = UltilsHelper.GetMessageByErrorCode(EStatusCode.SUCCESS), DataResponse = valueString };
             }
             catch (Exception ex)
@@ -60,13 +60,12 @@ namespace BookStoreCMS.Controllers
         {
             var response = new ResponseApiModel<string>() { Status = EStatusCode.SYSTEM_ERROR, Messenger = UltilsHelper.GetMessageByErrorCode(EStatusCode.SYSTEM_ERROR) };
 
-            int role = 0;
-            long accountId = TokenCMSManager.GetAccountIdByAccessToken(Request, ref role);
+            long accountId = await TokenCMSManager.GetAccountIdByAccessTokenAsync(Request);
             if (accountId <= 0)
                 return Ok(new ResponseApiModel<string>() { Status = accountId, Messenger = UltilsHelper.GetMessageByErrorCode((int)accountId) });
             try
             {
-                string valueString = GetListMailById(accountId);
+                string valueString = await GetListMailByIdAsync(accountId);
                 if(string.IsNullOrEmpty(valueString))
                     return Ok(new ResponseApiModel<string>() { Status = EStatusCode.MAIL_NOT_EXIST, Messenger = UltilsHelper.GetMessageByErrorCode(EStatusCode.MAIL_NOT_EXIST) });
                 List<MailObject> listMail = JsonConvert.DeserializeObject <List<MailObject>>(valueString);
@@ -89,13 +88,12 @@ namespace BookStoreCMS.Controllers
         {
             var response = new ResponseApiModel<string>() { Status = EStatusCode.SYSTEM_ERROR, Messenger = UltilsHelper.GetMessageByErrorCode(EStatusCode.SYSTEM_ERROR) };
 
-            int role = 0;
-            long accountId = TokenCMSManager.GetAccountIdByAccessToken(Request, ref role);
+            long accountId = await TokenCMSManager.GetAccountIdByAccessTokenAsync(Request);
             if (accountId <= 0)
                 return Ok(new ResponseApiModel<string>() { Status = accountId, Messenger = UltilsHelper.GetMessageByErrorCode((int)accountId) });
             try
             {
-                string valueString = GetListMailById(accountId);
+                string valueString = await GetListMailByIdAsync(accountId);
                 if (string.IsNullOrEmpty(valueString))
                     return Ok(new ResponseApiModel<string>() { Status = EStatusCode.MAIL_NOT_EXIST, Messenger = UltilsHelper.GetMessageByErrorCode(EStatusCode.MAIL_NOT_EXIST) });
                 List<MailObject> listMail = JsonConvert.DeserializeObject<List<MailObject>>(valueString);
@@ -107,7 +105,7 @@ namespace BookStoreCMS.Controllers
                     if (responseStatus == EStatusCode.SUCCESS){
                         jsonListMail = JsonConvert.SerializeObject(listMail);
                         string keyRedis = "CacheMail:" + accountId;
-                        RedisGatewayManager<string>.Inst.SaveData(keyRedis, jsonListMail, 300);
+                        await RedisGatewayCacheManager.Inst.SaveDataAsync(keyRedis, jsonListMail, 5);
                     }
                 }
                 response = new ResponseApiModel<string>() { Status = responseStatus, Messenger = UltilsHelper.GetMessageByErrorCode(responseStatus), DataResponse = jsonListMail };
@@ -120,14 +118,14 @@ namespace BookStoreCMS.Controllers
             return Ok(response);
         }
 
-        private string GetListMailById(long accountId) {
+        private async Task<string> GetListMailByIdAsync(long accountId) {
             string keyRedis = "CacheMail:" + accountId;
-            string valueString = RedisGatewayManager<string>.Inst.GetDataFromCache(keyRedis);
+            string valueString = await RedisGatewayCacheManager.Inst.GetDataFromCacheAsync(keyRedis);
             if (string.IsNullOrEmpty(valueString))
             {
                 var model = StoreMailSqlInstance.Inst.GetMailListByAccountId(accountId);
                 valueString = JsonConvert.SerializeObject(model);
-                RedisGatewayManager<string>.Inst.SaveData(keyRedis, valueString, 300);
+                await RedisGatewayCacheManager.Inst.SaveDataAsync(keyRedis, valueString, 5);
             }
             return valueString;
         }

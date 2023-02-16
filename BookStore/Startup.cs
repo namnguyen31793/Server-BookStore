@@ -41,6 +41,7 @@ namespace CoreWebApi
             services.ConfigureLoggerService();
             services.ConfigureVersioning();
             services.ConfigureResponseCaching();
+            services.ConfigureHttpCacheHeaders();
             services.ConfigureMailService();
 
             services.AddControllers().AddJsonOptions(options =>
@@ -70,6 +71,7 @@ namespace CoreWebApi
             app.UseHttpsRedirection();
             app.UseStaticFiles();
             app.UseResponseCaching();
+            app.UseHttpCacheHeaders();
             app.UseRouting();
             app.UseCors("CorsPolicy");
 

@@ -41,6 +41,7 @@ namespace ShareData.ErrorCode
         public const int ACOUNT_EXIST_BARCODE = -74;
         public const int BARCODE_NOT_EXIST = -75;
         public const int ACOUNT_NOT_EXIST_BARCODE = -76;
+        public const int VOURCHER_NAME_ESXIST = -77;
 
         public const int TOKEN_EXPIRES = -86;
 

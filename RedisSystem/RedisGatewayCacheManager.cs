@@ -51,7 +51,21 @@ namespace RedisSystem
             }
         }
 
-        public bool SaveData(string key, string value, long minuteExpires = -1)
+
+        public async Task DeleteArrayKeyAsync(string forderName)
+        {
+            try
+            {
+                var keys = Connection.GetServer(RedisConfig.RedisServerIpAddress + ":" + RedisConfig.RedisServerPort).Keys();
+                RedisKey[] keysArr = keys.Where(x => x.ToString().Contains(forderName)).Select(key => key).ToArray();
+                await Connection.GetDatabase().KeyDeleteAsync(keysArr);
+            }
+            catch (Exception exception)
+            {
+            }
+        }
+
+        public async Task<bool> SaveDataAsync(string key, string value, long minuteExpires = -1)
         {
             try
             {
@@ -59,11 +73,11 @@ namespace RedisSystem
                 if (minuteExpires < 0)
                     return _database.StringSet(key, value);
                 var timeExpires = TimeSpan.FromMinutes(minuteExpires);
-                return _database.StringSet(key, value, timeExpires);
+                return await _database.StringSetAsync(key, value, timeExpires);
             }
             catch (Exception exception)
             {
-                Task.Run(async () => await _logger.LogError("Redis-SaveData()", exception.ToString()).ConfigureAwait(false));
+                await _logger.LogError("Redis-SaveData()", exception.ToString()).ConfigureAwait(false);
                 return false;
             }
         }
@@ -84,30 +98,30 @@ namespace RedisSystem
             }
         }
 
-        public string GetDataFromCache(string key)
+        public async Task<string> GetDataFromCacheAsync(string key)
         {
             try
             {
                 var _database = Connection.GetDatabase();
-                return _database.StringGet(key);
+                return await _database.StringGetAsync(key);
             }
             catch (Exception exception)
             {
-                Task.Run(async () => await _logger.LogError("Redis-GetDataFromCache()", exception.ToString()).ConfigureAwait(false));
+                await _logger.LogError("Redis-GetDataFromCache()", exception.ToString()).ConfigureAwait(false);
                 return "";
             }
         }
 
-        public void DeleteDataFromCache(string key)
+        public async Task DeleteDataFromCacheAsync(string key)
         {
             try
             {
                 var _database = Connection.GetDatabase();
-                _database.KeyDelete(key);
+                await _database.KeyDeleteAsync(key);
             }
             catch (Exception exception)
             {
-                Task.Run(async () => await _logger.LogError("Redis-DeleteDataFromCache()", exception.ToString()).ConfigureAwait(false));
+                await _logger.LogError("Redis-DeleteDataFromCache()", exception.ToString()).ConfigureAwait(false);
             }
         }
 

@@ -12,7 +12,7 @@ namespace BookStoreCMS.Utils
 {
     public class TokenCMSManager
     {
-        public static string GenerateAccessToken(long accountId, int role, ClientRequestInfo clientInfo)
+        public static async Task<string> GenerateAccessTokenAsync(long accountId, int role, ClientRequestInfo clientInfo)
         {
             var response = string.Format("{0}|{1}|{2}|{3}|{4}",
                                           DateTime.UtcNow.Ticks,
@@ -24,13 +24,13 @@ namespace BookStoreCMS.Utils
             string result = response.Replace("=", "_");
 
             string keyRedis = "TokenCMS:" + result;
-            RedisGatewayCacheManager.Inst.SaveData(keyRedis, accountId.ToString() +"-"+role, 5);
+            await RedisGatewayCacheManager.Inst.SaveDataAsync(keyRedis, accountId.ToString() +"-"+role, 5);
 
             return result;
         }
-        public static long GetAccountIdByAccessToken(HttpRequest request, ref int role)
+        public static async Task<long> GetAccountIdByAccessTokenAsync(HttpRequest request)
         {
-            role = 0;
+            int role = 0;
             string accessToken = "";
             if (request.Headers.TryGetValue("Authorization", out var values)) {
                 accessToken = values.FirstOrDefault();
@@ -40,7 +40,7 @@ namespace BookStoreCMS.Utils
 
             string keyRedis = "TokenCMS:" + accessToken;
             long accountId = -1;
-            var data = RedisGatewayCacheManager.Inst.GetDataFromCache(keyRedis);
+            var data = await RedisGatewayCacheManager.Inst.GetDataFromCacheAsync(keyRedis);
             if (string.IsNullOrEmpty(data))
             {
                 var listdata = data.Split("-");
@@ -52,7 +52,7 @@ namespace BookStoreCMS.Utils
             return accountId;
         }
 
-        public static int CheckRoleAction(int rolePermission, HttpRequest request) {
+        public static async Task<int> CheckRoleActionAsync(int rolePermission, HttpRequest request) {
             int response = EStatusCode.SYSTEM_ERROR;
             string accessToken = "";
             if (request.Headers.TryGetValue("Authorization", out var values))
@@ -65,7 +65,7 @@ namespace BookStoreCMS.Utils
             string keyRedis = "TokenCMS:" + accessToken;
             long accountId = -1;
             int role = 0;
-            var data = RedisGatewayCacheManager.Inst.GetDataFromCache(keyRedis);
+            var data = await RedisGatewayCacheManager.Inst.GetDataFromCacheAsync(keyRedis);
             if (!string.IsNullOrEmpty(data))
             {
                 var listdata = data.Split("-");
@@ -87,10 +87,10 @@ namespace BookStoreCMS.Utils
             return response;
         }
 
-        public static long GetAccountIdByAccessToken(string accessToken) {
+        public static async Task<long> GetAccountIdByAccessTokenAsync(string accessToken) {
             string keyRedis = "Token:" + accessToken;
             long accountId = -1;
-            var data = RedisGatewayCacheManager.Inst.GetDataFromCache(keyRedis);
+            var data = await RedisGatewayCacheManager.Inst.GetDataFromCacheAsync(keyRedis);
             long.TryParse(data, out accountId);
             return accountId;
         }
@@ -110,7 +110,7 @@ namespace BookStoreCMS.Utils
             return Convert.ToBase64String(byteHash);
         }
 
-        public static string GenerateKeyTokenValidate(long accountId, string email)
+        public static async Task<string> GenerateKeyTokenValidateAsync(long accountId, string email)
         {
             var response = string.Format("{0}|{1}|{2}",
                                           DateTime.UtcNow.Ticks,
@@ -120,7 +120,7 @@ namespace BookStoreCMS.Utils
             string result = response.Replace("=", "_");
 
             string keyRedis = "Token:" + result;
-            RedisGatewayCacheManager.Inst.SaveData(keyRedis, accountId.ToString(), 5);
+            await RedisGatewayCacheManager.Inst.SaveDataAsync(keyRedis, accountId.ToString(), 5);
 
             return result;
         }

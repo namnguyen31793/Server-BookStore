@@ -1,6 +1,7 @@
 ﻿using DAO.Utitlities;
 using LoggerService;
 using ShareData.DB.Users;
+using ShareData.ErrorCode;
 using System;
 using System.Collections.Generic;
 using System.Data;
@@ -362,6 +363,33 @@ namespace DAO.DAOImp
                 db?.Close();
             }
             return response;
+        }
+        #endregion
+
+        #region VOURCHER
+        public List<AccountVourcherModel> GetVourcherAccount(long accountId, out int reponseStatus)
+        {
+            DBHelper db = null;
+            List<AccountVourcherModel> listConfig = null;
+            reponseStatus = EStatusCode.DATABASE_ERROR;
+            try
+            {
+                db = new DBHelper(ConfigDb.StoreBookConnectionString);
+                var pars = new SqlParameter[2];
+                pars[0] = new SqlParameter("@_AccountId", accountId);
+                pars[1] = new SqlParameter("@_ResponseStatus", SqlDbType.Int) { Direction = ParameterDirection.Output };
+                listConfig = db.GetListSP<AccountVourcherModel>("SP_Store_Vourcher_Account_Get", 4, pars);
+                reponseStatus = Convert.ToInt32(pars[1].Value);
+            }
+            catch (Exception exception)
+            {
+                Task.Run(async () => await _logger.LogError("SQL-GetVourcherAccount()", exception.ToString()).ConfigureAwait(false));
+            }
+            finally
+            {
+                db?.Close();
+            }
+            return listConfig;
         }
         #endregion
     }

@@ -33,14 +33,14 @@ namespace BookStoreCMS.Controllers
             try
             {
                 string keyRedis = "CacheAuthorInfo:" + authorId;
-                string jsonListSimpleBook = RedisGatewayManager<string>.Inst.GetDataFromCache(keyRedis);
+                string jsonListSimpleBook = await RedisGatewayCacheManager.Inst.GetDataFromCacheAsync(keyRedis);
                 if (string.IsNullOrEmpty(jsonListSimpleBook))
                 {
                     var listBook = StoreBookSqlInstance.Inst.GetAuthorById(authorId, out responseStatus);
                     if (responseStatus == EStatusCode.SUCCESS)
                     {
                         jsonListSimpleBook = JsonConvert.SerializeObject(listBook);
-                        RedisGatewayManager<string>.Inst.SaveData(keyRedis, jsonListSimpleBook, 600);
+                        await RedisGatewayCacheManager.Inst.SaveDataAsync(keyRedis, jsonListSimpleBook, 10);
                     }
                 }
                 response = new ResponseApiModel<string>() { Status = responseStatus, Messenger = UltilsHelper.GetMessageByErrorCode(responseStatus), DataResponse = jsonListSimpleBook };

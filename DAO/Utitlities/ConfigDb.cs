@@ -14,10 +14,14 @@ namespace DAO.Utitlities
             StoreUsersConnectionString = "Data Source=" + ConfigDb.SQL_CONNECTION + ";Initial Catalog=Store.Users;Persist Security Info=True;" + ConfigDb.SQL_PASS;
             StoreMailConnectionString = "Data Source=" + ConfigDb.SQL_CONNECTION + ";Initial Catalog=Store.Email;Persist Security Info=True;" + ConfigDb.SQL_PASS;
             StoreBookConnectionString = "Data Source=" + ConfigDb.SQL_CONNECTION + ";Initial Catalog=Store.Book;Persist Security Info=True;" + ConfigDb.SQL_PASS;
+            StoreMemberConnectionString = "Data Source=" + ConfigDb.SQL_CONNECTION + ";Initial Catalog=Store.Member;Persist Security Info=True;" + ConfigDb.SQL_PASS;
+            StoreVourcherConnectionString = "Data Source=" + ConfigDb.SQL_CONNECTION + ";Initial Catalog=Store.Vourcher;Persist Security Info=True;" + ConfigDb.SQL_PASS;
         }
         public static string StoreUsersConnectionString = "";
         public static string StoreMailConnectionString = "";
         public static string StoreBookConnectionString = "";
+        public static string StoreMemberConnectionString = "";
+        public static string StoreVourcherConnectionString = "";
 
         public static string SQL_CONNECTION;
 

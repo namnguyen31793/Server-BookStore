@@ -31,7 +31,6 @@ namespace BookStoreCMS.Controllers
 
         [HttpGet]
         [Route("{barcode}/GetAvgRate")]
-        [ResponseCache(Duration = 60)]
         public async Task<IActionResult> GetAvgRate(string barcode)
         {
             if (string.IsNullOrEmpty(barcode))
@@ -43,14 +42,14 @@ namespace BookStoreCMS.Controllers
             try
             {
                 string keyRedis = "CacheAvgRate:" + barcode;
-                string jsonListMail = RedisGatewayManager<string>.Inst.GetDataFromCache(keyRedis);
+                string jsonListMail = await RedisGatewayCacheManager.Inst.GetDataFromCacheAsync(keyRedis);
                 if (string.IsNullOrEmpty(jsonListMail))
                 {
                     responseStatus = StoreBookSqlInstance.Inst.GetAvgRate(barcode, out starRate);
                     if (responseStatus == EStatusCode.SUCCESS)
                     {
                         jsonListMail = JsonConvert.SerializeObject(starRate.ToString());
-                        RedisGatewayManager<string>.Inst.SaveData(keyRedis, jsonListMail, 600);
+                        await RedisGatewayCacheManager.Inst.SaveDataAsync(keyRedis, jsonListMail, 10);
                     }
                 }
                 response = new ResponseApiModel<string>() { Status = responseStatus, Messenger = UltilsHelper.GetMessageByErrorCode(responseStatus), DataResponse = jsonListMail };
@@ -66,7 +65,7 @@ namespace BookStoreCMS.Controllers
         [Route("AddColorConfig")]
         public async Task<IActionResult> SendCommentbook(BookColorConfig data)
         {
-            int checkRole = TokenCMSManager.CheckRoleAction(ERole.Administrator, Request);
+            int checkRole = await TokenCMSManager.CheckRoleActionAsync(ERole.Administrator, Request);
             if (checkRole < 0)
                 return Ok(new ResponseApiModel<string>() { Status = checkRole, Messenger = UltilsHelper.GetMessageByErrorCode(checkRole) });
 
@@ -77,7 +76,7 @@ namespace BookStoreCMS.Controllers
                 responseStatus = StoreBookSqlInstance.Inst.AddColorConfig(data);
                 if (responseStatus  == EStatusCode.SUCCESS) {
                     string keyRedis = "CacheListColorConfig";
-                    RedisGatewayManager<string>.Inst.DeleteDataFromCache(keyRedis);
+                    await RedisGatewayCacheManager.Inst.DeleteDataFromCacheAsync(keyRedis);
                 }
                 response = new ResponseApiModel<string>() { Status = responseStatus, Messenger = UltilsHelper.GetMessageByErrorCode(responseStatus) };
             }
@@ -91,7 +90,7 @@ namespace BookStoreCMS.Controllers
         [Route("UpdateColorConfig")]
         public async Task<IActionResult> UpdateColorConfig(BookColorConfig data)
         {
-            int checkRole = TokenCMSManager.CheckRoleAction(ERole.Administrator, Request);
+            int checkRole = await TokenCMSManager.CheckRoleActionAsync(ERole.Administrator, Request);
             if (checkRole < 0)
                 return Ok(new ResponseApiModel<string>() { Status = checkRole, Messenger = UltilsHelper.GetMessageByErrorCode(checkRole) });
 
@@ -102,7 +101,7 @@ namespace BookStoreCMS.Controllers
                 responseStatus = StoreBookSqlInstance.Inst.UpdateColorConfig(data);
                 if (responseStatus  == EStatusCode.SUCCESS) {
                     string keyRedis = "CacheListColorConfig";
-                    RedisGatewayManager<string>.Inst.DeleteDataFromCache(keyRedis);
+                    await RedisGatewayCacheManager.Inst.DeleteDataFromCacheAsync(keyRedis);
                 }
                 response = new ResponseApiModel<string>() { Status = responseStatus, Messenger = UltilsHelper.GetMessageByErrorCode(responseStatus) };
             }
@@ -115,10 +114,9 @@ namespace BookStoreCMS.Controllers
 
         [HttpGet]
         [Route("GetAllColorConfig")]
-        [ResponseCache(Duration = 5)]
         public async Task<IActionResult> GetAllColorConfig()
         {
-            int checkRole = TokenCMSManager.CheckRoleAction(ERole.Administrator, Request);
+            int checkRole = await TokenCMSManager.CheckRoleActionAsync(ERole.Administrator, Request);
             if (checkRole < 0)
                 return Ok(new ResponseApiModel<string>() { Status = checkRole, Messenger = UltilsHelper.GetMessageByErrorCode(checkRole) });
 
@@ -143,7 +141,7 @@ namespace BookStoreCMS.Controllers
         [Route("AddTag")]
         public async Task<IActionResult> AddTag(BookTagModel data)
         {
-            int checkRole = TokenCMSManager.CheckRoleAction(ERole.Administrator, Request);
+            int checkRole = await TokenCMSManager.CheckRoleActionAsync(ERole.Administrator, Request);
             if (checkRole < 0)
                 return Ok(new ResponseApiModel<string>() { Status = checkRole, Messenger = UltilsHelper.GetMessageByErrorCode(checkRole) });
 
@@ -164,7 +162,7 @@ namespace BookStoreCMS.Controllers
         [Route("UpdateTag")]
         public async Task<IActionResult> UpdateTag(BookTagModel data)
         {
-            int checkRole = TokenCMSManager.CheckRoleAction(ERole.Administrator, Request);
+            int checkRole = await TokenCMSManager.CheckRoleActionAsync(ERole.Administrator, Request);
             if (checkRole < 0)
                 return Ok(new ResponseApiModel<string>() { Status = checkRole, Messenger = UltilsHelper.GetMessageByErrorCode(checkRole) });
 
@@ -184,10 +182,9 @@ namespace BookStoreCMS.Controllers
 
         [HttpGet]
         [Route("GetAllTag")]
-        [ResponseCache(Duration = 5)]
         public async Task<IActionResult> GetAllTag()
         {
-            int checkRole = TokenCMSManager.CheckRoleAction(ERole.Administrator, Request);
+            int checkRole = await TokenCMSManager.CheckRoleActionAsync(ERole.Administrator, Request);
             if (checkRole < 0)
                 return Ok(new ResponseApiModel<string>() { Status = checkRole, Messenger = UltilsHelper.GetMessageByErrorCode(checkRole) });
 
@@ -209,10 +206,9 @@ namespace BookStoreCMS.Controllers
         #region AUTHOR
         [HttpGet]
         [Route("GetlistAuthorConfig")]
-        [ResponseCache(Duration = 5)]
         public async Task<IActionResult> GetListColorConfig()
         {
-            int checkRole = TokenCMSManager.CheckRoleAction(ERole.Administrator, Request);
+            int checkRole = await TokenCMSManager.CheckRoleActionAsync(ERole.Administrator, Request);
             if (checkRole < 0)
                 return Ok(new ResponseApiModel<string>() { Status = checkRole, Messenger = UltilsHelper.GetMessageByErrorCode(checkRole) });
             var response = new ResponseApiModel<string>() { Status = EStatusCode.SYSTEM_ERROR, Messenger = UltilsHelper.GetMessageByErrorCode(EStatusCode.SYSTEM_ERROR) };
@@ -233,7 +229,7 @@ namespace BookStoreCMS.Controllers
         [Route("AddAuthorConfig")]
         public async Task<IActionResult> AddAuthorConfig(AuthorInfoModel model)
         {
-            int checkRole = TokenCMSManager.CheckRoleAction(ERole.Administrator, Request);
+            int checkRole = await TokenCMSManager.CheckRoleActionAsync(ERole.Administrator, Request);
             if (checkRole < 0)
                 return Ok(new ResponseApiModel<string>() { Status = checkRole, Messenger = UltilsHelper.GetMessageByErrorCode(checkRole) });
             var response = new ResponseApiModel<string>() { Status = EStatusCode.SYSTEM_ERROR, Messenger = UltilsHelper.GetMessageByErrorCode(EStatusCode.SYSTEM_ERROR) };
@@ -254,7 +250,7 @@ namespace BookStoreCMS.Controllers
         [Route("UpdateAuthorConfig")]
         public async Task<IActionResult> UpdateAuthorConfig(AuthorInfoModel model)
         {
-            int checkRole = TokenCMSManager.CheckRoleAction(ERole.Administrator, Request);
+            int checkRole = await TokenCMSManager.CheckRoleActionAsync(ERole.Administrator, Request);
             if (checkRole < 0)
                 return Ok(new ResponseApiModel<string>() { Status = checkRole, Messenger = UltilsHelper.GetMessageByErrorCode(checkRole) });
             var response = new ResponseApiModel<string>() { Status = EStatusCode.SYSTEM_ERROR, Messenger = UltilsHelper.GetMessageByErrorCode(EStatusCode.SYSTEM_ERROR) };
@@ -278,7 +274,7 @@ namespace BookStoreCMS.Controllers
         [Route("AddBook")]
         public async Task<IActionResult> AddBook(AddBookModel model)
         {
-            int checkRole = TokenCMSManager.CheckRoleAction(ERole.Administrator, Request);
+            int checkRole = await TokenCMSManager.CheckRoleActionAsync(ERole.Administrator, Request);
             if (checkRole < 0)
                 return Ok(new ResponseApiModel<string>() { Status = checkRole, Messenger = UltilsHelper.GetMessageByErrorCode(checkRole) });
             var response = new ResponseApiModel<string>() { Status = EStatusCode.SYSTEM_ERROR, Messenger = UltilsHelper.GetMessageByErrorCode(EStatusCode.SYSTEM_ERROR) };
@@ -299,7 +295,7 @@ namespace BookStoreCMS.Controllers
         [Route("UpdateBook")]
         public async Task<IActionResult> UpdateBook(AddBookModel model)
         {
-            int checkRole = TokenCMSManager.CheckRoleAction(ERole.Administrator, Request);
+            int checkRole = await TokenCMSManager.CheckRoleActionAsync(ERole.Administrator, Request);
             if (checkRole < 0)
                 return Ok(new ResponseApiModel<string>() { Status = checkRole, Messenger = UltilsHelper.GetMessageByErrorCode(checkRole) });
             var response = new ResponseApiModel<string>() { Status = EStatusCode.SYSTEM_ERROR, Messenger = UltilsHelper.GetMessageByErrorCode(EStatusCode.SYSTEM_ERROR) };
@@ -318,10 +314,9 @@ namespace BookStoreCMS.Controllers
 
         [HttpGet]
         [Route("GetBook")]
-        [ResponseCache(Duration = 5)]
         public async Task<IActionResult> GetBook(string barcode)
         {
-            int checkRole = TokenCMSManager.CheckRoleAction(ERole.Administrator, Request);
+            int checkRole = await TokenCMSManager.CheckRoleActionAsync(ERole.Administrator, Request);
             if (checkRole < 0)
                 return Ok(new ResponseApiModel<string>() { Status = checkRole, Messenger = UltilsHelper.GetMessageByErrorCode(checkRole) });
             var response = new ResponseApiModel<string>() { Status = EStatusCode.SYSTEM_ERROR, Messenger = UltilsHelper.GetMessageByErrorCode(EStatusCode.SYSTEM_ERROR) };
@@ -339,12 +334,11 @@ namespace BookStoreCMS.Controllers
         }
         [HttpGet]
         [Route("GetBooks")]
-        [ResponseCache(Duration = 5)]
         public async Task<IActionResult> GetBooks(int page, int row)
         {
             if (page > 100)
                 page = 100;
-            int checkRole = TokenCMSManager.CheckRoleAction(ERole.Administrator, Request);
+            int checkRole = await TokenCMSManager.CheckRoleActionAsync(ERole.Administrator, Request);
             if (checkRole < 0)
                 return Ok(new ResponseApiModel<string>() { Status = checkRole, Messenger = UltilsHelper.GetMessageByErrorCode(checkRole) });
             var response = new ResponseApiModel<string>() { Status = EStatusCode.SYSTEM_ERROR, Messenger = UltilsHelper.GetMessageByErrorCode(EStatusCode.SYSTEM_ERROR) };

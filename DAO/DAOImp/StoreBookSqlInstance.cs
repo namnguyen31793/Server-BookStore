@@ -1,7 +1,6 @@
 ﻿using DAO.Utitlities;
 using LoggerService;
 using ShareData.DB.Books;
-using ShareData.DB.Mail;
 using ShareData.ErrorCode;
 using System;
 using System.Collections.Generic;
@@ -111,7 +110,7 @@ namespace DAO.DAOImp
                 pars[4] = new SqlParameter("@_ActionTime", ActionTime);
                 pars[5] = new SqlParameter("@_NickName", NickName);
                 pars[6] = new SqlParameter("@_ResponseStatus", SqlDbType.Int) { Direction = ParameterDirection.Output };
-                modelData = db.GetInstanceSP<RateCommentObject>("SP_Store_Book_Set_Account_Rate", 4, pars);
+                modelData = db.GetInstanceSP<RateCommentObject>("SP_Store_Book_Account_Rate_Set", 4, pars);
                 responseStatus = Convert.ToInt32(pars[6].Value);
             }
             catch (Exception exception)
@@ -666,20 +665,23 @@ namespace DAO.DAOImp
             }
             return countBuy;
         }
-        public SimpleBookModel AccountBuyBarcode(long accountId, string barcode, out int reponseStatus)
+        public SimpleBookModel AccountBuyBarcode(long accountId, string barcode, out int reponseStatus, out long price)
         {
             DBHelper db = null;
             SimpleBookModel data = null;
             reponseStatus = EStatusCode.DATABASE_ERROR;
+            price = 0;
             try
             {
                 db = new DBHelper(ConfigDb.StoreBookConnectionString);
-                var pars = new SqlParameter[3];
+                var pars = new SqlParameter[4];
                 pars[0] = new SqlParameter("@_AccountId", accountId);
                 pars[1] = new SqlParameter("@_Barcode", barcode);
-                pars[2] = new SqlParameter("@_ResponseStatus", SqlDbType.Int) { Direction = ParameterDirection.Output };
-                data = db.GetInstanceSP<SimpleBookModel>("SP_Store_Book_Set_Account_Buy_Barcode", 4, pars);
-                reponseStatus = Convert.ToInt32(pars[2].Value);
+                pars[2] = new SqlParameter("@_BookPrice", SqlDbType.Int) { Direction = ParameterDirection.Output };
+                pars[3] = new SqlParameter("@_ResponseStatus", SqlDbType.Int) { Direction = ParameterDirection.Output };
+                data = db.GetInstanceSP<SimpleBookModel>("SP_Store_Book_Account_Buy_Barcode_Set", 4, pars);
+                reponseStatus = Convert.ToInt32(pars[3].Value);
+                price = Convert.ToInt64(pars[2].Value);
             }
             catch (Exception exception)
             {

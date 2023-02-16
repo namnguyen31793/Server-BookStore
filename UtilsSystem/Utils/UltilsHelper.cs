@@ -163,6 +163,12 @@ namespace UtilsSystem.Utils
                 case EStatusCode.ACCOUNT_NOT_ENOUGH_ROLE:
                     message = "Tài khoản không đủ quyền";
                     break;
+                case EStatusCode.ACOUNT_NOT_EXIST_BARCODE:
+                    message = "Tài khoản chwa mua sách này";
+                    break;
+                case EStatusCode.VOURCHER_NAME_ESXIST:
+                    message = "Vourcher đã tồn tại";
+                    break;
             }
             return message;
         }

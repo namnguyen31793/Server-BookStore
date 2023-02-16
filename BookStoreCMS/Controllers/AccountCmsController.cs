@@ -91,7 +91,7 @@ namespace BookStoreCMS.Controllers
             try
             {
                 var res = EStatusCode.SUCCESS;
-                res = await Task.Run(() =>
+                res = await Task.Run(async () =>
                 {
                     int role = 0;
                     var accountId = StoreUsersSqlInstance.Inst.DoLoginCms(requestLogin.AccountName, AccountUtils.EncryptPasswordMd5(requestLogin.Password), clientInfo.MerchantId, clientInfo.TrueClientIp, (int)clientInfo.OsType, ref role, ref res);
@@ -104,7 +104,7 @@ namespace BookStoreCMS.Controllers
                         var responseToken = StoreUsersSqlInstance.Inst.AddToken(accountId, refreshToken);
                         if (responseToken >= 0)
                         {
-                            var accessToken = TokenCMSManager.GenerateAccessToken(accountId, role, clientInfo);
+                            var accessToken = await TokenCMSManager.GenerateAccessTokenAsync(accountId, role, clientInfo);
                             model.DataResponse = new TokenInfoCms() { Role = role, AccountId = accountId, Access_token = accessToken, Refresh_token = refreshToken };
                         }
                         else
@@ -131,7 +131,6 @@ namespace BookStoreCMS.Controllers
 
         [HttpGet]
         [Route("RefreshToken")]
-        [ResponseCache(Duration = 5)]
         public async Task<IActionResult> RefreshToken(TokenInfo data)
         {
             try
@@ -143,7 +142,7 @@ namespace BookStoreCMS.Controllers
                 if (response >= 0)
                 {
                     var clientInfo = new ClientRequestInfo(Request);
-                    var accessToken = TokenCMSManager.GenerateAccessToken(accountId, role, clientInfo);
+                    var accessToken = await TokenCMSManager.GenerateAccessTokenAsync(accountId, role, clientInfo);
                     var model = new TokenInfoCms() { Role = role, AccountId = accountId, Access_token = accessToken, Refresh_token = data.Refresh_token };
                     return Ok(new ResponseApiModel<TokenInfoCms>() { Status = EStatusCode.SUCCESS, Messenger = UltilsHelper.GetMessageByErrorCode(EStatusCode.SUCCESS), DataResponse = model });
                 }
@@ -165,14 +164,13 @@ namespace BookStoreCMS.Controllers
 
         [HttpGet]
         [Route("GetAccountInfoById")]
-        [ResponseCache(Duration = 5)]
         public async Task<IActionResult> GetAccountInfo(long accountId)
         {
             int responseStatus = -99;
             AccountModelDb response = null;
             try
             {
-                int checkRole = TokenCMSManager.CheckRoleAction(ERole.Administrator, Request);
+                int checkRole = await TokenCMSManager.CheckRoleActionAsync(ERole.Administrator, Request);
                 if(checkRole < 0)
                     return Ok(new ResponseApiModel<string>() { Status = checkRole, Messenger = UltilsHelper.GetMessageByErrorCode(checkRole) });
                 response = StoreUsersSqlInstance.Inst.GetAccountInfo(accountId, ref responseStatus);
@@ -186,10 +184,9 @@ namespace BookStoreCMS.Controllers
         }
         [HttpPost]
         [Route("GetBookBuy")]
-        [ResponseCache(Duration = 60)]
         public async Task<IActionResult> GetBookBuy(long accountId, int page = 0, int row = 100)
         {
-            int checkRole = TokenCMSManager.CheckRoleAction(ERole.Administrator, Request);
+            int checkRole = await TokenCMSManager.CheckRoleActionAsync(ERole.Administrator, Request);
             if (checkRole < 0)
                 return Ok(new ResponseApiModel<string>() { Status = checkRole, Messenger = UltilsHelper.GetMessageByErrorCode(checkRole) });
 
@@ -198,14 +195,14 @@ namespace BookStoreCMS.Controllers
             {
                 int responseStatus = EStatusCode.DATABASE_ERROR;
                 string keyRedis = "CacheBookBuy:" + accountId + ":" + page + "-" + row;
-                string jsonListSimpleBook = RedisGatewayManager<string>.Inst.GetDataFromCache(keyRedis);
+                string jsonListSimpleBook = await RedisGatewayCacheManager.Inst.GetDataFromCacheAsync(keyRedis);
                 if (string.IsNullOrEmpty(jsonListSimpleBook))
                 {
                     var listBook = StoreBookSqlInstance.Inst.GetBookBuyAccount(accountId, page, row, out responseStatus);
                     if (responseStatus == EStatusCode.SUCCESS)
                     {
                         jsonListSimpleBook = JsonConvert.SerializeObject(listBook);
-                        RedisGatewayManager<string>.Inst.SaveData(keyRedis, jsonListSimpleBook, 600);
+                        await RedisGatewayCacheManager.Inst.SaveDataAsync(keyRedis, jsonListSimpleBook, 10);
                     }
                 }
                 response = new ResponseApiModel<string>() { Status = responseStatus, Messenger = UltilsHelper.GetMessageByErrorCode(responseStatus), DataResponse = jsonListSimpleBook };
@@ -219,12 +216,11 @@ namespace BookStoreCMS.Controllers
 
         [HttpPost]
         [Route("UpdateRoleUser")]
-        [ResponseCache(Duration = 60)]
         public async Task<IActionResult> UpdateRoleUser(long accountId, int role)
         {
             if (role <= 1)
                 return Ok(new ResponseApiModel<string>() { Status = EStatusCode.ACCOUNT_NOT_ENOUGH_ROLE, Messenger = UltilsHelper.GetMessageByErrorCode(EStatusCode.ACCOUNT_NOT_ENOUGH_ROLE) });
-            int checkRole = TokenCMSManager.CheckRoleAction(ERole.GM, Request);
+            int checkRole = await TokenCMSManager.CheckRoleActionAsync(ERole.GM, Request);
             if (checkRole < 0)
                 return Ok(new ResponseApiModel<string>() { Status = checkRole, Messenger = UltilsHelper.GetMessageByErrorCode(checkRole) });
 

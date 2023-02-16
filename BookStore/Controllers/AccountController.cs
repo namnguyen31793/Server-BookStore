@@ -48,7 +48,7 @@ namespace BookStore.Controllers
             try
             {
                 var clientInfo = new ClientRequestInfo(Request);
-                response = await LoginAsync(requestLogin, clientInfo);
+                response = await LoginAsync(requestLogin, clientInfo); 
             }
             catch (Exception ex)
             {
@@ -89,6 +89,7 @@ namespace BookStore.Controllers
 
                 if (responseCode == (int)EStatusCode.SUCCESS)
                 {
+                    await _logger.LogInfo("Account-RegisterFB{}", facebookUserName + " " + res, res.ToString()).ConfigureAwait(false);
                     MailInstance.Inst.SendMailRegis(accountId);
                     if (AccountUtils.IsValidEmail(requestLogin.Email))
                         await SendMailAsync(requestLogin.Email, accountId).ConfigureAwait(false);
@@ -143,6 +144,7 @@ namespace BookStore.Controllers
 
                     if (responseCode == (int)EStatusCode.SUCCESS)
                     {
+                        await _logger.LogInfo("Account-Register{}", requestRegis.AccountName + " " + res, res.ToString()).ConfigureAwait(false);
                         MailInstance.Inst.SendMailRegis(accountId);
                         if (AccountUtils.IsValidEmail(requestRegis.Email))
                             await SendMailAsync(requestRegis.Email, accountId).ConfigureAwait(false);
@@ -179,9 +181,11 @@ namespace BookStore.Controllers
             try
             {
                 var res = EStatusCode.SUCCESS;
-                res = await Task.Run(() =>
+                res = await Task.Run(async () =>
                 {
                     var accountId = StoreUsersSqlInstance.Inst.DoLogin(requestLogin.AccountName, AccountUtils.EncryptPasswordMd5(requestLogin.Password), clientInfo.MerchantId, clientInfo.TrueClientIp, (int)clientInfo.OsType, ref res);
+
+                    await _logger.LogInfo("Account-LoginAsync{}", requestLogin.AccountName + " - accountId:" + accountId+ " - res:" + res, res.ToString()).ConfigureAwait(false);
                     if (accountId >= 0)
                     {
                         //create refresh token -> save db
@@ -189,7 +193,7 @@ namespace BookStore.Controllers
                         var responseToken = StoreUsersSqlInstance.Inst.AddToken(accountId, refreshToken);
                         if (responseToken >= 0)
                         {
-                            var accessToken = TokenManager.GenerateAccessToken(accountId, clientInfo);
+                            var accessToken = await TokenManager.GenerateAccessTokenAsync(accountId, clientInfo);
                             model.DataResponse = new TokenInfo() { AccountId = accountId, Access_token = accessToken, Refresh_token = refreshToken };
                         }
                         else
@@ -216,7 +220,6 @@ namespace BookStore.Controllers
 
         [HttpGet]
         [Route("RefreshToken")]
-        [ResponseCache(Duration = 5)]
         public async Task<IActionResult> RefreshToken(TokenInfo data)
         {
             try
@@ -224,10 +227,11 @@ namespace BookStore.Controllers
                 long accountId = 0;
                 //check token
                 var response = StoreUsersSqlInstance.Inst.CheckRefreshToken(data.Refresh_token, ref accountId);
+                await _logger.LogInfo("Account-RefreshToken{}", data.Refresh_token + " - " + accountId + " - " + response, response.ToString()).ConfigureAwait(false);
                 if (response >= 0)
                 {
                     var clientInfo = new ClientRequestInfo(Request);
-                    var accessToken = TokenManager.GenerateAccessToken(accountId, clientInfo);
+                    var accessToken = await TokenManager.GenerateAccessTokenAsync(accountId, clientInfo);
                     var model = new TokenInfo() { AccountId = accountId, Access_token = accessToken, Refresh_token = data.Refresh_token };
                     return Ok(new ResponseApiModel<TokenInfo>() { Status = EStatusCode.SUCCESS, Messenger = UltilsHelper.GetMessageByErrorCode(EStatusCode.SUCCESS), DataResponse = model });
                 }
@@ -249,14 +253,13 @@ namespace BookStore.Controllers
 
         [HttpGet]
         [Route("GetAccountInfo")]
-        [ResponseCache(Duration = 5)]
         public async Task<IActionResult> GetAccountInfo()
         {
             int responseStatus = -99;
             AccountModelDb response = null;
             try
             {
-                long accountId = TokenManager.GetAccountIdByAccessToken(Request);
+                long accountId = await TokenManager.GetAccountIdByAccessTokenAsync(Request);
                 if (accountId <= 0)
                     return Ok(new ResponseApiModel<string>() { Status = accountId, Messenger = UltilsHelper.GetMessageByErrorCode((int)accountId) });
                 response = StoreUsersSqlInstance.Inst.GetAccountInfo(accountId, ref responseStatus);
@@ -278,10 +281,11 @@ namespace BookStore.Controllers
             AccountModelDb response = null;
             try
             {
-                long accountId = TokenManager.GetAccountIdByAccessToken(Request);
+                long accountId = await TokenManager.GetAccountIdByAccessTokenAsync(Request);
                 if (accountId <= 0)
                     return Ok(new ResponseApiModel<string>() { Status = accountId, Messenger = UltilsHelper.GetMessageByErrorCode((int)accountId) });
                 response = StoreUsersSqlInstance.Inst.UpdateEmail(accountId, Email, ref responseStatus);
+                await _logger.LogInfo("Account-UpdateEmail{}", Email + " - accountId:" + accountId + " - " + response, response.ToString()).ConfigureAwait(false);
                 if (responseStatus == 0)
                 {
                     await SendMailAsync(Email, accountId);
@@ -306,10 +310,11 @@ namespace BookStore.Controllers
             AccountModelDb response = null;
             try
             {
-                long accountId = TokenManager.GetAccountIdByAccessToken(Request);
+                long accountId = await TokenManager.GetAccountIdByAccessTokenAsync(Request);
                 if (accountId <= 0)
                     return Ok(new ResponseApiModel<string>() { Status = accountId, Messenger = UltilsHelper.GetMessageByErrorCode((int)accountId) });
                 response = StoreUsersSqlInstance.Inst.UpdateInfo(accountId, model.Nickname, model.AvatarId, model.PhoneNumber, model.BirthDay, model.Adress, ref responseStatus);
+                await _logger.LogInfo("Account-UpdateInfo{}", JsonConvert.SerializeObject(model) + " - accountId:" + accountId + " - " + response, response.ToString()).ConfigureAwait(false);
             }
             catch (Exception ex)
             {
@@ -330,18 +335,18 @@ namespace BookStore.Controllers
             int responseStatus = EStatusCode.DATABASE_ERROR;
             try
             {
-                long accountId = TokenManager.GetAccountIdByAccessToken(Request);
+                long accountId = await TokenManager.GetAccountIdByAccessTokenAsync(Request);
                 if (accountId <= 0)
                     return Ok(new ResponseApiModel<string>() { Status = accountId, Messenger = UltilsHelper.GetMessageByErrorCode((int)accountId) });
                 string keyRedis = "CacheBookBuy:" + accountId+":"+page+"-"+row;
-                string jsonListSimpleBook = RedisGatewayManager<string>.Inst.GetDataFromCache(keyRedis);
+                string jsonListSimpleBook = await RedisGatewayCacheManager.Inst.GetDataFromCacheAsync(keyRedis);
                 if (string.IsNullOrEmpty(jsonListSimpleBook))
                 {
                     var listBook = StoreBookSqlInstance.Inst.GetBookBuyAccount(accountId, page, row, out responseStatus);
                     if (responseStatus == EStatusCode.SUCCESS)
                     {
                         jsonListSimpleBook = JsonConvert.SerializeObject(listBook);
-                        RedisGatewayManager<string>.Inst.SaveData(keyRedis, jsonListSimpleBook, 600);
+                        await RedisGatewayCacheManager.Inst.SaveDataAsync(keyRedis, jsonListSimpleBook, 10);
                     }
                 }
                 else
@@ -352,32 +357,31 @@ namespace BookStore.Controllers
             }
             catch (Exception ex)
             {
-                await _logger.LogError("Books-GetBookBuy{}", ex.ToString()).ConfigureAwait(false);
+                await _logger.LogError("Account-GetBookBuy{}", ex.ToString()).ConfigureAwait(false);
             }
             return Ok(response);
         }
 
         [HttpGet]
         [Route("GetCountBookBuy")]
-        //[ResponseCache(Duration = 60)]
         public async Task<IActionResult> GetCountBookBuy()
         {
             var response = new ResponseApiModel<string>() { Status = EStatusCode.SYSTEM_ERROR, Messenger = UltilsHelper.GetMessageByErrorCode(EStatusCode.SYSTEM_ERROR) };
             int responseStatus = EStatusCode.DATABASE_ERROR;
             try
             {
-                long accountId = TokenManager.GetAccountIdByAccessToken(Request);
+                long accountId = await TokenManager.GetAccountIdByAccessTokenAsync(Request);
                 if (accountId <= 0)
                     return Ok(new ResponseApiModel<string>() { Status = accountId, Messenger = UltilsHelper.GetMessageByErrorCode((int)accountId) });
                 string keyRedis = "CacheCountBookBuy:" + accountId;
-                string jsonListSimpleBook = RedisGatewayManager<string>.Inst.GetDataFromCache(keyRedis);
+                string jsonListSimpleBook = await RedisGatewayCacheManager.Inst.GetDataFromCacheAsync(keyRedis);
                 if (string.IsNullOrEmpty(jsonListSimpleBook))
                 {
                     long countBuy = StoreBookSqlInstance.Inst.GetCountBuyAccount(accountId, out responseStatus);
                     if (responseStatus == EStatusCode.SUCCESS)
                     {
                         jsonListSimpleBook = JsonConvert.SerializeObject(countBuy);
-                        RedisGatewayManager<string>.Inst.SaveData(keyRedis, jsonListSimpleBook, 600);
+                        await RedisGatewayCacheManager.Inst.SaveDataAsync(keyRedis, jsonListSimpleBook, 10);
                     }
                 }
                 else
@@ -388,62 +392,74 @@ namespace BookStore.Controllers
             }
             catch (Exception ex)
             {
-                await _logger.LogError("Books-GetCountBookBuy{}", ex.ToString()).ConfigureAwait(false);
+                await _logger.LogError("Account-GetCountBookBuy{}", ex.ToString()).ConfigureAwait(false);
             }
             return Ok(response);
         }
 
         [HttpPost]
         [Route("BuyBook")]
-        [ResponseCache(Duration = 5)]
         public async Task<IActionResult> BuyBook(string barcode)
         {
             var response = new ResponseApiModel<string>() { Status = EStatusCode.SYSTEM_ERROR, Messenger = UltilsHelper.GetMessageByErrorCode(EStatusCode.SYSTEM_ERROR) };
             int responseStatus = EStatusCode.DATABASE_ERROR;
+            long curentVip = 0;
+            long curentPoint = 0;
+            bool isNextLevel = false;
+            long point = 0;
+            string vipName = "";
             try
             {
-                long accountId = TokenManager.GetAccountIdByAccessToken(Request);
+                long accountId = await TokenManager.GetAccountIdByAccessTokenAsync(Request);
                 if (accountId <= 0)
                     return Ok(new ResponseApiModel<string>() { Status = accountId, Messenger = UltilsHelper.GetMessageByErrorCode((int)accountId) });
-
-                var model = StoreBookSqlInstance.Inst.AccountBuyBarcode(accountId, barcode, out responseStatus);
+                var model = StoreBookSqlInstance.Inst.AccountBuyBarcode(accountId, barcode, out responseStatus, out point);
                 if (responseStatus == EStatusCode.SUCCESS)
                 {
-                    string keyRedis = "CacheBookBuy:" + accountId; 
-                    RedisGatewayManager<string>.Inst.DeleteArrayKey(keyRedis);
+                    string keyRedis = "CacheBookBuy:" + accountId;
+                    await RedisGatewayCacheManager.Inst.DeleteArrayKeyAsync(keyRedis).ConfigureAwait(false);
                     keyRedis = "CacheCountBookBuy:" + accountId;
-                    RedisGatewayManager<string>.Inst.DeleteDataFromCache(keyRedis);
+                    await RedisGatewayCacheManager.Inst.DeleteDataFromCacheAsync(keyRedis).ConfigureAwait(false);
+                    //update vip value
+                    string rewardLevelUp = "";
+                    var responseStatusMail = StoreMemberSqlInstance.Inst.IncPointAccountByBook(accountId, (long)(point/1000), out curentPoint, out curentVip, out isNextLevel, out vipName, out rewardLevelUp);
+                    //if (isNextLevel) {
+                    //    string mailHeader = "Chúc mừng bạn lên hạng!";
+                    //    string mailContent = "Tặng bạn phần quà là vourcher "+ rewardLevelUp;
+                    //    var mail = StoreMailSqlInstance.Inst.SendMail(accountId, "admin", mailHeader, mailContent, out responseStatusMail);
+                    //}
                 }
-                response = new ResponseApiModel<string>() { Status = responseStatus, Messenger = UltilsHelper.GetMessageByErrorCode(responseStatus), DataResponse = JsonConvert.SerializeObject(model) };
+                await _logger.LogInfo("Account-BuyBook{}", barcode + " - accountId:" + accountId + " - curentPoint:" + curentPoint + " - curentVip:" + curentVip + " - isNextLevel:" + isNextLevel + " - " + response, response.ToString()).ConfigureAwait(false);
+                ResponseBuyBook responseBuyBook = new ResponseBuyBook() { modelBook = model, CurrentPoint = curentPoint, CurrentVip = curentVip, VipName = vipName, levelUp = isNextLevel };
+                response = new ResponseApiModel<string>() { Status = responseStatus, Messenger = UltilsHelper.GetMessageByErrorCode(responseStatus), DataResponse = JsonConvert.SerializeObject(responseBuyBook) };
             }
             catch (Exception ex)
             {
-                await _logger.LogError("Books-BuyBook{}", ex.ToString()).ConfigureAwait(false);
+                await _logger.LogError("Account-BuyBook{}", ex.ToString()).ConfigureAwait(false);
             }
             return Ok(response);
         }
 
         [HttpGet]
         [Route("GetLikeBook")]
-        [ResponseCache(Duration = 5)]
         public async Task<IActionResult> GetLikeBook(int page, int row)
         {
             var response = new ResponseApiModel<string>() { Status = EStatusCode.SYSTEM_ERROR, Messenger = UltilsHelper.GetMessageByErrorCode(EStatusCode.SYSTEM_ERROR) };
             int responseStatus = EStatusCode.DATABASE_ERROR;
-            long accountId = TokenManager.GetAccountIdByAccessToken(Request);
+            long accountId = await TokenManager.GetAccountIdByAccessTokenAsync(Request);
             if (accountId <= 0)
                 return Ok(new ResponseApiModel<string>() { Status = accountId, Messenger = UltilsHelper.GetMessageByErrorCode((int)accountId) });
             try
             {
                 string keyRedis = "CacheLikeBook:" + accountId+":"+page+"-"+row;
-                string jsonListSimpleBook = RedisGatewayManager<string>.Inst.GetDataFromCache(keyRedis);
+                string jsonListSimpleBook = await RedisGatewayCacheManager.Inst.GetDataFromCacheAsync(keyRedis);
                 if (string.IsNullOrEmpty(jsonListSimpleBook))
                 {
                     var downloadInfoModel = StoreBookSqlInstance.Inst.GetLikeBook(accountId, page, row, out responseStatus);
                     if (responseStatus == EStatusCode.SUCCESS)
                     {
                         jsonListSimpleBook = JsonConvert.SerializeObject(downloadInfoModel);
-                        RedisGatewayManager<string>.Inst.SaveData(keyRedis, jsonListSimpleBook, 600);
+                        await RedisGatewayCacheManager.Inst.SaveDataAsync(keyRedis, jsonListSimpleBook, 10);
                     }
                 }
                 else
@@ -454,32 +470,31 @@ namespace BookStore.Controllers
             }
             catch (Exception ex)
             {
-                await _logger.LogError("Books-GetLikeBook{}", ex.ToString()).ConfigureAwait(false);
+                await _logger.LogError("Account-GetLikeBook{}", ex.ToString()).ConfigureAwait(false);
             }
             return Ok(response);
         }
 
         [HttpGet]
         [Route("GetCountLikeBook")]
-        [ResponseCache(Duration = 5)]
         public async Task<IActionResult> GetCountLikeBook()
         {
             var response = new ResponseApiModel<string>() { Status = EStatusCode.SYSTEM_ERROR, Messenger = UltilsHelper.GetMessageByErrorCode(EStatusCode.SYSTEM_ERROR) };
             int responseStatus = EStatusCode.DATABASE_ERROR;
-            long accountId = TokenManager.GetAccountIdByAccessToken(Request);
+            long accountId = await TokenManager.GetAccountIdByAccessTokenAsync(Request);
             if (accountId <= 0)
                 return Ok(new ResponseApiModel<string>() { Status = accountId, Messenger = UltilsHelper.GetMessageByErrorCode((int)accountId) });
             try
             {
                 string keyRedis = "CacheCountLikeBook:" + accountId;
-                string jsonListSimpleBook = RedisGatewayManager<string>.Inst.GetDataFromCache(keyRedis);
+                string jsonListSimpleBook = await RedisGatewayCacheManager.Inst.GetDataFromCacheAsync(keyRedis);
                 if (string.IsNullOrEmpty(jsonListSimpleBook))
                 {
                     long countBuy = StoreBookSqlInstance.Inst.GetCountBookLike(accountId, out responseStatus);
                     if (responseStatus == EStatusCode.SUCCESS)
                     {
                         jsonListSimpleBook = JsonConvert.SerializeObject(countBuy);
-                        RedisGatewayManager<string>.Inst.SaveData(keyRedis, jsonListSimpleBook, 600);
+                        await RedisGatewayCacheManager.Inst.SaveDataAsync(keyRedis, jsonListSimpleBook, 10);
                     }
                 }
                 else
@@ -490,7 +505,82 @@ namespace BookStore.Controllers
             }
             catch (Exception ex)
             {
-                await _logger.LogError("Books-GetCountLikeBook{}", ex.ToString()).ConfigureAwait(false);
+                await _logger.LogError("Account-GetCountLikeBook{}", ex.ToString()).ConfigureAwait(false);
+            }
+            return Ok(response);
+        }
+
+        [HttpGet]
+        [Route("GetMemberVip")]
+        public async Task<IActionResult> GetMemberVip()
+        {
+            var response = new ResponseApiModel<string>() { Status = EStatusCode.SYSTEM_ERROR, Messenger = UltilsHelper.GetMessageByErrorCode(EStatusCode.SYSTEM_ERROR) };
+            int responseStatus = EStatusCode.DATABASE_ERROR;
+            long accountId = await TokenManager.GetAccountIdByAccessTokenAsync(Request);
+            if (accountId <= 0)
+                return Ok(new ResponseApiModel<string>() { Status = accountId, Messenger = UltilsHelper.GetMessageByErrorCode((int)accountId) });
+            long curentPoint = 0;
+            long curentVip = 0;
+            string vipName = "";
+            try
+            {
+                string keyRedis = "GetMemberVip:" + accountId;
+                string jsonListSimpleBook = await RedisGatewayCacheManager.Inst.GetDataFromCacheAsync(keyRedis);
+                if (string.IsNullOrEmpty(jsonListSimpleBook))
+                {
+                    StoreMemberSqlInstance.Inst.GetCurrentPointAccount(accountId, out curentPoint, out curentVip, out vipName, out responseStatus);
+                    if (responseStatus == EStatusCode.SUCCESS)
+                    {
+                        ResponseMemberVip model = new ResponseMemberVip() { CurrentPoint = curentPoint, CurrentVip = curentVip, VipName = vipName };
+                        jsonListSimpleBook = JsonConvert.SerializeObject(model);
+                        await RedisGatewayCacheManager.Inst.SaveDataAsync(keyRedis, jsonListSimpleBook, 1);
+                    }
+                }
+                else
+                {
+                    responseStatus = EStatusCode.SUCCESS;
+                }
+                response = new ResponseApiModel<string>() { Status = responseStatus, Messenger = UltilsHelper.GetMessageByErrorCode(responseStatus), DataResponse = jsonListSimpleBook };
+            }
+            catch (Exception ex)
+            {
+                await _logger.LogError("Account-GetCountLikeBook{}", ex.ToString()).ConfigureAwait(false);
+            }
+            return Ok(response);
+        }
+
+
+        [HttpGet]
+        [Route("GetVourcherAccount")]
+        public async Task<IActionResult> GetVourcherAccount()
+        {
+            var response = new ResponseApiModel<string>() { Status = EStatusCode.SYSTEM_ERROR, Messenger = UltilsHelper.GetMessageByErrorCode(EStatusCode.SYSTEM_ERROR) };
+            int responseStatus = EStatusCode.DATABASE_ERROR;
+            long accountId = await TokenManager.GetAccountIdByAccessTokenAsync(Request);
+            if (accountId <= 0)
+                return Ok(new ResponseApiModel<string>() { Status = accountId, Messenger = UltilsHelper.GetMessageByErrorCode((int)accountId) });
+            try
+            {
+                string keyRedis = "GetVourcherAccount:" + accountId;
+                string jsonstring = await RedisGatewayCacheManager.Inst.GetDataFromCacheAsync(keyRedis);
+                if (string.IsNullOrEmpty(jsonstring))
+                {
+                    var listModel = StoreUsersSqlInstance.Inst.GetVourcherAccount(accountId, out responseStatus);
+                    if (responseStatus == EStatusCode.SUCCESS)
+                    {
+                        jsonstring = JsonConvert.SerializeObject(listModel);
+                        await RedisGatewayCacheManager.Inst.SaveDataAsync(keyRedis, jsonstring, 1);
+                    }
+                }
+                else
+                {
+                    responseStatus = EStatusCode.SUCCESS;
+                }
+                response = new ResponseApiModel<string>() { Status = responseStatus, Messenger = UltilsHelper.GetMessageByErrorCode(responseStatus), DataResponse = jsonstring };
+            }
+            catch (Exception ex)
+            {
+                await _logger.LogError("Account-GetCountLikeBook{}", ex.ToString()).ConfigureAwait(false);
             }
             return Ok(response);
         }
@@ -515,10 +605,20 @@ namespace BookStore.Controllers
 
         private async Task SendMailAsync(string toAdress, long AccountId){
             return;
-            string key = HttpUtility.UrlEncode(TokenManager.GenerateKeyTokenValidate(AccountId, toAdress));
+            string key = HttpUtility.UrlEncode(await TokenManager.GenerateKeyTokenValidateAsync(AccountId, toAdress));
             string url = CONFIG.BaseLink + CONFIG.FunctionValidateEmail+ key;
 
             var message = new Message(new string[] { toAdress }, "Validate email", "This is the content from our email, token lifetime 10 min. Click with validate link: "+ url);
+            await _emailSender.SendEmailAsync(message).ConfigureAwait(false);
+        }
+
+        private async Task SendVourcherNewAccount(string toAdress, long AccountId)
+        {
+            return;
+            string key = HttpUtility.UrlEncode(await TokenManager.GenerateKeyTokenValidateAsync(AccountId, toAdress));
+            string url = CONFIG.BaseLink + CONFIG.FunctionValidateEmail + key;
+
+            var message = new Message(new string[] { toAdress }, "Validate email", "This is the content from our email, token lifetime 10 min. Click with validate link: " + url);
             await _emailSender.SendEmailAsync(message).ConfigureAwait(false);
         }
     }
