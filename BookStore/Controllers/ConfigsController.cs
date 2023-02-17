@@ -1,7 +1,6 @@
 ﻿using BookStore.Utils;
 using DAO.DAOImp;
 using LoggerService;
-using Marvin.Cache.Headers;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Newtonsoft.Json;
@@ -30,8 +29,7 @@ namespace BookStore.Controllers
 
         [HttpGet]
         [Route("GetMerberConfig")]
-        [HttpCacheExpiration(CacheLocation = CacheLocation.Public, MaxAge = 10)]
-        [HttpCacheValidation(MustRevalidate = false)]
+        [ResponseCache(Duration = 5)]
         public async Task<IActionResult> GetMerberConfig()
         {
             var response = new ResponseApiModel<string>() { Status = EStatusCode.SYSTEM_ERROR, Messenger = UltilsHelper.GetMessageByErrorCode(EStatusCode.SYSTEM_ERROR) };

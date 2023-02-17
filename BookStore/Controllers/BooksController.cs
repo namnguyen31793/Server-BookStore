@@ -1,7 +1,6 @@
 ﻿using BookStore.Utils;
 using DAO.DAOImp;
 using LoggerService;
-using Marvin.Cache.Headers;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Newtonsoft.Json;
@@ -30,8 +29,7 @@ namespace BookStore.Controllers
 
         [HttpGet]
         [Route("{barcode}/GetListComment")]
-        [HttpCacheExpiration(CacheLocation = CacheLocation.Public, MaxAge = 60)]
-        [HttpCacheValidation(MustRevalidate = false)]
+        [ResponseCache(Duration = 5)]
 
         public async Task<IActionResult> GetListComment(string barcode)
         {
@@ -67,8 +65,7 @@ namespace BookStore.Controllers
         }
         [HttpGet]
         [Route("{barcode}/GetAvgRate")]
-        [HttpCacheExpiration(CacheLocation = CacheLocation.Public, MaxAge = 60)]
-        [HttpCacheValidation(MustRevalidate = false)]
+        [ResponseCache(Duration = 5)]
         public async Task<IActionResult> GetAvgRate(string barcode)
         {
             if (string.IsNullOrEmpty(barcode))
@@ -138,8 +135,7 @@ namespace BookStore.Controllers
 
         [HttpGet]
         [Route("{barcode}/GetListSimpleBook")]
-        [HttpCacheExpiration(CacheLocation = CacheLocation.Public, MaxAge = 60)]
-        [HttpCacheValidation(MustRevalidate = true)]
+        [ResponseCache(Duration = 5)]
         public async Task<IActionResult> GetListSimpleBookBarCode(string barcode)
         {
             var response = new ResponseApiModel<string>() { Status = EStatusCode.SYSTEM_ERROR, Messenger = UltilsHelper.GetMessageByErrorCode(EStatusCode.SYSTEM_ERROR) };
@@ -170,8 +166,7 @@ namespace BookStore.Controllers
         }
         [HttpGet]
         [Route("{barcode}/GetBookDemo")]
-        [HttpCacheExpiration(CacheLocation = CacheLocation.Public, MaxAge = 60)]
-        [HttpCacheValidation(MustRevalidate = false)]
+        [ResponseCache(Duration = 5)]
         public async Task<IActionResult> GetBookDemo(string barcode)
         {
             var response = new ResponseApiModel<string>() { Status = EStatusCode.SYSTEM_ERROR, Messenger = UltilsHelper.GetMessageByErrorCode(EStatusCode.SYSTEM_ERROR) };
@@ -203,8 +198,7 @@ namespace BookStore.Controllers
 
         [HttpGet]
         [Route("{barcode}/GetLinkDownload")]
-        [HttpCacheExpiration(CacheLocation = CacheLocation.Public, MaxAge = 60)]
-        [HttpCacheValidation(MustRevalidate = false)]
+        [ResponseCache(Duration = 5)]
         public async Task<IActionResult> GetLinkDownload(string barcode)
         {
             var response = new ResponseApiModel<string>() { Status = EStatusCode.SYSTEM_ERROR, Messenger = UltilsHelper.GetMessageByErrorCode(EStatusCode.SYSTEM_ERROR) };
@@ -232,8 +226,7 @@ namespace BookStore.Controllers
 
         [HttpGet]
         [Route("GetListSimpleBook")]
-        [HttpCacheExpiration(CacheLocation = CacheLocation.Public, MaxAge = 60)]
-        [HttpCacheValidation(MustRevalidate = true)]
+        [ResponseCache(Duration = 5)]
         public async Task<IActionResult> GetListSimpleBook(int page, int row)
         {
             if (row > 100)
@@ -269,8 +262,7 @@ namespace BookStore.Controllers
 
         [HttpGet]
         [Route("GetListSimpleBookSameName")]
-        [HttpCacheExpiration(CacheLocation = CacheLocation.Public, MaxAge = 60)]
-        [HttpCacheValidation(MustRevalidate = false)]
+        [ResponseCache(Duration = 5)]
         public async Task<IActionResult> GetListSimpleBookSameName(string bookName)
         {
             var response = new ResponseApiModel<string>() { Status = EStatusCode.SYSTEM_ERROR, Messenger = UltilsHelper.GetMessageByErrorCode(EStatusCode.SYSTEM_ERROR) };
@@ -302,8 +294,7 @@ namespace BookStore.Controllers
         }
         [HttpGet]
         [Route("GetListSimpleBookbyTag")]
-        [HttpCacheExpiration(CacheLocation = CacheLocation.Public, MaxAge = 60)]
-        [HttpCacheValidation(MustRevalidate = false)]
+        [ResponseCache(Duration = 5)]
         public async Task<IActionResult> GetListSimpleBookbyTag(string tag, int page, int row)
         {
             if (row > 100)
@@ -371,8 +362,7 @@ namespace BookStore.Controllers
 
         [HttpPost]
         [Route("{barcode}/LikeBook")]
-        [HttpCacheExpiration(CacheLocation = CacheLocation.Public, MaxAge = 60)]
-        [HttpCacheValidation(MustRevalidate = false)]
+        [ResponseCache(Duration = 5)]
         public async Task<IActionResult> LikeBook(string barcode, int status = 0)
         {
             var response = new ResponseApiModel<string>() { Status = EStatusCode.SYSTEM_ERROR, Messenger = UltilsHelper.GetMessageByErrorCode(EStatusCode.SYSTEM_ERROR) };

@@ -19,8 +19,9 @@ namespace UtilsSystem.SocialNetwork
             var cancellationTokenSource = new CancellationTokenSource();
             cancellationTokenSource.CancelAfter(30000); //30s
 
-            var request = new RestRequest(HttpUtility.UrlEncode("me?access_token=" +facebookToken), Method.Get);
-            var client = new RestClient(HttpUtility.UrlEncode("https://graph.facebook.com/"));
+            var request = new RestRequest("", Method.Get); 
+            request.AddHeader("Content-Type", "application/json");
+            var client = new RestClient("https://graph.facebook.com/me?access_token=" + facebookToken);
             ServicePointManager.SecurityProtocol = SecurityProtocolType.Tls12 | SecurityProtocolType.Tls11 | SecurityProtocolType.Tls;
             var response = await client.ExecuteAsync(request, cancellationTokenSource.Token);
             var content = response.Content;
@@ -38,7 +39,9 @@ namespace UtilsSystem.SocialNetwork
         {
             //lay rieng
             var facebookAccountId = await GetFacebookUserIdAsync(facebookToken);
-            if (!string.IsNullOrEmpty(facebookAccountId)) return "FB_" + facebookAccountId;
+            var modelToken = JsonConvert.DeserializeObject<TokenFbModel>(facebookAccountId);
+            if(modelToken != null)
+             return "FB_" + modelToken.id;
             return string.Empty;
         }
 
@@ -48,6 +51,11 @@ namespace UtilsSystem.SocialNetwork
         {
             var password = userName + "Facebook@";
             return password;
+        }
+
+        public class TokenFbModel {
+            public string name { get; set; }
+            public string id { get; set; }
         }
     }
 }

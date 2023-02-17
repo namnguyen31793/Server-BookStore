@@ -8,7 +8,6 @@ D:\Server\Server-BookStore\BookStore\obj\Release\netcoreapp3.1\PubTmp\Out\BookSt
 D:\Server\Server-BookStore\BookStore\obj\Release\netcoreapp3.1\PubTmp\Out\BookStore.pdb
 D:\Server\Server-BookStore\BookStore\obj\Release\netcoreapp3.1\PubTmp\Out\DnsClient.dll
 D:\Server\Server-BookStore\BookStore\obj\Release\netcoreapp3.1\PubTmp\Out\MailKit.dll
-D:\Server\Server-BookStore\BookStore\obj\Release\netcoreapp3.1\PubTmp\Out\Marvin.Cache.Headers.dll
 D:\Server\Server-BookStore\BookStore\obj\Release\netcoreapp3.1\PubTmp\Out\Microsoft.AspNetCore.Mvc.Versioning.dll
 D:\Server\Server-BookStore\BookStore\obj\Release\netcoreapp3.1\PubTmp\Out\Microsoft.Extensions.Configuration.dll
 D:\Server\Server-BookStore\BookStore\obj\Release\netcoreapp3.1\PubTmp\Out\Microsoft.Extensions.Configuration.Abstractions.dll

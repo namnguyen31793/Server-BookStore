@@ -94,4 +94,3 @@ D:\Server\Server-BookStore\BookStore\bin\Release\netcoreapp3.1\MailKit.dll
 D:\Server\Server-BookStore\BookStore\bin\Release\netcoreapp3.1\MimeKit.dll
 D:\Server\Server-BookStore\BookStore\bin\Release\netcoreapp3.1\NETCore.MailKit.dll
 D:\Server\Server-BookStore\BookStore\bin\Release\netcoreapp3.1\BouncyCastle.Crypto.dll
-D:\Server\Server-BookStore\BookStore\bin\Release\netcoreapp3.1\Marvin.Cache.Headers.dll

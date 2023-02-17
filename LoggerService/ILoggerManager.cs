@@ -12,7 +12,7 @@ namespace LoggerService
         Task LogWarn(string message);
         Task LogDebug(string title, string message);
         Task LogError(string title, string message);
+        Task LogBuyBook(string title, long AccountId, string barcode, long price);
 
-        List<LogMongoModel> GetLog(int Type, int Page, int PageRow);
     }
 }

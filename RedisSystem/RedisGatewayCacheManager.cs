@@ -56,9 +56,15 @@ namespace RedisSystem
         {
             try
             {
-                var keys = Connection.GetServer(RedisConfig.RedisServerIpAddress + ":" + RedisConfig.RedisServerPort).Keys();
-                RedisKey[] keysArr = keys.Where(x => x.ToString().Contains(forderName)).Select(key => key).ToArray();
-                await Connection.GetDatabase().KeyDeleteAsync(keysArr);
+                //var keys = Connection.GetServer(RedisConfig.RedisServerIpAddress + ":" + RedisConfig.RedisServerPort).Keys();
+                //RedisKey[] keysArr = keys.Where(x => x.ToString().Contains(forderName)).Select(key => key).ToArray();
+                //await Connection.GetDatabase().KeyDeleteAsync(keysArr).ConfigureAwait(false);
+                var server = Connection.GetServer(RedisConfig.RedisServerIpAddress + ":" + RedisConfig.RedisServerPort);
+                var db = Connection.GetDatabase();
+                foreach (var key in server.Keys(0, forderName+":*",  pageSize: 500))
+                {
+                    await db.KeyDeleteAsync(key, flags: CommandFlags.FireAndForget).ConfigureAwait(false);
+                }
             }
             catch (Exception exception)
             {

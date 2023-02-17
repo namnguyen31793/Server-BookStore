@@ -129,25 +129,40 @@ namespace LoggerService
             throw new NotImplementedException();
         }
 
-        public List<LogMongoModel> GetLog(int Type, int Page, int PageRow) {
 
-            if (PageRow > 500)
-                PageRow = 500;
-            var database = _client.GetDatabase(NO_SQL_CONFIG.API_LOG_SYSTEM_DATABASE_NAME);
-            IMongoCollection<LogMongoModel> trackingCollection = database.GetCollection<LogMongoModel>(NO_SQL_CONFIG.API_LOG_NORMAL_COLLECTION);
-            if (Type == 1) {
-                trackingCollection = database.GetCollection<LogMongoModel>(NO_SQL_CONFIG.API_LOG_ERROR_COLLECTION);
-            }
-            List<LogMongoModel> model = new List<LogMongoModel>();
+        public async Task LogBuyBook(string title, long AccountId, string barcode, long price)
+        {
+            var database = _client.GetDatabase(NO_SQL_CONFIG.API_TRACKING_SYSTEM_DATABASE_NAME);
             try
             {
-                model = trackingCollection.AsQueryable<LogMongoModel>().Where(x => x.Id != null).OrderByDescending(y => y.ActionTime).Skip(PageRow * Page).Take(PageRow).ToList();
+                var document = new BsonDocument {
+                { "Title", title },
+                { "AccountId", AccountId },
+                { "Barcode", barcode },
+                { "Price", price },
+                { "ExpireAt", DateTime.SpecifyKind(DateTime.Now.AddMonths(6), DateTimeKind.Local) },
+                { "ActionTime", DateTime.Now } };
+                IMongoCollection<BsonDocument> trackingCollection = database.GetCollection<BsonDocument>(NO_SQL_CONFIG.API_LOG_BUY_BOOK_COLLECTION);
+
+                var indexBuilder = Builders<BsonDocument>.IndexKeys;
+                var key = indexBuilder.Ascending("ExpireAt");
+                var options = new CreateIndexOptions
+                {
+                    ExpireAfter = new TimeSpan(0),
+                    Name = "ExpireAtIndex",
+
+                };
+                await trackingCollection.Indexes.CreateOneAsync(key, options).ConfigureAwait(false);
+
+                await trackingCollection.InsertOneAsync(document);
             }
-            catch (Exception ex)
+            catch (Exception)
             {
-                LogError("GetLog", ex.ToString()).ConfigureAwait(false);
             }
-            return model;
+            finally
+            {
+                database = null;
+            }
         }
 
         public void Dispose()

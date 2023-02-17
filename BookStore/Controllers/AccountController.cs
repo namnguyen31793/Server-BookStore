@@ -72,49 +72,56 @@ namespace BookStore.Controllers
                 if (!AccountUtils.IsPhoneNumber(requestLogin.PhoneNumber))
                     return Ok(new ResponseApiModel<string>() { Status = EStatusCode.PHONE_INVAILD, Messenger = UltilsHelper.GetMessageByErrorCode(EStatusCode.PHONE_INVAILD) });
 
-            var clientInfo = new ClientRequestInfo(Request);
-
-            var facebookUserName = await FacebookHelper.GetFacebookUserNameAsync(requestLogin.Token);
-            await _logger.LogError("Account-Register{}", facebookUserName).ConfigureAwait(false);
-            var responseCode = -99;
-            if (string.IsNullOrEmpty(facebookUserName))
-                return Ok(new ResponseApiModel<string>() { Status = EStatusCode.SYSTEM_ERROR, Messenger = UltilsHelper.GetMessageByErrorCode(EStatusCode.SYSTEM_ERROR) });
-            var fbPassword = FacebookHelper.GetFacebookPassword(facebookUserName);
-            var passMd5 = AccountUtils.EncryptPasswordMd5(fbPassword);
-            responseCode = await Task.Run(async () =>
+            try
             {
-                int accountId = 0;
-                var res = StoreUsersSqlInstance.Inst.Register(REGISTER_TYPE.FACEBOOK_TYPE, facebookUserName, "", passMd5, clientInfo.MerchantId, clientInfo.TrueClientIp, clientInfo.DeviceId, (int)clientInfo.OsType,
-                    requestLogin.PhoneNumber, requestLogin.Email, out accountId);
+                var clientInfo = new ClientRequestInfo(Request);
 
+                var facebookUserName = await FacebookHelper.GetFacebookUserNameAsync(requestLogin.Token);
+                await _logger.LogError("Account-Register{}", facebookUserName).ConfigureAwait(false);
+                var responseCode = -99;
+                if (string.IsNullOrEmpty(facebookUserName))
+                    return Ok(new ResponseApiModel<string>() { Status = EStatusCode.SYSTEM_ERROR, Messenger = UltilsHelper.GetMessageByErrorCode(EStatusCode.SYSTEM_ERROR) });
+                var fbPassword = FacebookHelper.GetFacebookPassword(facebookUserName);
+                var passMd5 = AccountUtils.EncryptPasswordMd5(fbPassword);
+                responseCode = await Task.Run(async () =>
+                {
+                    int accountId = 0;
+                    var res = StoreUsersSqlInstance.Inst.Register(REGISTER_TYPE.FACEBOOK_TYPE, facebookUserName, "", passMd5, clientInfo.MerchantId, clientInfo.TrueClientIp, clientInfo.DeviceId, (int)clientInfo.OsType,
+                        requestLogin.PhoneNumber, requestLogin.Email, out accountId);
+
+                    if (responseCode == (int)EStatusCode.SUCCESS)
+                    {
+                        await _logger.LogInfo("Account-RegisterFB{}", facebookUserName + " " + res, res.ToString()).ConfigureAwait(false);
+                        MailInstance.Inst.SendMailRegis(accountId);
+                        if (AccountUtils.IsValidEmail(requestLogin.Email))
+                            await SendMailAsync(requestLogin.Email, accountId).ConfigureAwait(false);
+                    }
+                    return res;
+
+                });
                 if (responseCode == (int)EStatusCode.SUCCESS)
                 {
-                    await _logger.LogInfo("Account-RegisterFB{}", facebookUserName + " " + res, res.ToString()).ConfigureAwait(false);
-                    MailInstance.Inst.SendMailRegis(accountId);
-                    if (AccountUtils.IsValidEmail(requestLogin.Email))
-                        await SendMailAsync(requestLogin.Email, accountId).ConfigureAwait(false);
+                    //TrackingDAO.Inst.TrackingRegis();
                 }
-                return res;
-
-            });
-            if (responseCode == (int)EStatusCode.SUCCESS)
-            {
-                //TrackingDAO.Inst.TrackingRegis();
-            }
-            if (responseCode == (int)EStatusCode.ACCOUNT_EXITS || responseCode == (int)EStatusCode.SUCCESS)
-            {
-                //do login
-                RequestAuthenModel request = new RequestAuthenModel()
+                if (responseCode == (int)EStatusCode.ACCOUNT_EXITS || responseCode == (int)EStatusCode.SUCCESS)
                 {
-                    AccountName = facebookUserName,
-                    Password = fbPassword,
-                };
-                var response = await LoginAsync(request, clientInfo);
-                return Ok(response);
+                    //do login
+                    RequestAuthenModel request = new RequestAuthenModel()
+                    {
+                        AccountName = facebookUserName,
+                        Password = fbPassword,
+                    };
+                    var response = await LoginAsync(request, clientInfo);
+                    return Ok(response);
+                }
+                else
+                {
+                    return Ok(new ResponseApiModel<string>() { Status = EStatusCode.SYSTEM_ERROR, Messenger = UltilsHelper.GetMessageByErrorCode(EStatusCode.SYSTEM_ERROR) });
+                }
             }
-            else
+            catch (Exception ex)
             {
-                return Ok(new ResponseApiModel<string>() { Status = EStatusCode.SYSTEM_ERROR, Messenger = UltilsHelper.GetMessageByErrorCode(EStatusCode.SYSTEM_ERROR) });
+                return Ok(new ResponseApiModel<string>() { Status = EStatusCode.SYSTEM_ERROR, Messenger = UltilsHelper.GetMessageByErrorCode(EStatusCode.SYSTEM_ERROR), DataResponse= ex.ToString() });
             }
         }
 
@@ -428,9 +435,10 @@ namespace BookStore.Controllers
                     //    string mailContent = "Tặng bạn phần quà là vourcher "+ rewardLevelUp;
                     //    var mail = StoreMailSqlInstance.Inst.SendMail(accountId, "admin", mailHeader, mailContent, out responseStatusMail);
                     //}
+                    await _logger.LogBuyBook("Account-BuyBook{}", accountId, barcode, point).ConfigureAwait(false);
+
                 }
-                await _logger.LogInfo("Account-BuyBook{}", barcode + " - accountId:" + accountId + " - curentPoint:" + curentPoint + " - curentVip:" + curentVip + " - isNextLevel:" + isNextLevel + " - " + response, response.ToString()).ConfigureAwait(false);
-                ResponseBuyBook responseBuyBook = new ResponseBuyBook() { modelBook = model, CurrentPoint = curentPoint, CurrentVip = curentVip, VipName = vipName, levelUp = isNextLevel };
+                ResponseBuyBook responseBuyBook = new ResponseBuyBook() { modelBook = model, modelMember = new ResponseMemberVip() { CurrentPoint = curentPoint, CurrentVip = curentVip, VipName = vipName }, pointBook = (long)(point / 1000), levelUp = isNextLevel };
                 response = new ResponseApiModel<string>() { Status = responseStatus, Messenger = UltilsHelper.GetMessageByErrorCode(responseStatus), DataResponse = JsonConvert.SerializeObject(responseBuyBook) };
             }
             catch (Exception ex)

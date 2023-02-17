@@ -59,10 +59,6 @@
         "netcoreapp3.1": {
           "targetAlias": "netcoreapp3.1",
           "dependencies": {
-            "Marvin.Cache.Headers": {
-              "target": "Package",
-              "version": "[4.1.0, )"
-            },
             "Microsoft.AspNetCore.Cors": {
               "target": "Package",
               "version": "[2.2.0, )"
