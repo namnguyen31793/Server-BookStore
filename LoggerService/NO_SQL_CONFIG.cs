@@ -28,6 +28,7 @@ namespace LoggerService
         public static readonly string API_LOG_DEBUG_COLLECTION = "ApiDebugLog_Collection";
         public static readonly string API_LOG_NORMAL_COLLECTION = "ApiNormalLog_Collection";
         public static readonly string API_LOG_BUY_BOOK_COLLECTION = "BuyBookLog_Collection";
+        public static readonly string API_LOG_CCU_COLLECTION = "CcuLog_Collection";
         #endregion
 
     }

@@ -33,6 +33,7 @@
         "dependencies": {
           "DAO": "1.0.0",
           "LoggerService": "1.0.0",
+          "Marvin.Cache.Headers": "6.1.0",
           "Microsoft.AspNetCore.Cors": "2.2.0",
           "Microsoft.AspNetCore.Mvc.Versioning": "5.0.0",
           "NETCore.MailKit": "2.1.0",
@@ -338,6 +339,17 @@
         },
         "compile": {
           "lib/netstandard2.1/MailKit.dll": {}
+        }
+      },
+      "Marvin.Cache.Headers/6.1.0": {
+        "runtime": {
+          "lib/netcoreapp3.1/Marvin.Cache.Headers.dll": {
+            "assemblyVersion": "6.1.0.0",
+            "fileVersion": "6.1.0.0"
+          }
+        },
+        "compile": {
+          "lib/netcoreapp3.1/Marvin.Cache.Headers.dll": {}
         }
       },
       "Microsoft.AspNetCore.Cors/2.2.0": {
@@ -2907,6 +2919,13 @@
       "sha512": "sha512-5MTpTqmjqT7HPvYbP3HozRZMth5vSaT0ReN0iM3rAM4CgLI/R1qqtLDDNWGnFFIlcNzeJkZQRJJMkv8cgzWBbA==",
       "path": "mailkit/3.2.0",
       "hashPath": "mailkit.3.2.0.nupkg.sha512"
+    },
+    "Marvin.Cache.Headers/6.1.0": {
+      "type": "package",
+      "serviceable": true,
+      "sha512": "sha512-XHUeOdMfZrtRHXsWiqRUrebBl4U2SGew8Cr7Y/tHaGfiY/fbajnq4vRt5ktlkUnMebcpfvl8RJjAglu1KxWwYQ==",
+      "path": "marvin.cache.headers/6.1.0",
+      "hashPath": "marvin.cache.headers.6.1.0.nupkg.sha512"
     },
     "Microsoft.AspNetCore.Cors/2.2.0": {
       "type": "package",

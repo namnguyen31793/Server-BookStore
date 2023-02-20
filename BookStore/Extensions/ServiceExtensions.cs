@@ -1,5 +1,6 @@
 ﻿using BookStore.Instance;
 using LoggerService;
+using Marvin.Cache.Headers;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Versioning;
@@ -51,5 +52,17 @@ namespace BookStore.Extensions
 
         public static void ConfigureResponseCaching(this IServiceCollection services) =>
             services.AddResponseCaching();
+
+        public static void ConfigureHttpCacheHeaders(this IServiceCollection services) =>
+            services.AddHttpCacheHeaders((expirationOpt) =>
+                {
+                    expirationOpt.MaxAge = 5;
+                    expirationOpt.CacheLocation = CacheLocation.Private;
+                },
+                (validationOpt) =>
+                {
+                    validationOpt.NoCache = true;
+                    validationOpt.MustRevalidate = true;
+                });
     }
 }

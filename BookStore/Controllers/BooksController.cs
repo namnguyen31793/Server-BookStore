@@ -1,11 +1,13 @@
 ﻿using BookStore.Utils;
 using DAO.DAOImp;
 using LoggerService;
+using Marvin.Cache.Headers;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Newtonsoft.Json;
 using RedisSystem;
 using ShareData.API;
+using ShareData.DB.Books;
 using ShareData.ErrorCode;
 using System;
 using System.Collections.Generic;
@@ -29,8 +31,8 @@ namespace BookStore.Controllers
 
         [HttpGet]
         [Route("{barcode}/GetListComment")]
-        [ResponseCache(Duration = 5)]
-
+        [HttpCacheExpiration(CacheLocation = CacheLocation.Public, MaxAge = 60)]
+        [HttpCacheValidation(MustRevalidate = true)]
         public async Task<IActionResult> GetListComment(string barcode)
         {
             if(string.IsNullOrEmpty(barcode))
@@ -65,7 +67,8 @@ namespace BookStore.Controllers
         }
         [HttpGet]
         [Route("{barcode}/GetAvgRate")]
-        [ResponseCache(Duration = 5)]
+        [HttpCacheExpiration(CacheLocation = CacheLocation.Public, MaxAge = 10)]
+        [HttpCacheValidation(MustRevalidate = true)]
         public async Task<IActionResult> GetAvgRate(string barcode)
         {
             if (string.IsNullOrEmpty(barcode))
@@ -73,17 +76,18 @@ namespace BookStore.Controllers
 
             var response = new ResponseApiModel<string>() { Status = EStatusCode.SYSTEM_ERROR, Messenger = UltilsHelper.GetMessageByErrorCode(EStatusCode.SYSTEM_ERROR) };
             int responseStatus = EStatusCode.DATABASE_ERROR;
-            float starRate = 0;
+            string jsonListMail = "";
             try
             {
                 string keyRedis = "CacheAvgRate:" + barcode;
-                string jsonListMail = await RedisGatewayCacheManager.Inst.GetDataFromCacheAsync(keyRedis);
+                jsonListMail = await RedisGatewayCacheManager.Inst.GetDataFromCacheAsync(keyRedis);
                 if (string.IsNullOrEmpty(jsonListMail))
                 {
+                    RateCountModel starRate = null;
                     responseStatus = StoreBookSqlInstance.Inst.GetAvgRate(barcode, out starRate);
                     if (responseStatus == EStatusCode.SUCCESS)
                     {
-                        jsonListMail = JsonConvert.SerializeObject(starRate.ToString());
+                        jsonListMail = JsonConvert.SerializeObject(starRate);
                         await RedisGatewayCacheManager.Inst.SaveDataAsync(keyRedis, jsonListMail, 10);
                     }
                 }
@@ -102,6 +106,7 @@ namespace BookStore.Controllers
 
         [HttpPost]
         [Route("{barcode}/SendCommentbook")]
+        [HttpCacheIgnore]
         public async Task<IActionResult> SendCommentbook(string barcode, int rate, string comment, string Nickname)
         {
             if (string.IsNullOrEmpty(barcode))
@@ -135,7 +140,8 @@ namespace BookStore.Controllers
 
         [HttpGet]
         [Route("{barcode}/GetListSimpleBook")]
-        [ResponseCache(Duration = 5)]
+        [HttpCacheExpiration(CacheLocation = CacheLocation.Public, MaxAge = 10)]
+        [HttpCacheValidation(MustRevalidate = true)]
         public async Task<IActionResult> GetListSimpleBookBarCode(string barcode)
         {
             var response = new ResponseApiModel<string>() { Status = EStatusCode.SYSTEM_ERROR, Messenger = UltilsHelper.GetMessageByErrorCode(EStatusCode.SYSTEM_ERROR) };
@@ -166,7 +172,8 @@ namespace BookStore.Controllers
         }
         [HttpGet]
         [Route("{barcode}/GetBookDemo")]
-        [ResponseCache(Duration = 5)]
+        [HttpCacheExpiration(CacheLocation = CacheLocation.Public, MaxAge = 10)]
+        [HttpCacheValidation(MustRevalidate = true)]
         public async Task<IActionResult> GetBookDemo(string barcode)
         {
             var response = new ResponseApiModel<string>() { Status = EStatusCode.SYSTEM_ERROR, Messenger = UltilsHelper.GetMessageByErrorCode(EStatusCode.SYSTEM_ERROR) };
@@ -198,7 +205,8 @@ namespace BookStore.Controllers
 
         [HttpGet]
         [Route("{barcode}/GetLinkDownload")]
-        [ResponseCache(Duration = 5)]
+        [HttpCacheExpiration(CacheLocation = CacheLocation.Public, MaxAge = 10)]
+        [HttpCacheValidation(MustRevalidate = true)]
         public async Task<IActionResult> GetLinkDownload(string barcode)
         {
             var response = new ResponseApiModel<string>() { Status = EStatusCode.SYSTEM_ERROR, Messenger = UltilsHelper.GetMessageByErrorCode(EStatusCode.SYSTEM_ERROR) };
@@ -226,7 +234,8 @@ namespace BookStore.Controllers
 
         [HttpGet]
         [Route("GetListSimpleBook")]
-        [ResponseCache(Duration = 5)]
+        [HttpCacheExpiration(CacheLocation = CacheLocation.Public, MaxAge = 10)]
+        [HttpCacheValidation(MustRevalidate = true)]
         public async Task<IActionResult> GetListSimpleBook(int page, int row)
         {
             if (row > 100)
@@ -262,7 +271,8 @@ namespace BookStore.Controllers
 
         [HttpGet]
         [Route("GetListSimpleBookSameName")]
-        [ResponseCache(Duration = 5)]
+        [HttpCacheExpiration(CacheLocation = CacheLocation.Public, MaxAge = 10)]
+        [HttpCacheValidation(MustRevalidate = true)]
         public async Task<IActionResult> GetListSimpleBookSameName(string bookName)
         {
             var response = new ResponseApiModel<string>() { Status = EStatusCode.SYSTEM_ERROR, Messenger = UltilsHelper.GetMessageByErrorCode(EStatusCode.SYSTEM_ERROR) };
@@ -294,7 +304,8 @@ namespace BookStore.Controllers
         }
         [HttpGet]
         [Route("GetListSimpleBookbyTag")]
-        [ResponseCache(Duration = 5)]
+        [HttpCacheExpiration(CacheLocation = CacheLocation.Public, MaxAge = 10)]
+        [HttpCacheValidation(MustRevalidate = true)]
         public async Task<IActionResult> GetListSimpleBookbyTag(string tag, int page, int row)
         {
             if (row > 100)
@@ -328,8 +339,7 @@ namespace BookStore.Controllers
         }
         [HttpGet]
         [Route("GetListColorConfig")]
-        //[HttpCacheExpiration(CacheLocation = CacheLocation.Public, MaxAge = 60)]
-        //[HttpCacheValidation(MustRevalidate = true)]
+        [HttpCacheIgnore]
         public async Task<IActionResult> GetListColorConfig()
         {
             var response = new ResponseApiModel<string>() { Status = EStatusCode.SYSTEM_ERROR, Messenger = UltilsHelper.GetMessageByErrorCode(EStatusCode.SYSTEM_ERROR) };
@@ -362,7 +372,8 @@ namespace BookStore.Controllers
 
         [HttpPost]
         [Route("{barcode}/LikeBook")]
-        [ResponseCache(Duration = 5)]
+        [HttpCacheExpiration(CacheLocation = CacheLocation.Public, MaxAge = 10)]
+        [HttpCacheValidation(MustRevalidate = true)]
         public async Task<IActionResult> LikeBook(string barcode, int status = 0)
         {
             var response = new ResponseApiModel<string>() { Status = EStatusCode.SYSTEM_ERROR, Messenger = UltilsHelper.GetMessageByErrorCode(EStatusCode.SYSTEM_ERROR) };

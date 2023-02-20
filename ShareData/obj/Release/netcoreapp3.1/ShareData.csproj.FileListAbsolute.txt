@@ -58,13 +58,13 @@ D:\Vplay\ServerEventTet\ShareData\obj\Release\netcoreapp3.1\ShareData.pdb
 D:\Vplay\ServerEventTet\ShareData\bin\Release\netcoreapp3.1\ShareData.deps.json
 D:\Vplay\ServerEventTet\ShareData\bin\Release\netcoreapp3.1\ShareData.dll
 D:\Vplay\ServerEventTet\ShareData\bin\Release\netcoreapp3.1\ShareData.pdb
-D:\Server\Server-BookStore\ShareData\bin\Release\netcoreapp3.1\ShareData.deps.json
-D:\Server\Server-BookStore\ShareData\bin\Release\netcoreapp3.1\ShareData.dll
-D:\Server\Server-BookStore\ShareData\bin\Release\netcoreapp3.1\ShareData.pdb
 D:\Server\Server-BookStore\ShareData\obj\Release\netcoreapp3.1\ShareData.csproj.AssemblyReference.cache
 D:\Server\Server-BookStore\ShareData\obj\Release\netcoreapp3.1\ShareData.GeneratedMSBuildEditorConfig.editorconfig
 D:\Server\Server-BookStore\ShareData\obj\Release\netcoreapp3.1\ShareData.AssemblyInfoInputs.cache
 D:\Server\Server-BookStore\ShareData\obj\Release\netcoreapp3.1\ShareData.AssemblyInfo.cs
 D:\Server\Server-BookStore\ShareData\obj\Release\netcoreapp3.1\ShareData.csproj.CoreCompileInputs.cache
+D:\Server\Server-BookStore\ShareData\bin\Release\netcoreapp3.1\ShareData.deps.json
+D:\Server\Server-BookStore\ShareData\bin\Release\netcoreapp3.1\ShareData.dll
+D:\Server\Server-BookStore\ShareData\bin\Release\netcoreapp3.1\ShareData.pdb
 D:\Server\Server-BookStore\ShareData\obj\Release\netcoreapp3.1\ShareData.dll
 D:\Server\Server-BookStore\ShareData\obj\Release\netcoreapp3.1\ShareData.pdb

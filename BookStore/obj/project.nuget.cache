@@ -1,11 +1,12 @@
 {
   "version": 2,
-  "dgSpecHash": "bL4F/CWCTtps5PjjgCd8Tvy6rN3NWtJKACHxYh2Q8ycQ1w/N8wBDQ4VOlL7432KVwjHXcMlH6b5bkXskzPnBtA==",
+  "dgSpecHash": "+7Bd7nSMHpZg1344f/TTQuEWFWePhBVUanCaivol31MnWnOhZ6ZfBCkgQvqlBlODPsfFfDan00yKNHCHod8PJw==",
   "success": true,
   "projectFilePath": "D:\\Server\\Server-BookStore\\BookStore\\BookStore.csproj",
   "expectedPackageFiles": [
     "C:\\Users\\nguye\\.nuget\\packages\\dnsclient\\1.6.1\\dnsclient.1.6.1.nupkg.sha512",
     "C:\\Users\\nguye\\.nuget\\packages\\mailkit\\3.2.0\\mailkit.3.2.0.nupkg.sha512",
+    "C:\\Users\\nguye\\.nuget\\packages\\marvin.cache.headers\\6.1.0\\marvin.cache.headers.6.1.0.nupkg.sha512",
     "C:\\Users\\nguye\\.nuget\\packages\\microsoft.aspnetcore.cors\\2.2.0\\microsoft.aspnetcore.cors.2.2.0.nupkg.sha512",
     "C:\\Users\\nguye\\.nuget\\packages\\microsoft.aspnetcore.http.abstractions\\2.2.0\\microsoft.aspnetcore.http.abstractions.2.2.0.nupkg.sha512",
     "C:\\Users\\nguye\\.nuget\\packages\\microsoft.aspnetcore.http.extensions\\2.2.0\\microsoft.aspnetcore.http.extensions.2.2.0.nupkg.sha512",

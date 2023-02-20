@@ -1,6 +1,7 @@
 ﻿using BookStore.Utils;
 using DAO.DAOImp;
 using LoggerService;
+using Marvin.Cache.Headers;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Newtonsoft.Json;
@@ -29,7 +30,8 @@ namespace BookStore.Controllers
 
         [HttpGet]
         [Route("GetMerberConfig")]
-        [ResponseCache(Duration = 5)]
+        [HttpCacheExpiration(CacheLocation = CacheLocation.Public, MaxAge = 60)]
+        [HttpCacheValidation(MustRevalidate = true)]
         public async Task<IActionResult> GetMerberConfig()
         {
             var response = new ResponseApiModel<string>() { Status = EStatusCode.SYSTEM_ERROR, Messenger = UltilsHelper.GetMessageByErrorCode(EStatusCode.SYSTEM_ERROR) };
@@ -52,6 +54,26 @@ namespace BookStore.Controllers
                     responseStatus = EStatusCode.SUCCESS;
                 }
                 response = new ResponseApiModel<string>() { Status = responseStatus, Messenger = UltilsHelper.GetMessageByErrorCode(responseStatus), DataResponse = DataListMail };
+            }
+            catch (Exception ex)
+            {
+                await _logger.LogError("Configs-GetMerberConfig{}", ex.ToString()).ConfigureAwait(false);
+            }
+            return Ok(response);
+        }
+        [HttpGet]
+        [Route("GetCcu")]
+        [HttpCacheIgnore]
+        public async Task<IActionResult> GetCcu()
+        {
+            var response = new ResponseApiModel<string>() { Status = EStatusCode.SYSTEM_ERROR, Messenger = UltilsHelper.GetMessageByErrorCode(EStatusCode.SYSTEM_ERROR) };
+            int responseStatus = EStatusCode.DATABASE_ERROR;
+            try
+            {
+                string keyRedis = "Token";
+                long ccu = await RedisGatewayCacheManager.Inst.CountItemByString(keyRedis);
+                responseStatus = 0;
+                response = new ResponseApiModel<string>() { Status = responseStatus, Messenger = UltilsHelper.GetMessageByErrorCode(responseStatus), DataResponse = ccu.ToString() };
             }
             catch (Exception ex)
             {

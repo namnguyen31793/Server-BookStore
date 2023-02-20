@@ -64,22 +64,40 @@ namespace DAO.DAOImp
             return modelData;
         }
 
-        public int GetAvgRate(string barcode, out float starRate)
+        public int GetAvgRate(string barcode, out RateCountModel starRate)
         {
             DBHelper db = null;
-            starRate = 0;
+            starRate = new RateCountModel() { StarRate = 0, StarRate1 = 0, StarRate2 = 0, StarRate3 = 0, StarRate4 = 0, StarRate5 = 0};
             int reponseStatus = EStatusCode.DATABASE_ERROR;
             try
             {
                 db = new DBHelper(ConfigDb.StoreBookConnectionString);
-                var pars = new SqlParameter[3];
+                var pars = new SqlParameter[8];
                 pars[0] = new SqlParameter("@_Barcode", barcode);
                 pars[1] = new SqlParameter("@_StarRate", SqlDbType.Float) { Direction = ParameterDirection.Output };
-                pars[2] = new SqlParameter("@_ResponseStatus", SqlDbType.Int) { Direction = ParameterDirection.Output };
+                pars[2] = new SqlParameter("@_StarRate1", SqlDbType.Int) { Direction = ParameterDirection.Output };
+                pars[3] = new SqlParameter("@_StarRate2", SqlDbType.Int) { Direction = ParameterDirection.Output };
+                pars[4] = new SqlParameter("@_StarRate3", SqlDbType.Int) { Direction = ParameterDirection.Output };
+                pars[5] = new SqlParameter("@_StarRate4", SqlDbType.Int) { Direction = ParameterDirection.Output };
+                pars[6] = new SqlParameter("@_StarRate5", SqlDbType.Int) { Direction = ParameterDirection.Output };
+                pars[7] = new SqlParameter("@_ResponseStatus", SqlDbType.Int) { Direction = ParameterDirection.Output };
                 db.ExecuteNonQuerySP("SP_Store_Book_CMS_Barcodes_Rate_Star", 4, pars);
-                reponseStatus = Convert.ToInt32(pars[2].Value);
+                reponseStatus = Convert.ToInt32(pars[7].Value);
                 if (reponseStatus == 0) {
-                    float.TryParse(pars[2].Value.ToString(), out starRate);
+                    float countAvg = 0;
+                    float.TryParse(pars[1].Value.ToString(), out countAvg);
+                    starRate.StarRate = countAvg;
+                    int count = 0;
+                    int.TryParse(pars[2].Value.ToString(), out count);
+                    starRate.StarRate1 = count;
+                    int.TryParse(pars[3].Value.ToString(), out count);
+                    starRate.StarRate2 = count;
+                    int.TryParse(pars[4].Value.ToString(), out count);
+                    starRate.StarRate3 = count;
+                    int.TryParse(pars[5].Value.ToString(), out count);
+                    starRate.StarRate4 = count;
+                    int.TryParse(pars[6].Value.ToString(), out count);
+                    starRate.StarRate5 = count;
                 }
             }
             catch (Exception exception)

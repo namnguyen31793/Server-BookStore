@@ -2,6 +2,7 @@
 using BookStore.Utils;
 using DAO.DAOImp;
 using LoggerService;
+using Marvin.Cache.Headers;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Newtonsoft.Json;
@@ -37,6 +38,7 @@ namespace BookStore.Controllers
         private string token = string.Empty;
 
         [HttpPost]
+        [HttpCacheIgnore]
         [Route("Login")]
         public async Task<IActionResult> Login(RequestAuthenModel requestLogin)
         {
@@ -59,6 +61,76 @@ namespace BookStore.Controllers
         }
 
         [HttpPost]
+        [HttpCacheIgnore]
+        [Route("LoginGoogle")]
+        public async Task<IActionResult> LoginGoogle(RequestAuthenSocial requestLogin)
+        {
+            if (!AccountUtils.IsLoginRequestTrue(requestLogin))
+            {
+                return Ok(new ResponseApiModel<string>() { Status = EStatusCode.DATA_INVAILD, Messenger = UltilsHelper.GetMessageByErrorCode(EStatusCode.DATA_INVAILD) });
+            }
+            if (!string.IsNullOrEmpty(requestLogin.Email))
+                if (!AccountUtils.IsValidEmail(requestLogin.Email))
+                    return Ok(new ResponseApiModel<string>() { Status = EStatusCode.EMAIL_INVAILD, Messenger = UltilsHelper.GetMessageByErrorCode(EStatusCode.EMAIL_INVAILD) });
+            if (!string.IsNullOrEmpty(requestLogin.PhoneNumber))
+                if (!AccountUtils.IsPhoneNumber(requestLogin.PhoneNumber))
+                    return Ok(new ResponseApiModel<string>() { Status = EStatusCode.PHONE_INVAILD, Messenger = UltilsHelper.GetMessageByErrorCode(EStatusCode.PHONE_INVAILD) });
+            try
+            {
+                var clientInfo = new ClientRequestInfo(Request);
+
+                var facebookUserName = await GoogleHelper.GetGoogleUserNameAsync(requestLogin.Token);
+                await _logger.LogError("Account-Register{}", facebookUserName).ConfigureAwait(false);
+                var responseCode = -99;
+                if (string.IsNullOrEmpty(facebookUserName))
+                    return Ok(new ResponseApiModel<string>() { Status = EStatusCode.SYSTEM_ERROR, Messenger = UltilsHelper.GetMessageByErrorCode(EStatusCode.SYSTEM_ERROR) });
+                var fbPassword = FacebookHelper.GetFacebookPassword(facebookUserName);
+                var passMd5 = AccountUtils.EncryptPasswordMd5(fbPassword);
+                responseCode = await Task.Run(async () =>
+                {
+                    int accountId = 0;
+                    var res = StoreUsersSqlInstance.Inst.Register(REGISTER_TYPE.FACEBOOK_TYPE, facebookUserName, "", passMd5, clientInfo.MerchantId, clientInfo.TrueClientIp, clientInfo.DeviceId, (int)clientInfo.OsType,
+                        requestLogin.PhoneNumber, requestLogin.Email, out accountId);
+
+                    if (responseCode == (int)EStatusCode.SUCCESS)
+                    {
+                        await _logger.LogInfo("Account-LoginGoogle{}", facebookUserName + " " + res, res.ToString()).ConfigureAwait(false);
+                        MailInstance.Inst.SendMailRegis(accountId);
+                        if (AccountUtils.IsValidEmail(requestLogin.Email))
+                            await SendMailAsync(requestLogin.Email, accountId).ConfigureAwait(false);
+                    }
+                    return res;
+
+                });
+                if (responseCode == (int)EStatusCode.SUCCESS)
+                {
+                    //TrackingDAO.Inst.TrackingRegis();
+                }
+                if (responseCode == (int)EStatusCode.ACCOUNT_EXITS || responseCode == (int)EStatusCode.SUCCESS)
+                {
+                    //do login
+                    RequestAuthenModel request = new RequestAuthenModel()
+                    {
+                        AccountName = facebookUserName,
+                        Password = fbPassword,
+                    };
+                    var response = await LoginAsync(request, clientInfo);
+                    return Ok(response);
+                }
+                else
+                {
+                    return Ok(new ResponseApiModel<string>() { Status = EStatusCode.SYSTEM_ERROR, Messenger = UltilsHelper.GetMessageByErrorCode(EStatusCode.SYSTEM_ERROR) });
+                }
+            }
+            catch (Exception ex)
+            {
+                return Ok(new ResponseApiModel<string>() { Status = EStatusCode.SYSTEM_ERROR, Messenger = UltilsHelper.GetMessageByErrorCode(EStatusCode.SYSTEM_ERROR), DataResponse = ex.ToString() });
+            }
+        }
+
+
+        [HttpPost]
+        [HttpCacheIgnore]
         [Route("LoginFacebook")]
         public async Task<IActionResult> LoginFacebook(RequestAuthenSocial requestLogin)
         {
@@ -126,6 +198,7 @@ namespace BookStore.Controllers
         }
 
         [HttpPost]
+        [HttpCacheIgnore]
         [Route("Register")]
         public async Task<IActionResult> Regis(RequestRegisterModel requestRegis)
         {
@@ -226,6 +299,7 @@ namespace BookStore.Controllers
         }
 
         [HttpGet]
+        [HttpCacheIgnore]
         [Route("RefreshToken")]
         public async Task<IActionResult> RefreshToken(TokenInfo data)
         {
@@ -259,6 +333,7 @@ namespace BookStore.Controllers
         }
 
         [HttpGet]
+        [HttpCacheIgnore]
         [Route("GetAccountInfo")]
         public async Task<IActionResult> GetAccountInfo()
         {
@@ -280,6 +355,7 @@ namespace BookStore.Controllers
         }
 
         [HttpPost]
+        [HttpCacheIgnore]
         [Route("UpdateEmail")]
         public async Task<IActionResult> UpdateEmail(string Email)
         {
@@ -310,6 +386,7 @@ namespace BookStore.Controllers
             return Ok(new ResponseApiModel<AccountModel>() { Status = responseStatus, Messenger = message, DataResponse = new AccountModel(response) });
         }
         [HttpPost]
+        [HttpCacheIgnore]
         [Route("UpdateInfo")]
         public async Task<IActionResult> UpdateInfo(RequestUpdateInfoModel model)
         {
@@ -332,6 +409,7 @@ namespace BookStore.Controllers
         }
 
         [HttpGet]
+        [HttpCacheIgnore]
         [Route("GetBookBuy")]
         //[ResponseCache(Duration = 60)]
         public async Task<IActionResult> GetBookBuy(int page = 1, int row = 100)
@@ -370,6 +448,7 @@ namespace BookStore.Controllers
         }
 
         [HttpGet]
+        [HttpCacheIgnore]
         [Route("GetCountBookBuy")]
         public async Task<IActionResult> GetCountBookBuy()
         {
@@ -405,6 +484,7 @@ namespace BookStore.Controllers
         }
 
         [HttpPost]
+        [HttpCacheIgnore]
         [Route("BuyBook")]
         public async Task<IActionResult> BuyBook(string barcode)
         {
@@ -449,6 +529,7 @@ namespace BookStore.Controllers
         }
 
         [HttpGet]
+        [HttpCacheIgnore]
         [Route("GetLikeBook")]
         public async Task<IActionResult> GetLikeBook(int page, int row)
         {
@@ -484,6 +565,7 @@ namespace BookStore.Controllers
         }
 
         [HttpGet]
+        [HttpCacheIgnore]
         [Route("GetCountLikeBook")]
         public async Task<IActionResult> GetCountLikeBook()
         {
@@ -519,6 +601,7 @@ namespace BookStore.Controllers
         }
 
         [HttpGet]
+        [HttpCacheIgnore]
         [Route("GetMemberVip")]
         public async Task<IActionResult> GetMemberVip()
         {
@@ -559,6 +642,7 @@ namespace BookStore.Controllers
 
 
         [HttpGet]
+        [HttpCacheIgnore]
         [Route("GetVourcherAccount")]
         public async Task<IActionResult> GetVourcherAccount()
         {

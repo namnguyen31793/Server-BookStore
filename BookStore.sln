@@ -17,6 +17,10 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "BookStore", "BookStore\Book
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "BookStoreCMS", "BookStoreCMS\BookStoreCMS.csproj", "{4639EEEC-CEE3-4D7E-9171-B41FE62BF7C5}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "GetIp", "GetIp\GetIp.csproj", "{561BD8F7-A356-471F-BF3B-FFBC6165486F}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "JobWindowsProject", "JobWindowsProject\JobWindowsProject.csproj", "{4EBEA53A-45D1-4FE3-9E58-DDED560001A9}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -51,6 +55,14 @@ Global
 		{4639EEEC-CEE3-4D7E-9171-B41FE62BF7C5}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{4639EEEC-CEE3-4D7E-9171-B41FE62BF7C5}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{4639EEEC-CEE3-4D7E-9171-B41FE62BF7C5}.Release|Any CPU.Build.0 = Release|Any CPU
+		{561BD8F7-A356-471F-BF3B-FFBC6165486F}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{561BD8F7-A356-471F-BF3B-FFBC6165486F}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{561BD8F7-A356-471F-BF3B-FFBC6165486F}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{561BD8F7-A356-471F-BF3B-FFBC6165486F}.Release|Any CPU.Build.0 = Release|Any CPU
+		{4EBEA53A-45D1-4FE3-9E58-DDED560001A9}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{4EBEA53A-45D1-4FE3-9E58-DDED560001A9}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{4EBEA53A-45D1-4FE3-9E58-DDED560001A9}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{4EBEA53A-45D1-4FE3-9E58-DDED560001A9}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

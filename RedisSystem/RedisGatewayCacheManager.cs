@@ -51,6 +51,21 @@ namespace RedisSystem
             }
         }
 
+        public async Task<long> CountItemByString(string forderName)
+        {
+            long count = 0;
+            try
+            {
+                var server = Connection.GetServer(RedisConfig.RedisServerIpAddress + ":" + RedisConfig.RedisServerPort);
+                var db = Connection.GetDatabase();
+                count = server.Keys(0, forderName + ":*", pageSize: 500).Count();
+            }
+            catch (Exception exception)
+            {
+            }
+            return count;
+        }
+
 
         public async Task DeleteArrayKeyAsync(string forderName)
         {

@@ -105,8 +105,6 @@ D:\Server\Server-BookStore\UtilsSystem\obj\Release\netcoreapp3.1\UtilsSystem.Gen
 D:\Server\Server-BookStore\UtilsSystem\obj\Release\netcoreapp3.1\UtilsSystem.AssemblyInfoInputs.cache
 D:\Server\Server-BookStore\UtilsSystem\obj\Release\netcoreapp3.1\UtilsSystem.AssemblyInfo.cs
 D:\Server\Server-BookStore\UtilsSystem\obj\Release\netcoreapp3.1\UtilsSystem.csproj.CoreCompileInputs.cache
-D:\Server\Server-BookStore\UtilsSystem\obj\Release\netcoreapp3.1\UtilsSystem.dll
-D:\Server\Server-BookStore\UtilsSystem\obj\Release\netcoreapp3.1\UtilsSystem.pdb
 D:\Server\Server-BookStore\UtilsSystem\bin\Release\netcoreapp3.1\UtilsSystem.deps.json
 D:\Server\Server-BookStore\UtilsSystem\bin\Release\netcoreapp3.1\UtilsSystem.dll
 D:\Server\Server-BookStore\UtilsSystem\bin\Release\netcoreapp3.1\UtilsSystem.pdb
@@ -117,3 +115,5 @@ D:\Server\Server-BookStore\UtilsSystem\bin\Release\netcoreapp3.1\LoggerService.p
 D:\Server\Server-BookStore\UtilsSystem\bin\Release\netcoreapp3.1\RedisSystem.pdb
 D:\Server\Server-BookStore\UtilsSystem\bin\Release\netcoreapp3.1\ShareData.pdb
 D:\Server\Server-BookStore\UtilsSystem\obj\Release\netcoreapp3.1\UtilsSystem.csproj.CopyComplete
+D:\Server\Server-BookStore\UtilsSystem\obj\Release\netcoreapp3.1\UtilsSystem.dll
+D:\Server\Server-BookStore\UtilsSystem\obj\Release\netcoreapp3.1\UtilsSystem.pdb

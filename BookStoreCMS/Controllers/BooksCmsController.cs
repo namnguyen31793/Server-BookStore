@@ -38,17 +38,18 @@ namespace BookStoreCMS.Controllers
 
             var response = new ResponseApiModel<string>() { Status = EStatusCode.SYSTEM_ERROR, Messenger = UltilsHelper.GetMessageByErrorCode(EStatusCode.SYSTEM_ERROR) };
             int responseStatus = EStatusCode.DATABASE_ERROR;
-            float starRate = 0;
+            string jsonListMail = "";
             try
             {
                 string keyRedis = "CacheAvgRate:" + barcode;
-                string jsonListMail = await RedisGatewayCacheManager.Inst.GetDataFromCacheAsync(keyRedis);
+                jsonListMail = await RedisGatewayCacheManager.Inst.GetDataFromCacheAsync(keyRedis);
                 if (string.IsNullOrEmpty(jsonListMail))
                 {
+                    RateCountModel starRate = null;
                     responseStatus = StoreBookSqlInstance.Inst.GetAvgRate(barcode, out starRate);
                     if (responseStatus == EStatusCode.SUCCESS)
                     {
-                        jsonListMail = JsonConvert.SerializeObject(starRate.ToString());
+                        jsonListMail = JsonConvert.SerializeObject(starRate);
                         await RedisGatewayCacheManager.Inst.SaveDataAsync(keyRedis, jsonListMail, 10);
                     }
                 }
