@@ -2,7 +2,6 @@
 using BookStore.Utils;
 using DAO.DAOImp;
 using LoggerService;
-using Marvin.Cache.Headers;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Newtonsoft.Json;
@@ -38,7 +37,6 @@ namespace BookStore.Controllers
         private string token = string.Empty;
 
         [HttpPost]
-        [HttpCacheIgnore]
         [Route("Login")]
         public async Task<IActionResult> Login(RequestAuthenModel requestLogin)
         {
@@ -61,7 +59,6 @@ namespace BookStore.Controllers
         }
 
         [HttpPost]
-        [HttpCacheIgnore]
         [Route("LoginGoogle")]
         public async Task<IActionResult> LoginGoogle(RequestAuthenSocial requestLogin)
         {
@@ -130,7 +127,6 @@ namespace BookStore.Controllers
 
 
         [HttpPost]
-        [HttpCacheIgnore]
         [Route("LoginFacebook")]
         public async Task<IActionResult> LoginFacebook(RequestAuthenSocial requestLogin)
         {
@@ -198,7 +194,6 @@ namespace BookStore.Controllers
         }
 
         [HttpPost]
-        [HttpCacheIgnore]
         [Route("Register")]
         public async Task<IActionResult> Regis(RequestRegisterModel requestRegis)
         {
@@ -299,7 +294,6 @@ namespace BookStore.Controllers
         }
 
         [HttpGet]
-        [HttpCacheIgnore]
         [Route("RefreshToken")]
         public async Task<IActionResult> RefreshToken(TokenInfo data)
         {
@@ -333,7 +327,6 @@ namespace BookStore.Controllers
         }
 
         [HttpGet]
-        [HttpCacheIgnore]
         [Route("GetAccountInfo")]
         public async Task<IActionResult> GetAccountInfo()
         {
@@ -355,7 +348,6 @@ namespace BookStore.Controllers
         }
 
         [HttpPost]
-        [HttpCacheIgnore]
         [Route("UpdateEmail")]
         public async Task<IActionResult> UpdateEmail(string Email)
         {
@@ -386,7 +378,6 @@ namespace BookStore.Controllers
             return Ok(new ResponseApiModel<AccountModel>() { Status = responseStatus, Messenger = message, DataResponse = new AccountModel(response) });
         }
         [HttpPost]
-        [HttpCacheIgnore]
         [Route("UpdateInfo")]
         public async Task<IActionResult> UpdateInfo(RequestUpdateInfoModel model)
         {
@@ -409,7 +400,6 @@ namespace BookStore.Controllers
         }
 
         [HttpGet]
-        [HttpCacheIgnore]
         [Route("GetBookBuy")]
         //[ResponseCache(Duration = 60)]
         public async Task<IActionResult> GetBookBuy(int page = 1, int row = 100)
@@ -448,7 +438,6 @@ namespace BookStore.Controllers
         }
 
         [HttpGet]
-        [HttpCacheIgnore]
         [Route("GetCountBookBuy")]
         public async Task<IActionResult> GetCountBookBuy()
         {
@@ -484,7 +473,6 @@ namespace BookStore.Controllers
         }
 
         [HttpPost]
-        [HttpCacheIgnore]
         [Route("BuyBook")]
         public async Task<IActionResult> BuyBook(string barcode)
         {
@@ -529,7 +517,6 @@ namespace BookStore.Controllers
         }
 
         [HttpGet]
-        [HttpCacheIgnore]
         [Route("GetLikeBook")]
         public async Task<IActionResult> GetLikeBook(int page, int row)
         {
@@ -565,7 +552,6 @@ namespace BookStore.Controllers
         }
 
         [HttpGet]
-        [HttpCacheIgnore]
         [Route("GetCountLikeBook")]
         public async Task<IActionResult> GetCountLikeBook()
         {
@@ -601,7 +587,6 @@ namespace BookStore.Controllers
         }
 
         [HttpGet]
-        [HttpCacheIgnore]
         [Route("GetMemberVip")]
         public async Task<IActionResult> GetMemberVip()
         {
@@ -642,7 +627,6 @@ namespace BookStore.Controllers
 
 
         [HttpGet]
-        [HttpCacheIgnore]
         [Route("GetVourcherAccount")]
         public async Task<IActionResult> GetVourcherAccount()
         {

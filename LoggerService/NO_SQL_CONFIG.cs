@@ -19,10 +19,6 @@ namespace LoggerService
         public static readonly string API_TRACKING_SYSTEM_DATABASE_NAME = "TrackingLogSystem";
         public static readonly string API_LOG_NORMAL_BILLING_COLLECTION = "ApiNormalLog_Billing_Collection";
         public static readonly string API_LOG_NORMAL_CMS_COLLECTION = "ApiNormalLog_Cms_Collection";
-        public static readonly string API_LOG_NORMAL_RECEIVE_LOBBY_COLLECTION = "ApiNormalLog_ReceiveLobby_Collection";
-        public static readonly string API_LOG_NORMAL_RECEIVE_CONFIG_COLLECTION = "ApiNormalLog_ReceiveConfig_Collection";
-        public static readonly string API_LOG_NORMAL_RECEIVE_API_COLLECTION = "ApiNormalLog_ReceiveApi_Collection";
-        public static readonly string API_LOG_NORMAL_RECEIVE_LIVE_COLLECTION = "ApiNormalLog_ReceiveLive_Collection";
 
         public static readonly string API_LOG_ERROR_COLLECTION = "ApiErrorLog_Collection";
         public static readonly string API_LOG_DEBUG_COLLECTION = "ApiDebugLog_Collection";

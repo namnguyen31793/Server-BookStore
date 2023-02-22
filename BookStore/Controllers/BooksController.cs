@@ -9,6 +9,7 @@ using RedisSystem;
 using ShareData.API;
 using ShareData.DB.Books;
 using ShareData.ErrorCode;
+using ShareData.Request;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -107,7 +108,7 @@ namespace BookStore.Controllers
         [HttpPost]
         [Route("{barcode}/SendCommentbook")]
         [HttpCacheIgnore]
-        public async Task<IActionResult> SendCommentbook(string barcode, int rate, string comment, string Nickname)
+        public async Task<IActionResult> SendCommentbook(string barcode, [FromBody]RequestCommendModel data)
         {
             if (string.IsNullOrEmpty(barcode))
                 return Ok(new ResponseApiModel<string>() { Status = EStatusCode.DATA_INVAILD, Messenger = UltilsHelper.GetMessageByErrorCode(EStatusCode.DATA_INVAILD) });
@@ -121,8 +122,8 @@ namespace BookStore.Controllers
             string jsonListMail = "";
             try
             {
-                var commentObj = StoreBookSqlInstance.Inst.SendComment(accountId, barcode, rate, comment, UltilsHelper.FormatTime(DateTime.Now), Nickname, out responseStatus);
-                await _logger.LogInfo("Books-SendCommentbook{}", barcode + " - accountId:" + accountId + " - " + comment + " - " + Nickname + " - " + responseStatus, responseStatus.ToString()).ConfigureAwait(false);
+                var commentObj = StoreBookSqlInstance.Inst.SendComment(accountId, barcode, data.Rate, data.Comment, UltilsHelper.FormatTime(DateTime.Now), data.Nickname, out responseStatus);
+                await _logger.LogInfo("Books-SendCommentbook{}", barcode + " - accountId:" + accountId + " - " + data.Comment + " - " + data.Nickname + " - " + responseStatus, responseStatus.ToString()).ConfigureAwait(false);
                 if (responseStatus == EStatusCode.SUCCESS)
                 {
                     string keyRedis = "CacheComment:" + barcode;
@@ -172,7 +173,7 @@ namespace BookStore.Controllers
         }
         [HttpGet]
         [Route("{barcode}/GetBookDemo")]
-        [HttpCacheExpiration(CacheLocation = CacheLocation.Public, MaxAge = 10)]
+        [HttpCacheExpiration(CacheLocation = CacheLocation.Public, MaxAge = 60)]
         [HttpCacheValidation(MustRevalidate = true)]
         public async Task<IActionResult> GetBookDemo(string barcode)
         {

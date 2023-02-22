@@ -56,12 +56,11 @@ namespace BookStore.Extensions
         public static void ConfigureHttpCacheHeaders(this IServiceCollection services) =>
             services.AddHttpCacheHeaders((expirationOpt) =>
                 {
-                    expirationOpt.MaxAge = 5;
+                    expirationOpt.MaxAge = 60;
                     expirationOpt.CacheLocation = CacheLocation.Private;
                 },
                 (validationOpt) =>
                 {
-                    validationOpt.NoCache = true;
                     validationOpt.MustRevalidate = true;
                 });
     }
