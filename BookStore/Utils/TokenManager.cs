@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Http;
+﻿using BookStore.Interfaces;
+using Microsoft.AspNetCore.Http;
 using RedisSystem;
 using ShareData.ErrorCode;
 using System;
@@ -10,9 +11,13 @@ using UtilsSystem.Utils;
 
 namespace BookStore.Utils
 {
-    public class TokenManager
+    public class TokenManager : ITokenManager
     {
-        public static async Task<string> GenerateAccessTokenAsync(long accountId, ClientRequestInfo clientInfo)
+        public TokenManager()
+        {
+        }
+
+        public async Task<string> GenerateAccessTokenAsync(long accountId, ClientRequestInfo clientInfo)
         {
             var response = string.Format("{0}|{1}|{2}|{3}",
                                           DateTime.UtcNow.Ticks,
@@ -27,7 +32,7 @@ namespace BookStore.Utils
 
             return result;
         }
-        public static async Task<long> GetAccountIdByAccessTokenAsync(HttpRequest request)
+        public async Task<long> GetAccountIdByAccessTokenAsync(HttpRequest request)
         {
             string accessToken = "";
             if (request.Headers.TryGetValue("Authorization", out var values)) {
@@ -45,7 +50,7 @@ namespace BookStore.Utils
             return accountId;
         }
 
-        public static async Task<long> GetAccountIdByAccessTokenAsync(string accessToken) {
+        public async Task<long> GetAccountIdByAccessTokenAsync(string accessToken) {
             string keyRedis = "Token:" + accessToken;
             long accountId = -1;
             var data = await RedisGatewayCacheManager.Inst.GetDataFromCacheAsync(keyRedis);
@@ -53,14 +58,14 @@ namespace BookStore.Utils
             return accountId;
         }
 
-        public static string GenerateRefreshToken()
+        public string GenerateRefreshToken()
         {
             var randomNumber = new byte[64];
             using var rng = RandomNumberGenerator.Create();
             rng.GetBytes(randomNumber);
             return Convert.ToBase64String(randomNumber);
         }
-        public static string GetHash(string input)
+        public string GetHash(string input)
         {
             HashAlgorithm hashAlgorithm = new SHA256CryptoServiceProvider();
             byte[] byteValue = System.Text.Encoding.UTF8.GetBytes(input);
@@ -68,7 +73,7 @@ namespace BookStore.Utils
             return Convert.ToBase64String(byteHash);
         }
 
-        public static async Task<string> GenerateKeyTokenValidateAsync(long accountId, string email)
+        public async Task<string> GenerateKeyTokenValidateAsync(long accountId, string email)
         {
             var response = string.Format("{0}|{1}|{2}",
                                           DateTime.UtcNow.Ticks,
@@ -83,7 +88,7 @@ namespace BookStore.Utils
             return result;
         }
 
-        public static long ReadKeyTokenValidate(string accountInfoTxtRaw, ref string email)
+        public long ReadKeyTokenValidate(string accountInfoTxtRaw, ref string email)
         {
             try
             {
@@ -101,7 +106,7 @@ namespace BookStore.Utils
                 return EStatusCode.DATA_INVAILD;
             }
         }
-        private static bool IsCookieExpired(string accountInfoTxt)
+        private bool IsCookieExpired(string accountInfoTxt)
         {
             var accounts = accountInfoTxt.Split('|');
             var timeCreateTicks = Int64.Parse(accounts[0]);

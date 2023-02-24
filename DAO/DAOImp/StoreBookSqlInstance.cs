@@ -64,6 +64,32 @@ namespace DAO.DAOImp
             return modelData;
         }
 
+        public RateCommentObject GetRateComment(long AccountId, string barcode, out int reponseStatus)
+        {
+            DBHelper db = null;
+            RateCommentObject modelData = null;
+            reponseStatus = EStatusCode.DATABASE_ERROR;
+            try
+            {
+                db = new DBHelper(ConfigDb.StoreBookConnectionString);
+                var pars = new SqlParameter[3];
+                pars[0] = new SqlParameter("@_AccountId", barcode);
+                pars[1] = new SqlParameter("@_Barcode", barcode);
+                pars[2] = new SqlParameter("@_ResponseStatus", SqlDbType.Int) { Direction = ParameterDirection.Output };
+                modelData = db.GetInstanceSP<RateCommentObject>("SP_Store_Book_Rate_Get_Account_By_Barcodes", 4, pars);
+                reponseStatus = Convert.ToInt32(pars[2].Value);
+            }
+            catch (Exception exception)
+            {
+                Task.Run(async () => await _logger.LogError("SQL-GetRateComment()", exception.ToString()).ConfigureAwait(false));
+            }
+            finally
+            {
+                db?.Close();
+            }
+            return modelData;
+        }
+
         public int GetAvgRate(string barcode, out RateCountModel starRate)
         {
             DBHelper db = null;

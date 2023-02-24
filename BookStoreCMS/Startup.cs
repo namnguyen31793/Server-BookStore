@@ -42,6 +42,7 @@ namespace CoreWebApi
             services.ConfigureVersioning();
             services.ConfigureResponseCaching();
             services.ConfigureMailService();
+            services.ConfigureTokenService();
 
             services.AddControllers().AddJsonOptions(options =>
                 {

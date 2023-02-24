@@ -1,4 +1,6 @@
 ﻿using BookStoreCMS.Instance;
+using BookStoreCMS.Interfaces;
+using BookStoreCMS.Utils;
 using LoggerService;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Mvc;
@@ -46,8 +48,11 @@ namespace BookStoreCMS.Extensions
                 opt.ApiVersionReader = new HeaderApiVersionReader("api-version");
             });
         }
+
         public static void ConfigureMailService(this IServiceCollection services) =>
          services.AddSingleton<IEmailSender, EmailSender>();
+        public static void ConfigureTokenService(this IServiceCollection services) =>
+         services.AddSingleton<ITokenManager, TokenCMSManager>();
 
         public static void ConfigureResponseCaching(this IServiceCollection services) =>
             services.AddResponseCaching();

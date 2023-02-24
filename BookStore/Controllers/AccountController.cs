@@ -1,4 +1,5 @@
 ﻿using BookStore.Instance;
+using BookStore.Interfaces;
 using BookStore.Utils;
 using DAO.DAOImp;
 using LoggerService;
@@ -29,10 +30,12 @@ namespace BookStore.Controllers
 
         private ILoggerManager _logger;
         private IEmailSender _emailSender;
-        public AccountController(ILoggerManager logger, IEmailSender emailSender)
+        private ITokenManager _tokenManager;
+        public AccountController(ILoggerManager logger, IEmailSender emailSender, ITokenManager tokenManager)
         {
             _logger = logger;
             _emailSender = emailSender;
+            _tokenManager = tokenManager;
         }
         private string token = string.Empty;
 
@@ -264,11 +267,11 @@ namespace BookStore.Controllers
                     if (accountId >= 0)
                     {
                         //create refresh token -> save db
-                        var refreshToken = TokenManager.GenerateRefreshToken();
+                        var refreshToken = _tokenManager.GenerateRefreshToken();
                         var responseToken = StoreUsersSqlInstance.Inst.AddToken(accountId, refreshToken);
                         if (responseToken >= 0)
                         {
-                            var accessToken = await TokenManager.GenerateAccessTokenAsync(accountId, clientInfo);
+                            var accessToken = await _tokenManager.GenerateAccessTokenAsync(accountId, clientInfo);
                             model.DataResponse = new TokenInfo() { AccountId = accountId, Access_token = accessToken, Refresh_token = refreshToken };
                         }
                         else
@@ -306,7 +309,7 @@ namespace BookStore.Controllers
                 if (response >= 0)
                 {
                     var clientInfo = new ClientRequestInfo(Request);
-                    var accessToken = await TokenManager.GenerateAccessTokenAsync(accountId, clientInfo);
+                    var accessToken = await _tokenManager.GenerateAccessTokenAsync(accountId, clientInfo);
                     var model = new TokenInfo() { AccountId = accountId, Access_token = accessToken, Refresh_token = data.Refresh_token };
                     return Ok(new ResponseApiModel<TokenInfo>() { Status = EStatusCode.SUCCESS, Messenger = UltilsHelper.GetMessageByErrorCode(EStatusCode.SUCCESS), DataResponse = model });
                 }
@@ -334,7 +337,7 @@ namespace BookStore.Controllers
             AccountModelDb response = null;
             try
             {
-                long accountId = await TokenManager.GetAccountIdByAccessTokenAsync(Request);
+                long accountId = await _tokenManager.GetAccountIdByAccessTokenAsync(Request);
                 if (accountId <= 0)
                     return Ok(new ResponseApiModel<string>() { Status = accountId, Messenger = UltilsHelper.GetMessageByErrorCode((int)accountId) });
                 response = StoreUsersSqlInstance.Inst.GetAccountInfo(accountId, ref responseStatus);
@@ -356,7 +359,7 @@ namespace BookStore.Controllers
             AccountModelDb response = null;
             try
             {
-                long accountId = await TokenManager.GetAccountIdByAccessTokenAsync(Request);
+                long accountId = await _tokenManager.GetAccountIdByAccessTokenAsync(Request);
                 if (accountId <= 0)
                     return Ok(new ResponseApiModel<string>() { Status = accountId, Messenger = UltilsHelper.GetMessageByErrorCode((int)accountId) });
                 response = StoreUsersSqlInstance.Inst.UpdateEmail(accountId, Email, ref responseStatus);
@@ -385,7 +388,7 @@ namespace BookStore.Controllers
             AccountModelDb response = null;
             try
             {
-                long accountId = await TokenManager.GetAccountIdByAccessTokenAsync(Request);
+                long accountId = await _tokenManager.GetAccountIdByAccessTokenAsync(Request);
                 if (accountId <= 0)
                     return Ok(new ResponseApiModel<string>() { Status = accountId, Messenger = UltilsHelper.GetMessageByErrorCode((int)accountId) });
                 response = StoreUsersSqlInstance.Inst.UpdateInfo(accountId, model.Nickname, model.AvatarId, model.PhoneNumber, model.BirthDay, model.Adress, ref responseStatus);
@@ -410,7 +413,7 @@ namespace BookStore.Controllers
             int responseStatus = EStatusCode.DATABASE_ERROR;
             try
             {
-                long accountId = await TokenManager.GetAccountIdByAccessTokenAsync(Request);
+                long accountId = await _tokenManager.GetAccountIdByAccessTokenAsync(Request);
                 if (accountId <= 0)
                     return Ok(new ResponseApiModel<string>() { Status = accountId, Messenger = UltilsHelper.GetMessageByErrorCode((int)accountId) });
                 string keyRedis = "CacheBookBuy:" + accountId+":"+page+"-"+row;
@@ -445,7 +448,7 @@ namespace BookStore.Controllers
             int responseStatus = EStatusCode.DATABASE_ERROR;
             try
             {
-                long accountId = await TokenManager.GetAccountIdByAccessTokenAsync(Request);
+                long accountId = await _tokenManager.GetAccountIdByAccessTokenAsync(Request);
                 if (accountId <= 0)
                     return Ok(new ResponseApiModel<string>() { Status = accountId, Messenger = UltilsHelper.GetMessageByErrorCode((int)accountId) });
                 string keyRedis = "CacheCountBookBuy:" + accountId;
@@ -485,7 +488,7 @@ namespace BookStore.Controllers
             string vipName = "";
             try
             {
-                long accountId = await TokenManager.GetAccountIdByAccessTokenAsync(Request);
+                long accountId = await _tokenManager.GetAccountIdByAccessTokenAsync(Request);
                 if (accountId <= 0)
                     return Ok(new ResponseApiModel<string>() { Status = accountId, Messenger = UltilsHelper.GetMessageByErrorCode((int)accountId) });
                 var model = StoreBookSqlInstance.Inst.AccountBuyBarcode(accountId, barcode, out responseStatus, out point);
@@ -522,7 +525,7 @@ namespace BookStore.Controllers
         {
             var response = new ResponseApiModel<string>() { Status = EStatusCode.SYSTEM_ERROR, Messenger = UltilsHelper.GetMessageByErrorCode(EStatusCode.SYSTEM_ERROR) };
             int responseStatus = EStatusCode.DATABASE_ERROR;
-            long accountId = await TokenManager.GetAccountIdByAccessTokenAsync(Request);
+            long accountId = await _tokenManager.GetAccountIdByAccessTokenAsync(Request);
             if (accountId <= 0)
                 return Ok(new ResponseApiModel<string>() { Status = accountId, Messenger = UltilsHelper.GetMessageByErrorCode((int)accountId) });
             try
@@ -557,7 +560,7 @@ namespace BookStore.Controllers
         {
             var response = new ResponseApiModel<string>() { Status = EStatusCode.SYSTEM_ERROR, Messenger = UltilsHelper.GetMessageByErrorCode(EStatusCode.SYSTEM_ERROR) };
             int responseStatus = EStatusCode.DATABASE_ERROR;
-            long accountId = await TokenManager.GetAccountIdByAccessTokenAsync(Request);
+            long accountId = await _tokenManager.GetAccountIdByAccessTokenAsync(Request);
             if (accountId <= 0)
                 return Ok(new ResponseApiModel<string>() { Status = accountId, Messenger = UltilsHelper.GetMessageByErrorCode((int)accountId) });
             try
@@ -592,7 +595,7 @@ namespace BookStore.Controllers
         {
             var response = new ResponseApiModel<string>() { Status = EStatusCode.SYSTEM_ERROR, Messenger = UltilsHelper.GetMessageByErrorCode(EStatusCode.SYSTEM_ERROR) };
             int responseStatus = EStatusCode.DATABASE_ERROR;
-            long accountId = await TokenManager.GetAccountIdByAccessTokenAsync(Request);
+            long accountId = await _tokenManager.GetAccountIdByAccessTokenAsync(Request);
             if (accountId <= 0)
                 return Ok(new ResponseApiModel<string>() { Status = accountId, Messenger = UltilsHelper.GetMessageByErrorCode((int)accountId) });
             long curentPoint = 0;
@@ -632,7 +635,7 @@ namespace BookStore.Controllers
         {
             var response = new ResponseApiModel<string>() { Status = EStatusCode.SYSTEM_ERROR, Messenger = UltilsHelper.GetMessageByErrorCode(EStatusCode.SYSTEM_ERROR) };
             int responseStatus = EStatusCode.DATABASE_ERROR;
-            long accountId = await TokenManager.GetAccountIdByAccessTokenAsync(Request);
+            long accountId = await _tokenManager.GetAccountIdByAccessTokenAsync(Request);
             if (accountId <= 0)
                 return Ok(new ResponseApiModel<string>() { Status = accountId, Messenger = UltilsHelper.GetMessageByErrorCode((int)accountId) });
             try
@@ -681,21 +684,12 @@ namespace BookStore.Controllers
 
         private async Task SendMailAsync(string toAdress, long AccountId){
             return;
-            string key = HttpUtility.UrlEncode(await TokenManager.GenerateKeyTokenValidateAsync(AccountId, toAdress));
+            string key = HttpUtility.UrlEncode(await _tokenManager.GenerateKeyTokenValidateAsync(AccountId, toAdress));
             string url = CONFIG.BaseLink + CONFIG.FunctionValidateEmail+ key;
 
             var message = new Message(new string[] { toAdress }, "Validate email", "This is the content from our email, token lifetime 10 min. Click with validate link: "+ url);
             await _emailSender.SendEmailAsync(message).ConfigureAwait(false);
         }
-
-        private async Task SendVourcherNewAccount(string toAdress, long AccountId)
-        {
-            return;
-            string key = HttpUtility.UrlEncode(await TokenManager.GenerateKeyTokenValidateAsync(AccountId, toAdress));
-            string url = CONFIG.BaseLink + CONFIG.FunctionValidateEmail + key;
-
-            var message = new Message(new string[] { toAdress }, "Validate email", "This is the content from our email, token lifetime 10 min. Click with validate link: " + url);
-            await _emailSender.SendEmailAsync(message).ConfigureAwait(false);
-        }
+       
     }
 }

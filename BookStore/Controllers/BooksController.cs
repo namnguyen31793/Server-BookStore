@@ -1,4 +1,5 @@
-﻿using BookStore.Utils;
+﻿using BookStore.Interfaces;
+using BookStore.Utils;
 using DAO.DAOImp;
 using LoggerService;
 using Marvin.Cache.Headers;
@@ -25,9 +26,11 @@ namespace BookStore.Controllers
     {
 
         private ILoggerManager _logger;
-        public BooksController(ILoggerManager logger)
+        private ITokenManager _tokenManager;
+        public BooksController(ILoggerManager logger, ITokenManager tokenManager)
         {
             _logger = logger;
+            _tokenManager = tokenManager;
         }
 
         [HttpGet]
@@ -66,6 +69,35 @@ namespace BookStore.Controllers
             }
             return Ok(response);
         }
+
+        [HttpGet]
+        [Route("{barcode}/GetComment")]
+        [HttpCacheExpiration(CacheLocation = CacheLocation.Public, MaxAge = 10)]
+        [HttpCacheValidation(MustRevalidate = true)]
+        public async Task<IActionResult> GetComment(string barcode)
+        {
+            if (string.IsNullOrEmpty(barcode))
+                return Ok(new ResponseApiModel<string>() { Status = EStatusCode.DATA_INVAILD, Messenger = UltilsHelper.GetMessageByErrorCode(EStatusCode.DATA_INVAILD) });
+            long accountId = await _tokenManager.GetAccountIdByAccessTokenAsync(Request);
+            if (accountId <= 0)
+                return Ok(new ResponseApiModel<string>() { Status = accountId, Messenger = UltilsHelper.GetMessageByErrorCode((int)accountId) });
+            var response = new ResponseApiModel<string>() { Status = EStatusCode.SYSTEM_ERROR, Messenger = UltilsHelper.GetMessageByErrorCode(EStatusCode.SYSTEM_ERROR) };
+            int responseStatus = EStatusCode.DATABASE_ERROR;
+            string jsonListMail = "";
+            try
+            {
+                var listComment = StoreBookSqlInstance.Inst.GetRateComment(accountId, barcode, out responseStatus);
+                jsonListMail = JsonConvert.SerializeObject(listComment);
+                responseStatus = EStatusCode.SUCCESS;
+                response = new ResponseApiModel<string>() { Status = responseStatus, Messenger = UltilsHelper.GetMessageByErrorCode(responseStatus), DataResponse = jsonListMail };
+            }
+            catch (Exception ex)
+            {
+                await _logger.LogError("Books-GetComment{}", ex.ToString()).ConfigureAwait(false);
+            }
+            return Ok(response);
+        }
+
         [HttpGet]
         [Route("{barcode}/GetAvgRate")]
         [HttpCacheExpiration(CacheLocation = CacheLocation.Public, MaxAge = 10)]
@@ -113,7 +145,7 @@ namespace BookStore.Controllers
             if (string.IsNullOrEmpty(barcode))
                 return Ok(new ResponseApiModel<string>() { Status = EStatusCode.DATA_INVAILD, Messenger = UltilsHelper.GetMessageByErrorCode(EStatusCode.DATA_INVAILD) });
 
-            long accountId = await TokenManager.GetAccountIdByAccessTokenAsync(Request);
+            long accountId = await _tokenManager.GetAccountIdByAccessTokenAsync(Request);
             if (accountId <= 0)
                 return Ok(new ResponseApiModel<string>() { Status = accountId, Messenger = UltilsHelper.GetMessageByErrorCode((int)accountId) });
 
@@ -213,7 +245,7 @@ namespace BookStore.Controllers
             var response = new ResponseApiModel<string>() { Status = EStatusCode.SYSTEM_ERROR, Messenger = UltilsHelper.GetMessageByErrorCode(EStatusCode.SYSTEM_ERROR) };
             int responseStatus = EStatusCode.DATABASE_ERROR;
 
-            long accountId = await TokenManager.GetAccountIdByAccessTokenAsync(Request);
+            long accountId = await _tokenManager.GetAccountIdByAccessTokenAsync(Request);
             if (accountId <= 0)
                 return Ok(new ResponseApiModel<string>() { Status = accountId, Messenger = UltilsHelper.GetMessageByErrorCode((int)accountId) });
             try
@@ -382,7 +414,7 @@ namespace BookStore.Controllers
             bool like = false;
             if (status == 1)
                 like = true;
-            long accountId = await TokenManager.GetAccountIdByAccessTokenAsync(Request);
+            long accountId = await _tokenManager.GetAccountIdByAccessTokenAsync(Request);
             if (accountId <= 0)
                 return Ok(new ResponseApiModel<string>() { Status = accountId, Messenger = UltilsHelper.GetMessageByErrorCode((int)accountId) });
             try

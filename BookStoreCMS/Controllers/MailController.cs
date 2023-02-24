@@ -1,4 +1,5 @@
 ﻿using BookStoreCMS.Instance;
+using BookStoreCMS.Interfaces;
 using BookStoreCMS.Utils;
 using DAO.DAOImp;
 using LoggerService;
@@ -25,10 +26,12 @@ namespace BookStoreCMS.Controllers
 
         private ILoggerManager _logger;
         private IEmailSender _emailSender;
-        public MailController(ILoggerManager logger, IEmailSender emailSender)
+        private ITokenManager _tokenManager;
+        public MailController(ILoggerManager logger, IEmailSender emailSender, ITokenManager tokenManager)
         {
             _logger = logger;
             _emailSender = emailSender;
+            _tokenManager = tokenManager;
         }
 
         [HttpGet]
@@ -38,7 +41,7 @@ namespace BookStoreCMS.Controllers
         {
             var response = new ResponseApiModel<string>() { Status = EStatusCode.SYSTEM_ERROR, Messenger = UltilsHelper.GetMessageByErrorCode(EStatusCode.SYSTEM_ERROR) };
             
-            long accountId = await TokenCMSManager.GetAccountIdByAccessTokenAsync(Request);
+            long accountId = await _tokenManager.GetAccountIdByAccessTokenAsync(Request);
             if (accountId <= 0)
                 return Ok(new ResponseApiModel<string>() { Status = accountId, Messenger = UltilsHelper.GetMessageByErrorCode((int)accountId) });
             try
@@ -60,7 +63,7 @@ namespace BookStoreCMS.Controllers
         {
             var response = new ResponseApiModel<string>() { Status = EStatusCode.SYSTEM_ERROR, Messenger = UltilsHelper.GetMessageByErrorCode(EStatusCode.SYSTEM_ERROR) };
 
-            long accountId = await TokenCMSManager.GetAccountIdByAccessTokenAsync(Request);
+            long accountId = await _tokenManager.GetAccountIdByAccessTokenAsync(Request);
             if (accountId <= 0)
                 return Ok(new ResponseApiModel<string>() { Status = accountId, Messenger = UltilsHelper.GetMessageByErrorCode((int)accountId) });
             try
@@ -88,7 +91,7 @@ namespace BookStoreCMS.Controllers
         {
             var response = new ResponseApiModel<string>() { Status = EStatusCode.SYSTEM_ERROR, Messenger = UltilsHelper.GetMessageByErrorCode(EStatusCode.SYSTEM_ERROR) };
 
-            long accountId = await TokenCMSManager.GetAccountIdByAccessTokenAsync(Request);
+            long accountId = await _tokenManager.GetAccountIdByAccessTokenAsync(Request);
             if (accountId <= 0)
                 return Ok(new ResponseApiModel<string>() { Status = accountId, Messenger = UltilsHelper.GetMessageByErrorCode((int)accountId) });
             try

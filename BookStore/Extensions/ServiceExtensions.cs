@@ -1,4 +1,6 @@
 ﻿using BookStore.Instance;
+using BookStore.Interfaces;
+using BookStore.Utils;
 using LoggerService;
 using Marvin.Cache.Headers;
 using Microsoft.AspNetCore.Builder;
@@ -47,8 +49,12 @@ namespace BookStore.Extensions
                 opt.ApiVersionReader = new HeaderApiVersionReader("api-version");
             });
         }
+
         public static void ConfigureMailService(this IServiceCollection services) =>
             services.AddSingleton<IEmailSender, EmailSender>();
+
+        public static void ConfigureTokenService(this IServiceCollection services) =>
+            services.AddSingleton<ITokenManager, TokenManager>();
 
         public static void ConfigureResponseCaching(this IServiceCollection services) =>
             services.AddResponseCaching();

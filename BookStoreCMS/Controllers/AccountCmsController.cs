@@ -1,4 +1,5 @@
 ﻿using BookStoreCMS.Instance;
+using BookStoreCMS.Interfaces;
 using BookStoreCMS.Utils;
 using DAO.DAOImp;
 using LoggerService;
@@ -30,10 +31,12 @@ namespace BookStoreCMS.Controllers
 
         private ILoggerManager _logger;
         private IEmailSender _emailSender;
-        public AccountCmsController(ILoggerManager logger, IEmailSender emailSender)
+        private ITokenManager _tokenManager;
+        public AccountCmsController(ILoggerManager logger, IEmailSender emailSender, ITokenManager tokenManager)
         {
             _logger = logger;
             _emailSender = emailSender;
+            _tokenManager = tokenManager;
         }
         private string token = string.Empty;
 
@@ -100,11 +103,11 @@ namespace BookStoreCMS.Controllers
                         if (role != ERole.GM && role != ERole.Administrator)
                             return res = EStatusCode.ACCOUNT_NOT_ENOUGH_ROLE;
                         //create refresh token -> save db
-                        var refreshToken = TokenCMSManager.GenerateRefreshToken();
+                        var refreshToken = _tokenManager.GenerateRefreshToken();
                         var responseToken = StoreUsersSqlInstance.Inst.AddToken(accountId, refreshToken);
                         if (responseToken >= 0)
                         {
-                            var accessToken = await TokenCMSManager.GenerateAccessTokenAsync(accountId, role, clientInfo);
+                            var accessToken = await _tokenManager.GenerateAccessTokenAsync(accountId, role, clientInfo);
                             model.DataResponse = new TokenInfoCms() { Role = role, AccountId = accountId, Access_token = accessToken, Refresh_token = refreshToken };
                         }
                         else
@@ -142,7 +145,7 @@ namespace BookStoreCMS.Controllers
                 if (response >= 0)
                 {
                     var clientInfo = new ClientRequestInfo(Request);
-                    var accessToken = await TokenCMSManager.GenerateAccessTokenAsync(accountId, role, clientInfo);
+                    var accessToken = await _tokenManager.GenerateAccessTokenAsync(accountId, role, clientInfo);
                     var model = new TokenInfoCms() { Role = role, AccountId = accountId, Access_token = accessToken, Refresh_token = data.Refresh_token };
                     return Ok(new ResponseApiModel<TokenInfoCms>() { Status = EStatusCode.SUCCESS, Messenger = UltilsHelper.GetMessageByErrorCode(EStatusCode.SUCCESS), DataResponse = model });
                 }
@@ -170,7 +173,7 @@ namespace BookStoreCMS.Controllers
             AccountModelDb response = null;
             try
             {
-                int checkRole = await TokenCMSManager.CheckRoleActionAsync(ERole.Administrator, Request);
+                int checkRole = await _tokenManager.CheckRoleActionAsync(ERole.Administrator, Request);
                 if(checkRole < 0)
                     return Ok(new ResponseApiModel<string>() { Status = checkRole, Messenger = UltilsHelper.GetMessageByErrorCode(checkRole) });
                 response = StoreUsersSqlInstance.Inst.GetAccountInfo(accountId, ref responseStatus);
@@ -186,7 +189,7 @@ namespace BookStoreCMS.Controllers
         [Route("GetBookBuy")]
         public async Task<IActionResult> GetBookBuy(long accountId, int page = 0, int row = 100)
         {
-            int checkRole = await TokenCMSManager.CheckRoleActionAsync(ERole.Administrator, Request);
+            int checkRole = await _tokenManager.CheckRoleActionAsync(ERole.Administrator, Request);
             if (checkRole < 0)
                 return Ok(new ResponseApiModel<string>() { Status = checkRole, Messenger = UltilsHelper.GetMessageByErrorCode(checkRole) });
 
@@ -220,7 +223,7 @@ namespace BookStoreCMS.Controllers
         {
             if (role <= 1)
                 return Ok(new ResponseApiModel<string>() { Status = EStatusCode.ACCOUNT_NOT_ENOUGH_ROLE, Messenger = UltilsHelper.GetMessageByErrorCode(EStatusCode.ACCOUNT_NOT_ENOUGH_ROLE) });
-            int checkRole = await TokenCMSManager.CheckRoleActionAsync(ERole.GM, Request);
+            int checkRole = await _tokenManager.CheckRoleActionAsync(ERole.GM, Request);
             if (checkRole < 0)
                 return Ok(new ResponseApiModel<string>() { Status = checkRole, Messenger = UltilsHelper.GetMessageByErrorCode(checkRole) });
 

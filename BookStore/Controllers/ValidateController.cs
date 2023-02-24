@@ -1,4 +1,5 @@
-﻿using BookStore.Utils;
+﻿using BookStore.Interfaces;
+using BookStore.Utils;
 using DAO.DAOImp;
 using LoggerService;
 using Microsoft.AspNetCore.Http;
@@ -19,9 +20,11 @@ namespace BookStore.Controllers
     public class ValidateController : ControllerBase
     {
         private ILoggerManager _logger;
-        public ValidateController(ILoggerManager logger)
+        private ITokenManager _tokenManager;
+        public ValidateController(ILoggerManager logger, ITokenManager tokenManager)
         {
             _logger = logger;
+            _tokenManager = tokenManager;
         }
 
         [HttpPost]
@@ -30,7 +33,7 @@ namespace BookStore.Controllers
         public async Task<IActionResult> ValidateEmail(string key)
         {
             string email = "";
-            var accountid = TokenManager.ReadKeyTokenValidate(key, ref email);
+            var accountid = _tokenManager.ReadKeyTokenValidate(key, ref email);
             if (accountid < 0) {
                 return Content(UltilsHelper.GetMessageByErrorCode((int)accountid) );
             }
