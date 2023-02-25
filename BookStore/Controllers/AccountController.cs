@@ -3,6 +3,7 @@ using BookStore.Interfaces;
 using BookStore.Utils;
 using DAO.DAOImp;
 using LoggerService;
+using Marvin.Cache.Headers;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Newtonsoft.Json;
@@ -41,6 +42,7 @@ namespace BookStore.Controllers
 
         [HttpPost]
         [Route("Login")]
+        [HttpCacheIgnore]
         public async Task<IActionResult> Login(RequestAuthenModel requestLogin)
         {
             var response = new ResponseApiModel<TokenInfo>() { Status = EStatusCode.SYSTEM_ERROR, Messenger = UltilsHelper.GetMessageByErrorCode(EStatusCode.SYSTEM_ERROR) };
@@ -63,6 +65,7 @@ namespace BookStore.Controllers
 
         [HttpPost]
         [Route("LoginGoogle")]
+        [HttpCacheIgnore]
         public async Task<IActionResult> LoginGoogle(RequestAuthenSocial requestLogin)
         {
             if (!AccountUtils.IsLoginRequestTrue(requestLogin))
@@ -131,6 +134,7 @@ namespace BookStore.Controllers
 
         [HttpPost]
         [Route("LoginFacebook")]
+        [HttpCacheIgnore]
         public async Task<IActionResult> LoginFacebook(RequestAuthenSocial requestLogin)
         {
             if (!AccountUtils.IsLoginRequestTrue(requestLogin)) {
@@ -198,6 +202,7 @@ namespace BookStore.Controllers
 
         [HttpPost]
         [Route("Register")]
+        [HttpCacheIgnore]
         public async Task<IActionResult> Regis(RequestRegisterModel requestRegis)
         {
             if (!AccountUtils.IsRegisterRequestTrue(requestRegis)) {
@@ -296,8 +301,9 @@ namespace BookStore.Controllers
             return model;
         }
 
-        [HttpGet]
+        [HttpPost]
         [Route("RefreshToken")]
+        [HttpCacheIgnore]
         public async Task<IActionResult> RefreshToken(TokenInfo data)
         {
             try
@@ -331,6 +337,7 @@ namespace BookStore.Controllers
 
         [HttpGet]
         [Route("GetAccountInfo")]
+        [HttpCacheIgnore]
         public async Task<IActionResult> GetAccountInfo()
         {
             int responseStatus = -99;
@@ -352,6 +359,7 @@ namespace BookStore.Controllers
 
         [HttpPost]
         [Route("UpdateEmail")]
+        [HttpCacheIgnore]
         public async Task<IActionResult> UpdateEmail(string Email)
         {
             string message = "";
@@ -382,6 +390,7 @@ namespace BookStore.Controllers
         }
         [HttpPost]
         [Route("UpdateInfo")]
+        [HttpCacheIgnore]
         public async Task<IActionResult> UpdateInfo(RequestUpdateInfoModel model)
         {
             int responseStatus = -99;
@@ -404,6 +413,7 @@ namespace BookStore.Controllers
 
         [HttpGet]
         [Route("GetBookBuy")]
+        [HttpCacheIgnore]
         //[ResponseCache(Duration = 60)]
         public async Task<IActionResult> GetBookBuy(int page = 1, int row = 100)
         {
@@ -442,6 +452,7 @@ namespace BookStore.Controllers
 
         [HttpGet]
         [Route("GetCountBookBuy")]
+        [HttpCacheIgnore]
         public async Task<IActionResult> GetCountBookBuy()
         {
             var response = new ResponseApiModel<string>() { Status = EStatusCode.SYSTEM_ERROR, Messenger = UltilsHelper.GetMessageByErrorCode(EStatusCode.SYSTEM_ERROR) };
@@ -477,6 +488,7 @@ namespace BookStore.Controllers
 
         [HttpPost]
         [Route("BuyBook")]
+        [HttpCacheIgnore]
         public async Task<IActionResult> BuyBook(string barcode)
         {
             var response = new ResponseApiModel<string>() { Status = EStatusCode.SYSTEM_ERROR, Messenger = UltilsHelper.GetMessageByErrorCode(EStatusCode.SYSTEM_ERROR) };
@@ -521,6 +533,7 @@ namespace BookStore.Controllers
 
         [HttpGet]
         [Route("GetLikeBook")]
+        [HttpCacheIgnore]
         public async Task<IActionResult> GetLikeBook(int page, int row)
         {
             var response = new ResponseApiModel<string>() { Status = EStatusCode.SYSTEM_ERROR, Messenger = UltilsHelper.GetMessageByErrorCode(EStatusCode.SYSTEM_ERROR) };
@@ -556,6 +569,7 @@ namespace BookStore.Controllers
 
         [HttpGet]
         [Route("GetCountLikeBook")]
+        [HttpCacheIgnore]
         public async Task<IActionResult> GetCountLikeBook()
         {
             var response = new ResponseApiModel<string>() { Status = EStatusCode.SYSTEM_ERROR, Messenger = UltilsHelper.GetMessageByErrorCode(EStatusCode.SYSTEM_ERROR) };
@@ -591,6 +605,7 @@ namespace BookStore.Controllers
 
         [HttpGet]
         [Route("GetMemberVip")]
+        [HttpCacheIgnore]
         public async Task<IActionResult> GetMemberVip()
         {
             var response = new ResponseApiModel<string>() { Status = EStatusCode.SYSTEM_ERROR, Messenger = UltilsHelper.GetMessageByErrorCode(EStatusCode.SYSTEM_ERROR) };
@@ -631,6 +646,7 @@ namespace BookStore.Controllers
 
         [HttpGet]
         [Route("GetVourcherAccount")]
+        [HttpCacheIgnore]
         public async Task<IActionResult> GetVourcherAccount()
         {
             var response = new ResponseApiModel<string>() { Status = EStatusCode.SYSTEM_ERROR, Messenger = UltilsHelper.GetMessageByErrorCode(EStatusCode.SYSTEM_ERROR) };
