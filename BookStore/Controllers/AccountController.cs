@@ -3,8 +3,6 @@ using BookStore.Interfaces;
 using BookStore.Utils;
 using DAO.DAOImp;
 using LoggerService;
-using Marvin.Cache.Headers;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Newtonsoft.Json;
 using RedisSystem;
@@ -42,7 +40,7 @@ namespace BookStore.Controllers
 
         [HttpPost]
         [Route("Login")]
-        [HttpCacheIgnore]
+        [ResponseCache(Duration = 0, Location = ResponseCacheLocation.None, NoStore = true)]
         public async Task<IActionResult> Login(RequestAuthenModel requestLogin)
         {
             var response = new ResponseApiModel<TokenInfo>() { Status = EStatusCode.SYSTEM_ERROR, Messenger = UltilsHelper.GetMessageByErrorCode(EStatusCode.SYSTEM_ERROR) };
@@ -53,7 +51,12 @@ namespace BookStore.Controllers
             try
             {
                 var clientInfo = new ClientRequestInfo(Request);
-                response = await LoginAsync(requestLogin, clientInfo); 
+                //check spam request
+                string key = "SPAM:LOGIN" + clientInfo.TrueClientIp + "-" + clientInfo.DeviceId;
+                if (RedisGatewayCacheManager.Inst.CheckExistKey(key))
+                    return Ok(new ResponseApiModel<string>() { Status = EStatusCode.TRANSACTION_SPAM, Messenger = UltilsHelper.GetMessageByErrorCode(EStatusCode.TRANSACTION_SPAM) });
+                await RedisGatewayCacheManager.Inst.SaveDataSecond(key, "1", 3).ConfigureAwait(false);
+                response = await LoginAsync(requestLogin, clientInfo);
             }
             catch (Exception ex)
             {
@@ -65,7 +68,7 @@ namespace BookStore.Controllers
 
         [HttpPost]
         [Route("LoginGoogle")]
-        [HttpCacheIgnore]
+        [ResponseCache(Duration = 0, Location = ResponseCacheLocation.None, NoStore = true)]
         public async Task<IActionResult> LoginGoogle(RequestAuthenSocial requestLogin)
         {
             if (!AccountUtils.IsLoginRequestTrue(requestLogin))
@@ -81,6 +84,11 @@ namespace BookStore.Controllers
             try
             {
                 var clientInfo = new ClientRequestInfo(Request);
+                //check spam request
+                string key = "SPAM:LOGINGG" + clientInfo.TrueClientIp + "-" + clientInfo.DeviceId;
+                if (RedisGatewayCacheManager.Inst.CheckExistKey(key))
+                    return Ok(new ResponseApiModel<string>() { Status = EStatusCode.TRANSACTION_SPAM, Messenger = UltilsHelper.GetMessageByErrorCode(EStatusCode.TRANSACTION_SPAM) });
+                await RedisGatewayCacheManager.Inst.SaveDataSecond(key, "1", 3).ConfigureAwait(false);
 
                 var facebookUserName = await GoogleHelper.GetGoogleUserNameAsync(requestLogin.Token);
                 await _logger.LogError("Account-Register{}", facebookUserName).ConfigureAwait(false);
@@ -92,7 +100,7 @@ namespace BookStore.Controllers
                 responseCode = await Task.Run(async () =>
                 {
                     int accountId = 0;
-                    var res = StoreUsersSqlInstance.Inst.Register(REGISTER_TYPE.FACEBOOK_TYPE, facebookUserName, "", passMd5, clientInfo.MerchantId, clientInfo.TrueClientIp, clientInfo.DeviceId, (int)clientInfo.OsType,
+                    var res = StoreUsersSqlInstance.Inst.Register(REGISTER_TYPE.FACEBOOK_TYPE, facebookUserName, requestLogin.NickName, passMd5, clientInfo.MerchantId, clientInfo.TrueClientIp, clientInfo.DeviceId, (int)clientInfo.OsType,
                         requestLogin.PhoneNumber, requestLogin.Email, out accountId);
 
                     if (responseCode == (int)EStatusCode.SUCCESS)
@@ -134,7 +142,7 @@ namespace BookStore.Controllers
 
         [HttpPost]
         [Route("LoginFacebook")]
-        [HttpCacheIgnore]
+        [ResponseCache(Duration = 0, Location = ResponseCacheLocation.None, NoStore = true)]
         public async Task<IActionResult> LoginFacebook(RequestAuthenSocial requestLogin)
         {
             if (!AccountUtils.IsLoginRequestTrue(requestLogin)) {
@@ -150,6 +158,11 @@ namespace BookStore.Controllers
             try
             {
                 var clientInfo = new ClientRequestInfo(Request);
+                //check spam request
+                string key = "SPAM:LOGINFB" + clientInfo.TrueClientIp + "-" + clientInfo.DeviceId;
+                if (RedisGatewayCacheManager.Inst.CheckExistKey(key))
+                    return Ok(new ResponseApiModel<string>() { Status = EStatusCode.TRANSACTION_SPAM, Messenger = UltilsHelper.GetMessageByErrorCode(EStatusCode.TRANSACTION_SPAM) });
+                await RedisGatewayCacheManager.Inst.SaveDataSecond(key, "1", 3).ConfigureAwait(false);
 
                 var facebookUserName = await FacebookHelper.GetFacebookUserNameAsync(requestLogin.Token);
                 await _logger.LogError("Account-Register{}", facebookUserName).ConfigureAwait(false);
@@ -161,7 +174,7 @@ namespace BookStore.Controllers
                 responseCode = await Task.Run(async () =>
                 {
                     int accountId = 0;
-                    var res = StoreUsersSqlInstance.Inst.Register(REGISTER_TYPE.FACEBOOK_TYPE, facebookUserName, "", passMd5, clientInfo.MerchantId, clientInfo.TrueClientIp, clientInfo.DeviceId, (int)clientInfo.OsType,
+                    var res = StoreUsersSqlInstance.Inst.Register(REGISTER_TYPE.FACEBOOK_TYPE, facebookUserName, requestLogin.NickName, passMd5, clientInfo.MerchantId, clientInfo.TrueClientIp, clientInfo.DeviceId, (int)clientInfo.OsType,
                         requestLogin.PhoneNumber, requestLogin.Email, out accountId);
 
                     if (responseCode == (int)EStatusCode.SUCCESS)
@@ -196,13 +209,13 @@ namespace BookStore.Controllers
             }
             catch (Exception ex)
             {
-                return Ok(new ResponseApiModel<string>() { Status = EStatusCode.SYSTEM_ERROR, Messenger = UltilsHelper.GetMessageByErrorCode(EStatusCode.SYSTEM_ERROR), DataResponse= ex.ToString() });
+                return Ok(new ResponseApiModel<string>() { Status = EStatusCode.SYSTEM_ERROR, Messenger = UltilsHelper.GetMessageByErrorCode(EStatusCode.SYSTEM_ERROR), DataResponse = ex.ToString() });
             }
         }
 
         [HttpPost]
         [Route("Register")]
-        [HttpCacheIgnore]
+        [ResponseCache(Duration = 0, Location = ResponseCacheLocation.None, NoStore = true)]
         public async Task<IActionResult> Regis(RequestRegisterModel requestRegis)
         {
             if (!AccountUtils.IsRegisterRequestTrue(requestRegis)) {
@@ -216,6 +229,11 @@ namespace BookStore.Controllers
                     return Ok(new ResponseApiModel<string>() { Status = EStatusCode.PHONE_INVAILD, Messenger = UltilsHelper.GetMessageByErrorCode(EStatusCode.PHONE_INVAILD) });
 
             var clientInfo = new ClientRequestInfo(Request);
+            //check spam request
+            string key = "SPAM:REGIS" + clientInfo.TrueClientIp + "-" + clientInfo.DeviceId;
+            if (RedisGatewayCacheManager.Inst.CheckExistKey(key))
+                return Ok(new ResponseApiModel<string>() { Status = EStatusCode.TRANSACTION_SPAM, Messenger = UltilsHelper.GetMessageByErrorCode(EStatusCode.TRANSACTION_SPAM) });
+            await RedisGatewayCacheManager.Inst.SaveDataSecond(key, "1", 3).ConfigureAwait(false);
             var responseCode = -99;
             try
             {
@@ -268,7 +286,7 @@ namespace BookStore.Controllers
                 {
                     var accountId = StoreUsersSqlInstance.Inst.DoLogin(requestLogin.AccountName, AccountUtils.EncryptPasswordMd5(requestLogin.Password), clientInfo.MerchantId, clientInfo.TrueClientIp, (int)clientInfo.OsType, ref res);
 
-                    await _logger.LogInfo("Account-LoginAsync{}", requestLogin.AccountName + " - accountId:" + accountId+ " - res:" + res, res.ToString()).ConfigureAwait(false);
+                    await _logger.LogInfo("Account-LoginAsync{}", requestLogin.AccountName + " - accountId:" + accountId + " - res:" + res, res.ToString()).ConfigureAwait(false);
                     if (accountId >= 0)
                     {
                         //create refresh token -> save db
@@ -303,30 +321,36 @@ namespace BookStore.Controllers
 
         [HttpPost]
         [Route("RefreshToken")]
-        [HttpCacheIgnore]
+        [ResponseCache(Duration = 0, Location = ResponseCacheLocation.None, NoStore = true)]
         public async Task<IActionResult> RefreshToken(TokenInfo data)
         {
+            ResponseApiModel<TokenInfo> model = new ResponseApiModel<TokenInfo>() { Status = EStatusCode.SYSTEM_ERROR, Messenger = UltilsHelper.GetMessageByErrorCode(EStatusCode.SYSTEM_ERROR) };
             try
             {
+                var clientInfo = new ClientRequestInfo(Request);
+                string key = "SPAM:REFRESH" + clientInfo.TrueClientIp + "-" + clientInfo.DeviceId;
+                if (RedisGatewayCacheManager.Inst.CheckExistKey(key))
+                    return Ok(new ResponseApiModel<string>() { Status = EStatusCode.TRANSACTION_SPAM, Messenger = UltilsHelper.GetMessageByErrorCode(EStatusCode.TRANSACTION_SPAM) });
+                await RedisGatewayCacheManager.Inst.SaveDataSecond(key, "1", 3).ConfigureAwait(false);
                 long accountId = 0;
                 //check token
                 var response = StoreUsersSqlInstance.Inst.CheckRefreshToken(data.Refresh_token, ref accountId);
-                await _logger.LogInfo("Account-RefreshToken{}", data.Refresh_token + " - " + accountId + " - " + response, response.ToString()).ConfigureAwait(false);
                 if (response >= 0)
                 {
-                    var clientInfo = new ClientRequestInfo(Request);
-                    var accessToken = await _tokenManager.GenerateAccessTokenAsync(accountId, clientInfo);
-                    var model = new TokenInfo() { AccountId = accountId, Access_token = accessToken, Refresh_token = data.Refresh_token };
-                    return Ok(new ResponseApiModel<TokenInfo>() { Status = EStatusCode.SUCCESS, Messenger = UltilsHelper.GetMessageByErrorCode(EStatusCode.SUCCESS), DataResponse = model });
+                    var res = EStatusCode.SUCCESS;
+                    res = await Task.Run(async () =>
+                    {
+                        var accessToken = await _tokenManager.GenerateAccessTokenAsync(accountId, clientInfo);
+                        model.DataResponse = new TokenInfo() { AccountId = accountId, Access_token = accessToken, Refresh_token = data.Refresh_token };
+                        return res;
+                    });
+                    model.Status = res;
+                    model.Messenger = UltilsHelper.GetMessageByErrorCode(res);
                 }
-                else if (response == EStatusCode.TOKEN_INVALID)
-                {
-                    return Ok(new ResponseApiModel<TokenInfo>() { Status = EStatusCode.TOKEN_INVALID, Messenger = UltilsHelper.GetMessageByErrorCode(EStatusCode.TOKEN_INVALID) });
+                else {
+                    return Ok(new ResponseApiModel<TokenInfo>() { Status = response, Messenger = UltilsHelper.GetMessageByErrorCode(response) });
                 }
-                else if (response == EStatusCode.TOKEN_EXPIRES)
-                {
-                    return Ok(new ResponseApiModel<TokenInfo>() { Status = EStatusCode.TOKEN_EXPIRES, Messenger = UltilsHelper.GetMessageByErrorCode(EStatusCode.TOKEN_EXPIRES) });
-                }
+                return Ok(model);
             }
             catch (Exception ex)
             {
@@ -337,7 +361,7 @@ namespace BookStore.Controllers
 
         [HttpGet]
         [Route("GetAccountInfo")]
-        [HttpCacheIgnore]
+        [ResponseCache(Duration = 0, Location = ResponseCacheLocation.None, NoStore = true)]
         public async Task<IActionResult> GetAccountInfo()
         {
             int responseStatus = -99;
@@ -345,6 +369,12 @@ namespace BookStore.Controllers
             try
             {
                 long accountId = await _tokenManager.GetAccountIdByAccessTokenAsync(Request);
+                string accessToken = "";
+                if (Request.Headers.TryGetValue("Authorization", out var values))
+                {
+                    accessToken = values.FirstOrDefault();
+                }
+                await _logger.LogInfo("Account-GetAccountInfo{}", accessToken+" - " +accountId , "0").ConfigureAwait(false);
                 if (accountId <= 0)
                     return Ok(new ResponseApiModel<string>() { Status = accountId, Messenger = UltilsHelper.GetMessageByErrorCode((int)accountId) });
                 response = StoreUsersSqlInstance.Inst.GetAccountInfo(accountId, ref responseStatus);
@@ -359,7 +389,7 @@ namespace BookStore.Controllers
 
         [HttpPost]
         [Route("UpdateEmail")]
-        [HttpCacheIgnore]
+        [ResponseCache(Duration = 0, Location = ResponseCacheLocation.None, NoStore = true)]
         public async Task<IActionResult> UpdateEmail(string Email)
         {
             string message = "";
@@ -390,7 +420,7 @@ namespace BookStore.Controllers
         }
         [HttpPost]
         [Route("UpdateInfo")]
-        [HttpCacheIgnore]
+        [ResponseCache(Duration = 0, Location = ResponseCacheLocation.None, NoStore = true)]
         public async Task<IActionResult> UpdateInfo(RequestUpdateInfoModel model)
         {
             int responseStatus = -99;
@@ -413,7 +443,7 @@ namespace BookStore.Controllers
 
         [HttpGet]
         [Route("GetBookBuy")]
-        [HttpCacheIgnore]
+        [ResponseCache(Duration = 0, Location = ResponseCacheLocation.None, NoStore = true)]
         //[ResponseCache(Duration = 60)]
         public async Task<IActionResult> GetBookBuy(int page = 1, int row = 100)
         {
@@ -452,7 +482,7 @@ namespace BookStore.Controllers
 
         [HttpGet]
         [Route("GetCountBookBuy")]
-        [HttpCacheIgnore]
+        [ResponseCache(Duration = 0, Location = ResponseCacheLocation.None, NoStore = true)]
         public async Task<IActionResult> GetCountBookBuy()
         {
             var response = new ResponseApiModel<string>() { Status = EStatusCode.SYSTEM_ERROR, Messenger = UltilsHelper.GetMessageByErrorCode(EStatusCode.SYSTEM_ERROR) };
@@ -488,7 +518,7 @@ namespace BookStore.Controllers
 
         [HttpPost]
         [Route("BuyBook")]
-        [HttpCacheIgnore]
+        [ResponseCache(Duration = 0, Location = ResponseCacheLocation.None, NoStore = true)]
         public async Task<IActionResult> BuyBook(string barcode)
         {
             var response = new ResponseApiModel<string>() { Status = EStatusCode.SYSTEM_ERROR, Messenger = UltilsHelper.GetMessageByErrorCode(EStatusCode.SYSTEM_ERROR) };
@@ -533,7 +563,7 @@ namespace BookStore.Controllers
 
         [HttpGet]
         [Route("GetLikeBook")]
-        [HttpCacheIgnore]
+        [ResponseCache(Duration = 0, Location = ResponseCacheLocation.None, NoStore = true)]
         public async Task<IActionResult> GetLikeBook(int page, int row)
         {
             var response = new ResponseApiModel<string>() { Status = EStatusCode.SYSTEM_ERROR, Messenger = UltilsHelper.GetMessageByErrorCode(EStatusCode.SYSTEM_ERROR) };
@@ -569,7 +599,7 @@ namespace BookStore.Controllers
 
         [HttpGet]
         [Route("GetCountLikeBook")]
-        [HttpCacheIgnore]
+        [ResponseCache(Duration = 0, Location = ResponseCacheLocation.None, NoStore = true)]
         public async Task<IActionResult> GetCountLikeBook()
         {
             var response = new ResponseApiModel<string>() { Status = EStatusCode.SYSTEM_ERROR, Messenger = UltilsHelper.GetMessageByErrorCode(EStatusCode.SYSTEM_ERROR) };
@@ -605,7 +635,7 @@ namespace BookStore.Controllers
 
         [HttpGet]
         [Route("GetMemberVip")]
-        [HttpCacheIgnore]
+        [ResponseCache(Duration = 0, Location = ResponseCacheLocation.None, NoStore = true)]
         public async Task<IActionResult> GetMemberVip()
         {
             var response = new ResponseApiModel<string>() { Status = EStatusCode.SYSTEM_ERROR, Messenger = UltilsHelper.GetMessageByErrorCode(EStatusCode.SYSTEM_ERROR) };
@@ -646,7 +676,7 @@ namespace BookStore.Controllers
 
         [HttpGet]
         [Route("GetVourcherAccount")]
-        [HttpCacheIgnore]
+        [ResponseCache(Duration = 0, Location = ResponseCacheLocation.None, NoStore = true)]
         public async Task<IActionResult> GetVourcherAccount()
         {
             var response = new ResponseApiModel<string>() { Status = EStatusCode.SYSTEM_ERROR, Messenger = UltilsHelper.GetMessageByErrorCode(EStatusCode.SYSTEM_ERROR) };

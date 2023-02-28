@@ -1,6 +1,5 @@
 ﻿using DAO.DAOImp;
 using LoggerService;
-using Marvin.Cache.Headers;
 using Microsoft.AspNetCore.Mvc;
 using Newtonsoft.Json;
 using RedisSystem;
@@ -26,8 +25,7 @@ namespace BookStore.Controllers
 
         [HttpGet]
         [Route("{authorId}/GetAuthorInfo")]
-        [HttpCacheExpiration(CacheLocation = CacheLocation.Public, MaxAge = 60)]
-        [HttpCacheValidation(MustRevalidate = true)]
+        [ResponseCache(Duration = 60)]
         public async Task<IActionResult> GetAuthorInfo(int authorId)
         {
             var response = new ResponseApiModel<string>() { Status = EStatusCode.SYSTEM_ERROR, Messenger = UltilsHelper.GetMessageByErrorCode(EStatusCode.SYSTEM_ERROR) };

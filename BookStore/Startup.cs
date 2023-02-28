@@ -41,7 +41,24 @@ namespace CoreWebApi
             services.ConfigureLoggerService();
             services.ConfigureVersioning();
             services.ConfigureResponseCaching();
-            services.ConfigureHttpCacheHeaders();
+            //services.AddHttpCacheHeaders(
+            //   expirationModelOptionsAction: expirationModelOptions =>
+            //   {
+            //       expirationModelOptions.MaxAge = 600;
+            //       expirationModelOptions.SharedMaxAge = 300;
+            //   },
+            //   validationModelOptionsAction: validationModelOptions =>
+            //   {
+            //       validationModelOptions.MustRevalidate = true;
+            //       validationModelOptions.ProxyRevalidate = true;
+            //   },
+            //   middlewareOptionsAction: middlewareOptions =>
+            //   {
+            //       middlewareOptions.DisableGlobalHeaderGeneration = true;
+            //       middlewareOptions.IgnoredStatusCodes = HttpStatusCodes.ServerErrors;
+            //   });
+
+            //services.ConfigureHttpCacheHeaders();
             services.ConfigureMailService();
             services.ConfigureTokenService();
 
@@ -72,7 +89,7 @@ namespace CoreWebApi
             app.UseHttpsRedirection();
             app.UseStaticFiles();
             app.UseResponseCaching();
-            app.UseHttpCacheHeaders();
+            //app.UseHttpCacheHeaders();
             app.UseRouting();
             app.UseCors("CorsPolicy");
 

@@ -73,7 +73,7 @@ namespace DAO.DAOImp
             {
                 db = new DBHelper(ConfigDb.StoreBookConnectionString);
                 var pars = new SqlParameter[3];
-                pars[0] = new SqlParameter("@_AccountId", barcode);
+                pars[0] = new SqlParameter("@_AccountId", AccountId);
                 pars[1] = new SqlParameter("@_Barcode", barcode);
                 pars[2] = new SqlParameter("@_ResponseStatus", SqlDbType.Int) { Direction = ParameterDirection.Output };
                 modelData = db.GetInstanceSP<RateCommentObject>("SP_Store_Book_Rate_Get_Account_By_Barcodes", 4, pars);

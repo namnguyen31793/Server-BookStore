@@ -32,6 +32,7 @@ namespace BookStoreCMS.Controllers
             _tokenManager = tokenManager;
         }
 
+        #region RATE
         [HttpGet]
         [Route("{barcode}/GetAvgRate")]
         public async Task<IActionResult> GetAvgRate(string barcode)
@@ -64,6 +65,30 @@ namespace BookStoreCMS.Controllers
             }
             return Ok(response);
         }
+
+
+        [HttpPost]
+        [Route("AddFakeRate")]
+        public async Task<IActionResult> AddBook(RateCommentObject model)
+        {
+            int checkRole = await _tokenManager.CheckRoleActionAsync(ERole.Administrator, Request);
+            if (checkRole < 0)
+                return Ok(new ResponseApiModel<string>() { Status = checkRole, Messenger = UltilsHelper.GetMessageByErrorCode(checkRole) });
+            var response = new ResponseApiModel<string>() { Status = EStatusCode.SYSTEM_ERROR, Messenger = UltilsHelper.GetMessageByErrorCode(EStatusCode.SYSTEM_ERROR) };
+            int responseStatus = EStatusCode.DATABASE_ERROR;
+            try
+            {
+                var book = StoreBookSqlInstance.Inst.SendComment(model.AccountId,model.Barcode, model.StarRate, model.Comment, model.ActionTime, model.NickName, out responseStatus);
+                response = new ResponseApiModel<string>() { Status = responseStatus, Messenger = UltilsHelper.GetMessageByErrorCode(responseStatus), DataResponse = JsonConvert.SerializeObject(book) };
+            }
+            catch (Exception ex)
+            {
+                await _logger.LogError("Books-UpdateAuthorConfig{}", ex.ToString()).ConfigureAwait(false);
+            }
+            return Ok(response);
+        }
+        #endregion
+
         #region COLOR
         [HttpPost]
         [Route("AddColorConfig")]

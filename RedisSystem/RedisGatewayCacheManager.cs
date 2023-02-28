@@ -85,6 +85,22 @@ namespace RedisSystem
             {
             }
         }
+        public bool SaveData(string key, string value, long minuteExpires = -1)
+        {
+            try
+            {
+                var _database = Connection.GetDatabase();
+                if (minuteExpires < 0)
+                    return _database.StringSet(key, value);
+                var timeExpires = TimeSpan.FromMinutes(minuteExpires);
+                return _database.StringSet(key, value, timeExpires);
+            }
+            catch (Exception exception)
+            {
+                _logger.LogError("Redis-SaveData()", exception.ToString()).ConfigureAwait(false);
+                return false;
+            }
+        }
 
         public async Task<bool> SaveDataAsync(string key, string value, long minuteExpires = -1)
         {
@@ -102,7 +118,7 @@ namespace RedisSystem
                 return false;
             }
         }
-        public bool SaveDataSecond(string key, string value, long secondExpires = -1)
+        public async Task<bool> SaveDataSecond(string key, string value, long secondExpires = -1)
         {
             try
             {
@@ -110,11 +126,11 @@ namespace RedisSystem
                 if (secondExpires < 0)
                     return _database.StringSet(key, value);
                 var timeExpires = TimeSpan.FromSeconds(secondExpires);
-                return _database.StringSet(key, value, timeExpires);
+                return await _database.StringSetAsync(key, value, timeExpires);
             }
             catch (Exception exception)
             {
-                Task.Run(async () => await _logger.LogError("Redis-SaveData()", exception.ToString()).ConfigureAwait(false));
+                await Task.Run(async () => await _logger.LogError("Redis-SaveData()", exception.ToString()).ConfigureAwait(false));
                 return false;
             }
         }
@@ -129,6 +145,19 @@ namespace RedisSystem
             catch (Exception exception)
             {
                 await _logger.LogError("Redis-GetDataFromCache()", exception.ToString()).ConfigureAwait(false);
+                return "";
+            }
+        }
+        public string GetDataFromCache(string key)
+        {
+            try
+            {
+                var _database = Connection.GetDatabase();
+                return _database.StringGet(key);
+            }
+            catch (Exception exception)
+            {
+                _logger.LogError("Redis-GetDataFromCache()", exception.ToString()).ConfigureAwait(false);
                 return "";
             }
         }
