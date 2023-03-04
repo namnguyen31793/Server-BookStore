@@ -9,9 +9,7 @@ namespace ShareData.DB.Mail
         public string SenderNickname { get; set; }
         public string MailHeader { get; set; }
         public string MailContent { get; set; }
-        [JsonIgnore]
         public DateTime SendTime { get; set; }
-        [JsonIgnore]
         public int IsReaded { get; set; }
         public long Money { get; set; }
         [JsonIgnore]

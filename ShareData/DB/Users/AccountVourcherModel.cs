@@ -10,7 +10,6 @@ namespace ShareData.DB.Users
         public int VourcherId { get; set; }
         public string VourcherName { get; set; }
         public int CountUse { get; set; }
-        [JsonIgnore]
         public DateTime TTL { get; set; }
     }
 }

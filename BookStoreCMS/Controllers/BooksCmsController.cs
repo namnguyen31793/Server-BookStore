@@ -78,7 +78,8 @@ namespace BookStoreCMS.Controllers
             int responseStatus = EStatusCode.DATABASE_ERROR;
             try
             {
-                var book = StoreBookSqlInstance.Inst.SendComment(model.AccountId,model.Barcode, model.StarRate, model.Comment, model.ActionTime, model.NickName, out responseStatus);
+                RateCountModel modelRate = null;
+                var book = StoreBookSqlInstance.Inst.SendComment(model.AccountId,model.Barcode, model.StarRate, model.Comment, model.ActionTime, model.NickName, out responseStatus, out modelRate);
                 response = new ResponseApiModel<string>() { Status = responseStatus, Messenger = UltilsHelper.GetMessageByErrorCode(responseStatus), DataResponse = JsonConvert.SerializeObject(book) };
             }
             catch (Exception ex)

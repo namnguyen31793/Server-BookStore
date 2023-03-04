@@ -18,7 +18,7 @@ namespace UtilsSystem.Utils
         }
         public static string FormatTime(DateTime time)
         {
-            var res =time.ToString("dd/mm/YYYY hh:mm:ss", CultureInfo.InvariantCulture);
+            var res = time.ToString("MM/dd/yyyy HH:mm:ss");
             return res;
         }
 

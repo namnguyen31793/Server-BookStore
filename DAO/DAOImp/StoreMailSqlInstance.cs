@@ -55,7 +55,57 @@ namespace DAO.DAOImp
             }
             catch (Exception exception)
             {
-                 Task.Run(async () => await _logger.LogError("SQL-DeleteMail()", exception.ToString()).ConfigureAwait(false));
+                Task.Run(async () => await _logger.LogError("SQL-DeleteMail()", exception.ToString()).ConfigureAwait(false));
+            }
+            finally
+            {
+                db?.Close();
+            }
+            return mCurrentMail;
+        }
+        public MailObject RestoreMail(long mailId, out int reponseStatus)
+        {
+            DBHelper db = null;
+            MailObject mCurrentMail = null;
+            reponseStatus = EStatusCode.DATABASE_ERROR;
+            try
+            {
+                db = new DBHelper(ConfigDb.StoreMailConnectionString);
+                var pars = new SqlParameter[2];
+                pars[0] = new SqlParameter("@_MailId", mailId);
+                pars[1] = new SqlParameter("@_ResponseStatus", SqlDbType.Int) { Direction = ParameterDirection.Output };
+                mCurrentMail = db.GetInstanceSP<MailObject>("SP_Store_Mail_RestoreMail", 4, pars);
+                reponseStatus = Convert.ToInt32(pars[1].Value);
+            }
+            catch (Exception exception)
+            {
+                Task.Run(async () => await _logger.LogError("SQL-RestoreMail()", exception.ToString()).ConfigureAwait(false));
+            }
+            finally
+            {
+                db?.Close();
+            }
+            return mCurrentMail;
+        }
+        public List<MailObject> GetAllMailListByAccountId(long accountId, int page, int row)
+        {
+            DBHelper db = null;
+            List<MailObject> mCurrentMail = null;
+            int responseStatus = EStatusCode.DATABASE_ERROR;
+            try
+            {
+                db = new DBHelper(ConfigDb.StoreMailConnectionString);
+                var pars = new SqlParameter[4];
+                pars[0] = new SqlParameter("@_AccountId", accountId);
+                pars[1] = new SqlParameter("@_Index", page);
+                pars[2] = new SqlParameter("@_NUMBER_GET", row);
+                pars[3] = new SqlParameter("@_ResponseStatus", SqlDbType.Int) { Direction = ParameterDirection.Output };
+                mCurrentMail = db.GetListSP<MailObject>("SP_Store_Mail_GetAllMailByAccountId", 4, pars);
+                responseStatus = Convert.ToInt32(pars[3].Value);
+            }
+            catch (Exception exception)
+            {
+                Task.Run(async () => await _logger.LogError("SQL-GetAllMailListByAccountId()", exception.ToString()).ConfigureAwait(false));
             }
             finally
             {
@@ -176,6 +226,28 @@ namespace DAO.DAOImp
             catch (Exception exception)
             {
                  Task.Run(async () => await _logger.LogError("SQL-UpdateReadedMail()", exception.ToString()).ConfigureAwait(false));
+            }
+            finally
+            {
+                db?.Close();
+            }
+        }
+        public void UpdateReadedAllMail(long AccountId, out int responseStatus)
+        {
+            DBHelper db = null;
+            responseStatus = EStatusCode.DATABASE_ERROR;
+            try
+            {
+                db = new DBHelper(ConfigDb.StoreMailConnectionString);
+                var pars = new SqlParameter[2];
+                pars[0] = new SqlParameter("@_AccountId", AccountId);
+                pars[1] = new SqlParameter("@_ResponseStatus", SqlDbType.Int) { Direction = ParameterDirection.Output };
+                db.ExecuteNonQuerySP("SP_Store_Mail_UpdateReadAllMail", 4, pars);
+                responseStatus = Convert.ToInt32(pars[1].Value);
+            }
+            catch (Exception exception)
+            {
+                Task.Run(async () => await _logger.LogError("SQL-UpdateReadedAllMail()", exception.ToString()).ConfigureAwait(false));
             }
             finally
             {

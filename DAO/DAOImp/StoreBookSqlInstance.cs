@@ -107,7 +107,7 @@ namespace DAO.DAOImp
                 pars[5] = new SqlParameter("@_StarRate4", SqlDbType.Int) { Direction = ParameterDirection.Output };
                 pars[6] = new SqlParameter("@_StarRate5", SqlDbType.Int) { Direction = ParameterDirection.Output };
                 pars[7] = new SqlParameter("@_ResponseStatus", SqlDbType.Int) { Direction = ParameterDirection.Output };
-                db.ExecuteNonQuerySP("SP_Store_Book_CMS_Barcodes_Rate_Star", 4, pars);
+                db.ExecuteNonQuerySP("SP_Store_Book_Rate_Barcodes_Star", 4, pars);
                 reponseStatus = Convert.ToInt32(pars[7].Value);
                 if (reponseStatus == 0) {
                     float countAvg = 0;
@@ -138,24 +138,48 @@ namespace DAO.DAOImp
 
         }
 
-        public RateCommentObject SendComment(long accountId, string Barcode, int Rate, string Comment, string ActionTime, string NickName, out int responseStatus)
+        public RateCommentObject SendComment(long accountId, string Barcode, int Rate, string Comment, string ActionTime, string NickName, out int responseStatus, out RateCountModel starRate)
         {
             DBHelper db = null;
+            starRate = new RateCountModel() { StarRate = 0, StarRate1 = 0, StarRate2 = 0, StarRate3 = 0, StarRate4 = 0, StarRate5 = 0 };
             RateCommentObject modelData = null;
             responseStatus = EStatusCode.DATABASE_ERROR;
             try
             {
                 db = new DBHelper(ConfigDb.StoreBookConnectionString);
-                var pars = new SqlParameter[7];
+                var pars = new SqlParameter[13];
                 pars[0] = new SqlParameter("@_AccountId", accountId);
                 pars[1] = new SqlParameter("@_Barcode", Barcode);
                 pars[2] = new SqlParameter("@_Rate", Rate);
                 pars[3] = new SqlParameter("@_Comment", Comment);
                 pars[4] = new SqlParameter("@_ActionTime", ActionTime);
                 pars[5] = new SqlParameter("@_NickName", NickName);
-                pars[6] = new SqlParameter("@_ResponseStatus", SqlDbType.Int) { Direction = ParameterDirection.Output };
-                modelData = db.GetInstanceSP<RateCommentObject>("SP_Store_Book_Account_Rate_Set", 4, pars);
-                responseStatus = Convert.ToInt32(pars[6].Value);
+                pars[6] = new SqlParameter("@_StarRate", SqlDbType.Float) { Direction = ParameterDirection.Output };
+                pars[7] = new SqlParameter("@_StarRate1", SqlDbType.Int) { Direction = ParameterDirection.Output };
+                pars[8] = new SqlParameter("@_StarRate2", SqlDbType.Int) { Direction = ParameterDirection.Output };
+                pars[9] = new SqlParameter("@_StarRate3", SqlDbType.Int) { Direction = ParameterDirection.Output };
+                pars[10] = new SqlParameter("@_StarRate4", SqlDbType.Int) { Direction = ParameterDirection.Output };
+                pars[11] = new SqlParameter("@_StarRate5", SqlDbType.Int) { Direction = ParameterDirection.Output };
+                pars[12] = new SqlParameter("@_ResponseStatus", SqlDbType.Int) { Direction = ParameterDirection.Output };
+                modelData = db.GetInstanceSP<RateCommentObject>("SP_Store_Book_Rate_Account_Set", 4, pars);
+                responseStatus = Convert.ToInt32(pars[12].Value);
+                if (responseStatus == 0)
+                {
+                    float countAvg = 0;
+                    float.TryParse(pars[6].Value.ToString(), out countAvg);
+                    starRate.StarRate = countAvg;
+                    int count = 0;
+                    int.TryParse(pars[7].Value.ToString(), out count);
+                    starRate.StarRate1 = count;
+                    int.TryParse(pars[8].Value.ToString(), out count);
+                    starRate.StarRate2 = count;
+                    int.TryParse(pars[9].Value.ToString(), out count);
+                    starRate.StarRate3 = count;
+                    int.TryParse(pars[10].Value.ToString(), out count);
+                    starRate.StarRate4 = count;
+                    int.TryParse(pars[11].Value.ToString(), out count);
+                    starRate.StarRate5 = count;
+                }
             }
             catch (Exception exception)
             {
@@ -813,6 +837,30 @@ namespace DAO.DAOImp
                 db?.Close();
             }
             return listConfig;
+        }
+        public BookTagModel GetTagConfig(int tagId, out int reponseStatus)
+        {
+            DBHelper db = null;
+            BookTagModel data = null;
+            reponseStatus = EStatusCode.DATABASE_ERROR;
+            try
+            {
+                db = new DBHelper(ConfigDb.StoreBookConnectionString);
+                var pars = new SqlParameter[2];
+                pars[0] = new SqlParameter("@_TagId", tagId);
+                pars[1] = new SqlParameter("@_ResponseStatus", SqlDbType.Int) { Direction = ParameterDirection.Output };
+                data = db.GetInstanceSP<BookTagModel>("SP_Store_Book_Tag_Get", 4, pars);
+                reponseStatus = Convert.ToInt32(pars[1].Value);
+            }
+            catch (Exception exception)
+            {
+                Task.Run(async () => await _logger.LogError("SQL-GetTagConfig()", exception.ToString()).ConfigureAwait(false));
+            }
+            finally
+            {
+                db?.Close();
+            }
+            return data;
         }
         #endregion
 

@@ -91,7 +91,79 @@ namespace BookStore.Controllers
                 await RedisGatewayCacheManager.Inst.SaveDataSecond(key, "1", 3).ConfigureAwait(false);
 
                 var facebookUserName = await GoogleHelper.GetGoogleUserNameAsync(requestLogin.Token);
-                await _logger.LogError("Account-Register{}", facebookUserName).ConfigureAwait(false);
+                await _logger.LogError("Account-LoginGoogle{}", requestLogin.Token+" - "+ facebookUserName).ConfigureAwait(false);
+                var responseCode = -99;
+                if (string.IsNullOrEmpty(facebookUserName))
+                    return Ok(new ResponseApiModel<string>() { Status = EStatusCode.SYSTEM_ERROR, Messenger = UltilsHelper.GetMessageByErrorCode(EStatusCode.SYSTEM_ERROR) });
+                var fbPassword = FacebookHelper.GetFacebookPassword(facebookUserName);
+                var passMd5 = AccountUtils.EncryptPasswordMd5(fbPassword);
+                responseCode = await Task.Run(async () =>
+                {
+                    int accountId = 0;
+                    var res = StoreUsersSqlInstance.Inst.Register(REGISTER_TYPE.FACEBOOK_TYPE, facebookUserName, requestLogin.NickName, passMd5, clientInfo.MerchantId, clientInfo.TrueClientIp, clientInfo.DeviceId, (int)clientInfo.OsType,
+                        requestLogin.PhoneNumber, requestLogin.Email, out accountId);
+
+                    if (responseCode == (int)EStatusCode.SUCCESS)
+                    {
+                        await _logger.LogInfo("Account-LoginGoogle{}", facebookUserName + " " + res, res.ToString()).ConfigureAwait(false);
+                        MailInstance.Inst.SendMailRegis(accountId);
+                        if (AccountUtils.IsValidEmail(requestLogin.Email))
+                            await SendMailAsync(requestLogin.Email, accountId).ConfigureAwait(false);
+                    }
+                    return res;
+
+                });
+                if (responseCode == (int)EStatusCode.SUCCESS)
+                {
+                    //TrackingDAO.Inst.TrackingRegis();
+                }
+                if (responseCode == (int)EStatusCode.ACCOUNT_EXITS || responseCode == (int)EStatusCode.SUCCESS)
+                {
+                    //do login
+                    RequestAuthenModel request = new RequestAuthenModel()
+                    {
+                        AccountName = facebookUserName,
+                        Password = fbPassword,
+                    };
+                    var response = await LoginAsync(request, clientInfo);
+                    return Ok(response);
+                }
+                else
+                {
+                    return Ok(new ResponseApiModel<string>() { Status = EStatusCode.SYSTEM_ERROR, Messenger = UltilsHelper.GetMessageByErrorCode(EStatusCode.SYSTEM_ERROR) });
+                }
+            }
+            catch (Exception ex)
+            {
+                return Ok(new ResponseApiModel<string>() { Status = EStatusCode.SYSTEM_ERROR, Messenger = UltilsHelper.GetMessageByErrorCode(EStatusCode.SYSTEM_ERROR), DataResponse = ex.ToString() });
+            }
+        }
+        [HttpPost]
+        [Route("LoginGoogleJWT")]
+        [ResponseCache(Duration = 0, Location = ResponseCacheLocation.None, NoStore = true)]
+        public async Task<IActionResult> LoginGoogleJWT(RequestAuthenSocial requestLogin)
+        {
+            if (!AccountUtils.IsLoginRequestTrue(requestLogin))
+            {
+                return Ok(new ResponseApiModel<string>() { Status = EStatusCode.DATA_INVAILD, Messenger = UltilsHelper.GetMessageByErrorCode(EStatusCode.DATA_INVAILD) });
+            }
+            if (!string.IsNullOrEmpty(requestLogin.Email))
+                if (!AccountUtils.IsValidEmail(requestLogin.Email))
+                    return Ok(new ResponseApiModel<string>() { Status = EStatusCode.EMAIL_INVAILD, Messenger = UltilsHelper.GetMessageByErrorCode(EStatusCode.EMAIL_INVAILD) });
+            if (!string.IsNullOrEmpty(requestLogin.PhoneNumber))
+                if (!AccountUtils.IsPhoneNumber(requestLogin.PhoneNumber))
+                    return Ok(new ResponseApiModel<string>() { Status = EStatusCode.PHONE_INVAILD, Messenger = UltilsHelper.GetMessageByErrorCode(EStatusCode.PHONE_INVAILD) });
+            try
+            {
+                var clientInfo = new ClientRequestInfo(Request);
+                //check spam request
+                string key = "SPAM:LOGINGG" + clientInfo.TrueClientIp + "-" + clientInfo.DeviceId;
+                if (RedisGatewayCacheManager.Inst.CheckExistKey(key))
+                    return Ok(new ResponseApiModel<string>() { Status = EStatusCode.TRANSACTION_SPAM, Messenger = UltilsHelper.GetMessageByErrorCode(EStatusCode.TRANSACTION_SPAM) });
+                await RedisGatewayCacheManager.Inst.SaveDataSecond(key, "1", 3).ConfigureAwait(false);
+
+                var facebookUserName = await GoogleHelper.GetGoogleUserNameByJwtAsync(requestLogin.Token);
+                await _logger.LogError("Account-LoginGoogleJWT{}", requestLogin.Token + " - " + facebookUserName).ConfigureAwait(false);
                 var responseCode = -99;
                 if (string.IsNullOrEmpty(facebookUserName))
                     return Ok(new ResponseApiModel<string>() { Status = EStatusCode.SYSTEM_ERROR, Messenger = UltilsHelper.GetMessageByErrorCode(EStatusCode.SYSTEM_ERROR) });
@@ -686,22 +758,8 @@ namespace BookStore.Controllers
                 return Ok(new ResponseApiModel<string>() { Status = accountId, Messenger = UltilsHelper.GetMessageByErrorCode((int)accountId) });
             try
             {
-                string keyRedis = "GetVourcherAccount:" + accountId;
-                string jsonstring = await RedisGatewayCacheManager.Inst.GetDataFromCacheAsync(keyRedis);
-                if (string.IsNullOrEmpty(jsonstring))
-                {
-                    var listModel = StoreUsersSqlInstance.Inst.GetVourcherAccount(accountId, out responseStatus);
-                    if (responseStatus == EStatusCode.SUCCESS)
-                    {
-                        jsonstring = JsonConvert.SerializeObject(listModel);
-                        await RedisGatewayCacheManager.Inst.SaveDataAsync(keyRedis, jsonstring, 1);
-                    }
-                }
-                else
-                {
-                    responseStatus = EStatusCode.SUCCESS;
-                }
-                response = new ResponseApiModel<string>() { Status = responseStatus, Messenger = UltilsHelper.GetMessageByErrorCode(responseStatus), DataResponse = jsonstring };
+                var listModel = StoreUsersSqlInstance.Inst.GetVourcherAccount(accountId, out responseStatus);
+                response = new ResponseApiModel<string>() { Status = responseStatus, Messenger = UltilsHelper.GetMessageByErrorCode(responseStatus), DataResponse = JsonConvert.SerializeObject(listModel) };
             }
             catch (Exception ex)
             {

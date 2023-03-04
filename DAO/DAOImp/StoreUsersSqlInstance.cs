@@ -374,7 +374,7 @@ namespace DAO.DAOImp
             reponseStatus = EStatusCode.DATABASE_ERROR;
             try
             {
-                db = new DBHelper(ConfigDb.StoreBookConnectionString);
+                db = new DBHelper(ConfigDb.StoreUsersConnectionString);
                 var pars = new SqlParameter[2];
                 pars[0] = new SqlParameter("@_AccountId", accountId);
                 pars[1] = new SqlParameter("@_ResponseStatus", SqlDbType.Int) { Direction = ParameterDirection.Output };

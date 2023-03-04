@@ -35,7 +35,7 @@ namespace BookStore.Controllers
         }
 
         [HttpGet]
-        [ResponseCache(Duration = 5)]
+        //[ResponseCache(Duration = 5)]
         [Route("GetUserMail")]
         public async Task<IActionResult> GetUserMail()
         {
@@ -73,13 +73,49 @@ namespace BookStore.Controllers
                 List<MailObject> listMail = JsonConvert.DeserializeObject <List<MailObject>>(valueString);
                 int responseStatus = EStatusCode.DATABASE_ERROR;
                 if (listMail.Exists(x => x.MailId == MailId))
+                {
                     StoreMailSqlInstance.Inst.UpdateReadedMail(MailId, out responseStatus);
+                    if (responseStatus == EStatusCode.SUCCESS)
+                    {
+                        string keyRedis = "CacheMail:" + accountId;
+                        await RedisGatewayCacheManager.Inst.DeleteDataFromCacheAsync(keyRedis).ConfigureAwait(false);
+                    }
+                }
                 response = new ResponseApiModel<string>() { Status = responseStatus, Messenger = UltilsHelper.GetMessageByErrorCode(responseStatus) };
                 await _logger.LogInfo("Account-ReadMail{}", MailId + " - " + accountId + " - " + responseStatus, responseStatus.ToString()).ConfigureAwait(false);
             }
             catch (Exception ex)
             {
                 await _logger.LogError("Account-ReadMail{}", ex.ToString()).ConfigureAwait(false);
+            }
+
+            return Ok(response);
+        }
+        [HttpPost]
+        [Route("ReadAllMail")]
+        public async Task<IActionResult> ReadAllMail()
+        {
+            var response = new ResponseApiModel<string>() { Status = EStatusCode.SYSTEM_ERROR, Messenger = UltilsHelper.GetMessageByErrorCode(EStatusCode.SYSTEM_ERROR) };
+
+            long accountId = await _tokenManager.GetAccountIdByAccessTokenAsync(Request);
+            if (accountId <= 0)
+                return Ok(new ResponseApiModel<string>() { Status = accountId, Messenger = UltilsHelper.GetMessageByErrorCode((int)accountId) });
+            try
+            {
+                int responseStatus = EStatusCode.DATABASE_ERROR;
+                StoreMailSqlInstance.Inst.UpdateReadedAllMail(accountId, out responseStatus);
+                if (responseStatus == EStatusCode.SUCCESS)
+                {
+                    string keyRedis = "CacheMail:" + accountId;
+                    await RedisGatewayCacheManager.Inst.DeleteDataFromCacheAsync(keyRedis).ConfigureAwait(false);
+                }
+                
+                response = new ResponseApiModel<string>() { Status = responseStatus, Messenger = UltilsHelper.GetMessageByErrorCode(responseStatus) };
+                await _logger.LogInfo("Account-ReadAllMail{}", accountId + " - " + responseStatus, responseStatus.ToString()).ConfigureAwait(false);
+            }
+            catch (Exception ex)
+            {
+                await _logger.LogError("Account-ReadAllMail{}", ex.ToString()).ConfigureAwait(false);
             }
 
             return Ok(response);
@@ -129,7 +165,7 @@ namespace BookStore.Controllers
             {
                 var model = StoreMailSqlInstance.Inst.GetMailListByAccountId(accountId);
                 valueString = JsonConvert.SerializeObject(model);
-                await RedisGatewayCacheManager.Inst.SaveDataAsync(keyRedis, valueString, 5);
+                await RedisGatewayCacheManager.Inst.SaveDataAsync(keyRedis, valueString, 1);
             }
             return valueString;
         }
