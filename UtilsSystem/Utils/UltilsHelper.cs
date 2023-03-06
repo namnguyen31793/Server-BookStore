@@ -152,19 +152,19 @@ namespace UtilsSystem.Utils
                     message = "Mail không tồn tại";
                     break;
                 case EStatusCode.BARCODE_EXIST:
-                    message = "Barcode đã tồn tại";
+                    message = "Mã đã tồn tại";
                     break;
                 case EStatusCode.ACOUNT_EXIST_BARCODE:
                     message = "Tài khoản đã tồn tại barcode này.";
                     break;
                 case EStatusCode.BARCODE_NOT_EXIST:
-                    message = "Barcode không tồn tại";
+                    message = "Mã không tồn tại";
                     break;
                 case EStatusCode.ACCOUNT_NOT_ENOUGH_ROLE:
                     message = "Tài khoản không đủ quyền";
                     break;
                 case EStatusCode.ACOUNT_NOT_EXIST_BARCODE:
-                    message = "Tài khoản chwa mua sách này";
+                    message = "Tài khoản chưa mua sách này";
                     break;
                 case EStatusCode.VOURCHER_NAME_ESXIST:
                     message = "Vourcher đã tồn tại";

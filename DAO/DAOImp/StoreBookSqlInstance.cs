@@ -773,7 +773,7 @@ namespace DAO.DAOImp
                 db = new DBHelper(ConfigDb.StoreBookConnectionString);
                 var pars = new SqlParameter[3];
                 pars[0] = new SqlParameter("@_TagName", model.TagName);
-                pars[1] = new SqlParameter("@_LinkIcon", model.ImageLink);
+                pars[1] = new SqlParameter("@_LinkIcon", model.LinkIcon);
                 pars[2] = new SqlParameter("@_ResponseStatus", SqlDbType.Int) { Direction = ParameterDirection.Output };
                 data = db.GetInstanceSP<BookTagModel>("SP_Store_Book_Tag_Add", 4, pars);
                 reponseStatus = Convert.ToInt32(pars[2].Value);
@@ -800,7 +800,7 @@ namespace DAO.DAOImp
                 var pars = new SqlParameter[4];
                 pars[0] = new SqlParameter("@_TagId", model.TagId);
                 pars[1] = new SqlParameter("@_TagName", model.TagName);
-                pars[2] = new SqlParameter("@_LinkIcon", model.ImageLink);
+                pars[2] = new SqlParameter("@_LinkIcon", model.LinkIcon);
                 pars[3] = new SqlParameter("@_ResponseStatus", SqlDbType.Int) { Direction = ParameterDirection.Output };
                 data = db.GetInstanceSP<BookTagModel>("SP_Store_Book_Tag_Update", 4, pars);
                 reponseStatus = Convert.ToInt32(pars[3].Value);
@@ -970,6 +970,183 @@ namespace DAO.DAOImp
                 db?.Close();
             }
             return countLike;
+        }
+        #endregion
+
+        #region Feature book
+        public List<FeaturedBookConfigModel> GetFeatureBookConfig(out int reponseStatus)
+        {
+            DBHelper db = null;
+            List<FeaturedBookConfigModel> modelData = null;
+            reponseStatus = EStatusCode.DATABASE_ERROR;
+            try
+            {
+                db = new DBHelper(ConfigDb.StoreBookConnectionString);
+                var pars = new SqlParameter[1];
+                pars[0] = new SqlParameter("@_ResponseStatus", SqlDbType.Int) { Direction = ParameterDirection.Output };
+                modelData = db.GetListSP<FeaturedBookConfigModel>("SP_Store_Book_Feature_Config_Get", 4, pars);
+                reponseStatus = Convert.ToInt32(pars[0].Value);
+            }
+            catch (Exception exception)
+            {
+                Task.Run(async () => await _logger.LogError("SQL-GetFeatureBookConfig()", exception.ToString()).ConfigureAwait(false));
+            }
+            finally
+            {
+                db?.Close();
+            }
+            return modelData;
+        }
+        public List<FeaturedBookConfigModel> GetFeatureBookConfigAll(out int reponseStatus)
+        {
+            DBHelper db = null;
+            List<FeaturedBookConfigModel> modelData = null;
+            reponseStatus = EStatusCode.DATABASE_ERROR;
+            try
+            {
+                db = new DBHelper(ConfigDb.StoreBookConnectionString);
+                var pars = new SqlParameter[1];
+                pars[0] = new SqlParameter("@_ResponseStatus", SqlDbType.Int) { Direction = ParameterDirection.Output };
+                modelData = db.GetListSP<FeaturedBookConfigModel>("SP_Store_Book_Feature_Config_Get_All", 4, pars);
+                reponseStatus = Convert.ToInt32(pars[0].Value);
+            }
+            catch (Exception exception)
+            {
+                Task.Run(async () => await _logger.LogError("SQL-GetFeatureBookConfigAll()", exception.ToString()).ConfigureAwait(false));
+            }
+            finally
+            {
+                db?.Close();
+            }
+            return modelData;
+        }
+        public FeaturedBookConfigModel AddFeatureBookConfig(FeaturedBookConfigModel model, out int reponseStatus)
+        {
+            DBHelper db = null;
+            FeaturedBookConfigModel data = null;
+            reponseStatus = EStatusCode.DATABASE_ERROR;
+            try
+            {
+                db = new DBHelper(ConfigDb.StoreBookConnectionString);
+                var pars = new SqlParameter[4];
+                pars[0] = new SqlParameter("@_FeatureName", model.FeatureName);
+                pars[1] = new SqlParameter("@_LinkIcon", model.LinkIcon);
+                pars[2] = new SqlParameter("@_Status", model.Status);
+                pars[3] = new SqlParameter("@_ResponseStatus", SqlDbType.Int) { Direction = ParameterDirection.Output };
+                data = db.GetInstanceSP<FeaturedBookConfigModel>("SP_Store_Book_Feature_Config_Add", 4, pars);
+                reponseStatus = Convert.ToInt32(pars[3].Value);
+            }
+            catch (Exception exception)
+            {
+                Task.Run(async () => await _logger.LogError("SQL-AddFeatureBookConfig()", exception.ToString()).ConfigureAwait(false));
+            }
+            finally
+            {
+                db?.Close();
+            }
+            return data;
+        }
+
+        public FeaturedBookConfigModel UpdateFeatureBookConfig(FeaturedBookConfigModel model, out int reponseStatus)
+        {
+            DBHelper db = null;
+            FeaturedBookConfigModel data = null;
+            reponseStatus = EStatusCode.DATABASE_ERROR;
+            try
+            {
+                db = new DBHelper(ConfigDb.StoreBookConnectionString);
+                var pars = new SqlParameter[5];
+                pars[0] = new SqlParameter("@_FeatureType", model.FeatureType);
+                pars[1] = new SqlParameter("@_FeatureName", model.FeatureName);
+                pars[2] = new SqlParameter("@_LinkIcon", model.LinkIcon);
+                pars[3] = new SqlParameter("@_Status", model.Status);
+                pars[4] = new SqlParameter("@_ResponseStatus", SqlDbType.Int) { Direction = ParameterDirection.Output };
+                data = db.GetInstanceSP<FeaturedBookConfigModel>("SP_Store_Book_Feature_Config_Update", 4, pars);
+                reponseStatus = Convert.ToInt32(pars[4].Value);
+            }
+            catch (Exception exception)
+            {
+                Task.Run(async () => await _logger.LogError("SQL-UpdateFeatureBookConfig()", exception.ToString()).ConfigureAwait(false));
+            }
+            finally
+            {
+                db?.Close();
+            }
+            return data;
+        }
+
+        public List<FeaturedBookDataModel> GetFeatureBookData(int featuredType, out int reponseStatus)
+        {
+            DBHelper db = null;
+            List<FeaturedBookDataModel> modelData = null;
+            reponseStatus = EStatusCode.DATABASE_ERROR;
+            try
+            {
+                db = new DBHelper(ConfigDb.StoreBookConnectionString);
+                var pars = new SqlParameter[2];
+                pars[0] = new SqlParameter("@_FeatureType", featuredType);
+                pars[1] = new SqlParameter("@_ResponseStatus", SqlDbType.Int) { Direction = ParameterDirection.Output };
+                modelData = db.GetListSP<FeaturedBookDataModel>("SP_Store_Book_Feature_Data_Get", 4, pars);
+                reponseStatus = Convert.ToInt32(pars[1].Value);
+            }
+            catch (Exception exception)
+            {
+                Task.Run(async () => await _logger.LogError("SQL-GetFeatureBookData()", exception.ToString()).ConfigureAwait(false));
+            }
+            finally
+            {
+                db?.Close();
+            }
+            return modelData;
+        }
+        public FeaturedBookDataModel AddFeatureBookData(int FeatureType, string Barcode, out int reponseStatus)
+        {
+            DBHelper db = null;
+            FeaturedBookDataModel data = null;
+            reponseStatus = EStatusCode.DATABASE_ERROR;
+            try
+            {
+                db = new DBHelper(ConfigDb.StoreBookConnectionString);
+                var pars = new SqlParameter[3];
+                pars[0] = new SqlParameter("@_FeatureType", FeatureType);
+                pars[1] = new SqlParameter("@_Barcode", Barcode);
+                pars[2] = new SqlParameter("@_ResponseStatus", SqlDbType.Int) { Direction = ParameterDirection.Output };
+                data = db.GetInstanceSP<FeaturedBookDataModel>("SP_Store_Book_Feature_Data_Add", 4, pars);
+                reponseStatus = Convert.ToInt32(pars[2].Value);
+            }
+            catch (Exception exception)
+            {
+                Task.Run(async () => await _logger.LogError("SQL-AddFeatureBookData()", exception.ToString()).ConfigureAwait(false));
+            }
+            finally
+            {
+                db?.Close();
+            }
+            return data;
+        }
+
+        public int RemoveFeatureBookData(FeaturedBookDataModel model)
+        {
+            DBHelper db = null;
+            int reponseStatus = EStatusCode.DATABASE_ERROR;
+            try
+            {
+                db = new DBHelper(ConfigDb.StoreBookConnectionString);
+                var pars = new SqlParameter[2];
+                pars[0] = new SqlParameter("@_FeatureId", model.FeatureId);
+                pars[1] = new SqlParameter("@_ResponseStatus", SqlDbType.Int) { Direction = ParameterDirection.Output };
+                db.ExecuteNonQuerySP("SP_Store_Book_Feature_Data_Remove", 4, pars);
+                reponseStatus = Convert.ToInt32(pars[1].Value);
+            }
+            catch (Exception exception)
+            {
+                Task.Run(async () => await _logger.LogError("SQL-AddFeatureBookData()", exception.ToString()).ConfigureAwait(false));
+            }
+            finally
+            {
+                db?.Close();
+            }
+            return reponseStatus;
         }
         #endregion
 

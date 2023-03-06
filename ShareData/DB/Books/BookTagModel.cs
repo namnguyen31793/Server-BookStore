@@ -8,6 +8,6 @@ namespace ShareData.DB.Books
     {
         public int TagId { get; set; }
         public string TagName { get; set; }
-        public string ImageLink { get; set; } //img icon
+        public string LinkIcon { get; set; } //img icon
     }
 }

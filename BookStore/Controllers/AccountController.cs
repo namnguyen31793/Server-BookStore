@@ -615,11 +615,13 @@ namespace BookStore.Controllers
                     //update vip value
                     string rewardLevelUp = "";
                     var responseStatusMail = StoreMemberSqlInstance.Inst.IncPointAccountByBook(accountId, (long)(point/1000), out curentPoint, out curentVip, out isNextLevel, out vipName, out rewardLevelUp);
-                    //if (isNextLevel) {
-                    //    string mailHeader = "Chúc mừng bạn lên hạng!";
-                    //    string mailContent = "Tặng bạn phần quà là vourcher "+ rewardLevelUp;
-                    //    var mail = StoreMailSqlInstance.Inst.SendMail(accountId, "admin", mailHeader, mailContent, out responseStatusMail);
-                    //}
+                    if (isNextLevel) {
+                        keyRedis = "CacheMail:" + accountId;
+                        await RedisGatewayCacheManager.Inst.DeleteDataFromCacheAsync(keyRedis).ConfigureAwait(false);
+                        //    string mailHeader = "Chúc mừng bạn lên hạng!";
+                        //    string mailContent = "Tặng bạn phần quà là vourcher "+ rewardLevelUp;
+                        //    var mail = StoreMailSqlInstance.Inst.SendMail(accountId, "admin", mailHeader, mailContent, out responseStatusMail);
+                    }
                     await _logger.LogBuyBook("Account-BuyBook{}", accountId, barcode, point).ConfigureAwait(false);
 
                 }

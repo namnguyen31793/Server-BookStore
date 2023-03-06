@@ -466,5 +466,74 @@ namespace BookStore.Controllers
             }
             return Ok(response);
         }
+
+        #region Feature book 
+        [HttpGet]
+        [Route("GetFeaturedBookConfig")]
+        //[ResponseCache(Duration = 10)]
+        public async Task<IActionResult> GetFeaturedBookConfig()
+        {
+            var response = new ResponseApiModel<string>() { Status = EStatusCode.SYSTEM_ERROR, Messenger = UltilsHelper.GetMessageByErrorCode(EStatusCode.SYSTEM_ERROR) };
+            int responseStatus = EStatusCode.DATABASE_ERROR;
+            try
+            {
+                string keyRedis = "FeaturedBookConfig" ;
+                string jsonTag = await RedisGatewayCacheManager.Inst.GetDataFromCacheAsync(keyRedis);
+                if (string.IsNullOrEmpty(jsonTag))
+                {
+                    var bookConfig = StoreBookSqlInstance.Inst.GetFeatureBookConfig(out responseStatus);
+                    if (responseStatus == EStatusCode.SUCCESS)
+                    {
+                        jsonTag = JsonConvert.SerializeObject(bookConfig);
+                        await RedisGatewayCacheManager.Inst.SaveDataAsync(keyRedis, jsonTag, 5);
+                    }
+                }
+                else
+                {
+                    responseStatus = EStatusCode.SUCCESS;
+                }
+                response = new ResponseApiModel<string>() { Status = responseStatus, Messenger = UltilsHelper.GetMessageByErrorCode(responseStatus), DataResponse = jsonTag };
+            }
+            catch (Exception ex)
+            {
+                await _logger.LogError("Books-UpdateAuthorConfig{}", ex.ToString()).ConfigureAwait(false);
+            }
+            return Ok(response);
+        }
+
+        [HttpGet]
+        [Route("GetFeaturedBookData")]
+        //[ResponseCache(Duration = 10)]
+        public async Task<IActionResult> GetFeaturedBookData(int FeatureType)
+        {
+            var response = new ResponseApiModel<string>() { Status = EStatusCode.SYSTEM_ERROR, Messenger = UltilsHelper.GetMessageByErrorCode(EStatusCode.SYSTEM_ERROR) };
+            int responseStatus = EStatusCode.DATABASE_ERROR;
+            try
+            {
+                string keyRedis = "GetFeaturedBookData:"+ FeatureType;
+                string jsonTag = await RedisGatewayCacheManager.Inst.GetDataFromCacheAsync(keyRedis);
+                if (string.IsNullOrEmpty(jsonTag))
+                {
+                    var bookData = StoreBookSqlInstance.Inst.GetFeatureBookData(FeatureType, out responseStatus);
+                    if (responseStatus == EStatusCode.SUCCESS)
+                    {
+                        jsonTag = JsonConvert.SerializeObject(bookData);
+                        await RedisGatewayCacheManager.Inst.SaveDataAsync(keyRedis, jsonTag, 5);
+                    }
+                }
+                else
+                {
+                    responseStatus = EStatusCode.SUCCESS;
+                }
+                response = new ResponseApiModel<string>() { Status = responseStatus, Messenger = UltilsHelper.GetMessageByErrorCode(responseStatus), DataResponse = jsonTag };
+            }
+            catch (Exception ex)
+            {
+                await _logger.LogError("Books-GetFeaturedBookData{}", ex.ToString()).ConfigureAwait(false);
+            }
+            return Ok(response);
+        }
+
+        #endregion
     }
 }

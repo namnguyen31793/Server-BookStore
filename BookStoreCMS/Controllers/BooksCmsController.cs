@@ -200,9 +200,9 @@ namespace BookStoreCMS.Controllers
             int responseStatus = EStatusCode.DATABASE_ERROR;
             try
             {
-                    var tagModel = StoreBookSqlInstance.Inst.UpdateTagConfig(data, out responseStatus);
-                    response = new ResponseApiModel<string>() { Status = responseStatus, Messenger = UltilsHelper.GetMessageByErrorCode(responseStatus), DataResponse = JsonConvert.SerializeObject(tagModel) };
-             }
+                var tagModel = StoreBookSqlInstance.Inst.UpdateTagConfig(data, out responseStatus);
+                response = new ResponseApiModel<string>() { Status = responseStatus, Messenger = UltilsHelper.GetMessageByErrorCode(responseStatus), DataResponse = JsonConvert.SerializeObject(tagModel) };
+            }
             catch (Exception ex)
             {
                 await _logger.LogError("Books-AddColor{}", ex.ToString()).ConfigureAwait(false);
@@ -316,7 +316,7 @@ namespace BookStoreCMS.Controllers
             }
             catch (Exception ex)
             {
-                await _logger.LogError("Books-UpdateAuthorConfig{}", ex.ToString()).ConfigureAwait(false);
+                await _logger.LogError("Books-AddBook{}", ex.ToString()).ConfigureAwait(false);
             }
             return Ok(response);
         }
@@ -337,7 +337,7 @@ namespace BookStoreCMS.Controllers
             }
             catch (Exception ex)
             {
-                await _logger.LogError("Books-UpdateAuthorConfig{}", ex.ToString()).ConfigureAwait(false);
+                await _logger.LogError("Books-UpdateBook{}", ex.ToString()).ConfigureAwait(false);
             }
             return Ok(response);
         }
@@ -358,7 +358,7 @@ namespace BookStoreCMS.Controllers
             }
             catch (Exception ex)
             {
-                await _logger.LogError("Books-UpdateAuthorConfig{}", ex.ToString()).ConfigureAwait(false);
+                await _logger.LogError("Books-GetBook{}", ex.ToString()).ConfigureAwait(false);
             }
             return Ok(response);
         }
@@ -380,7 +380,148 @@ namespace BookStoreCMS.Controllers
             }
             catch (Exception ex)
             {
+                await _logger.LogError("Books-GetBooks{}", ex.ToString()).ConfigureAwait(false);
+            }
+            return Ok(response);
+        }
+        #endregion
+
+        #region Feature book 
+        [HttpGet]
+        [Route("GetFeaturedBookConfig")]
+        public async Task<IActionResult> GetFeaturedBookConfig()
+        {
+            var response = new ResponseApiModel<string>() { Status = EStatusCode.SYSTEM_ERROR, Messenger = UltilsHelper.GetMessageByErrorCode(EStatusCode.SYSTEM_ERROR) };
+            int responseStatus = EStatusCode.DATABASE_ERROR;
+            try
+            {
+                var bookConfig = StoreBookSqlInstance.Inst.GetFeatureBookConfigAll(out responseStatus);
+                response = new ResponseApiModel<string>() { Status = responseStatus, Messenger = UltilsHelper.GetMessageByErrorCode(responseStatus), DataResponse = JsonConvert.SerializeObject(bookConfig) };
+            }
+            catch (Exception ex)
+            {
                 await _logger.LogError("Books-UpdateAuthorConfig{}", ex.ToString()).ConfigureAwait(false);
+            }
+            return Ok(response);
+        }
+        [HttpPost]
+        [Route("AddFeaturedBookConfig")]
+        public async Task<IActionResult> AddFeaturedBookConfig(FeaturedBookConfigModel model)
+        {
+            int checkRole = await _tokenManager.CheckRoleActionAsync(ERole.Administrator, Request);
+            if (checkRole < 0)
+                return Ok(new ResponseApiModel<string>() { Status = checkRole, Messenger = UltilsHelper.GetMessageByErrorCode(checkRole) });
+            var response = new ResponseApiModel<string>() { Status = EStatusCode.SYSTEM_ERROR, Messenger = UltilsHelper.GetMessageByErrorCode(EStatusCode.SYSTEM_ERROR) };
+            int responseStatus = EStatusCode.DATABASE_ERROR;
+            try
+            {
+                var bookConfig = StoreBookSqlInstance.Inst.AddFeatureBookConfig(model, out responseStatus);
+                if (responseStatus == EStatusCode.SUCCESS)
+                {
+                    string keyRedis = "FeaturedBookConfig";
+                    await RedisGatewayCacheManager.Inst.DeleteDataFromCacheAsync(keyRedis);
+                }
+                response = new ResponseApiModel<string>() { Status = responseStatus, Messenger = UltilsHelper.GetMessageByErrorCode(responseStatus), DataResponse = JsonConvert.SerializeObject(bookConfig) };
+            }
+            catch (Exception ex)
+            {
+                await _logger.LogError("Books-AddFeaturedBookConfig{}", ex.ToString()).ConfigureAwait(false);
+            }
+            return Ok(response);
+        }
+
+        [HttpPost]
+        [Route("UpdateFeaturedBookConfig")]
+        public async Task<IActionResult> UpdateFeaturedBookConfig(FeaturedBookConfigModel model)
+        {
+            int checkRole = await _tokenManager.CheckRoleActionAsync(ERole.Administrator, Request);
+            if (checkRole < 0)
+                return Ok(new ResponseApiModel<string>() { Status = checkRole, Messenger = UltilsHelper.GetMessageByErrorCode(checkRole) });
+            var response = new ResponseApiModel<string>() { Status = EStatusCode.SYSTEM_ERROR, Messenger = UltilsHelper.GetMessageByErrorCode(EStatusCode.SYSTEM_ERROR) };
+            int responseStatus = EStatusCode.DATABASE_ERROR;
+            try
+            {
+                var book = StoreBookSqlInstance.Inst.UpdateFeatureBookConfig(model, out responseStatus);
+                if (responseStatus == EStatusCode.SUCCESS)
+                {
+                    string keyRedis = "FeaturedBookConfig";
+                    await RedisGatewayCacheManager.Inst.DeleteDataFromCacheAsync(keyRedis);
+                }
+                response = new ResponseApiModel<string>() { Status = responseStatus, Messenger = UltilsHelper.GetMessageByErrorCode(responseStatus), DataResponse = JsonConvert.SerializeObject(book) };
+            }
+            catch (Exception ex)
+            {
+                await _logger.LogError("Books-UpdateFeaturedBookConfig{}", ex.ToString()).ConfigureAwait(false);
+            }
+            return Ok(response);
+        }
+
+        [HttpGet]
+        [Route("GetFeaturedBookData")]
+        //[ResponseCache(Duration = 10)]
+        public async Task<IActionResult> GetFeaturedBookData(int FeatureType)
+        {
+            var response = new ResponseApiModel<string>() { Status = EStatusCode.SYSTEM_ERROR, Messenger = UltilsHelper.GetMessageByErrorCode(EStatusCode.SYSTEM_ERROR) };
+            int responseStatus = EStatusCode.DATABASE_ERROR;
+            try
+            {
+                var bookData = StoreBookSqlInstance.Inst.GetFeatureBookData(FeatureType, out responseStatus);
+                response = new ResponseApiModel<string>() { Status = responseStatus, Messenger = UltilsHelper.GetMessageByErrorCode(responseStatus), DataResponse = JsonConvert.SerializeObject(bookData) };
+            }
+            catch (Exception ex)
+            {
+                await _logger.LogError("Books-GetFeaturedBookData{}", ex.ToString()).ConfigureAwait(false);
+            }
+            return Ok(response);
+        }
+
+        [HttpPost]
+        [Route("AddFeaturedBookData")]
+        public async Task<IActionResult> AddFeaturedBookData(int FeatureType, string Barcode)
+        {
+            int checkRole = await _tokenManager.CheckRoleActionAsync(ERole.Administrator, Request);
+            if (checkRole < 0)
+                return Ok(new ResponseApiModel<string>() { Status = checkRole, Messenger = UltilsHelper.GetMessageByErrorCode(checkRole) });
+            var response = new ResponseApiModel<string>() { Status = EStatusCode.SYSTEM_ERROR, Messenger = UltilsHelper.GetMessageByErrorCode(EStatusCode.SYSTEM_ERROR) };
+            int responseStatus = EStatusCode.DATABASE_ERROR;
+            try
+            {
+                var bookConfig = StoreBookSqlInstance.Inst.AddFeatureBookData(FeatureType, Barcode, out responseStatus);
+                if (responseStatus == EStatusCode.SUCCESS)
+                {
+                    string keyRedis = "GetFeaturedBookData:" + FeatureType;
+                    await RedisGatewayCacheManager.Inst.DeleteArrayKeyAsync(keyRedis);
+                }
+                response = new ResponseApiModel<string>() { Status = responseStatus, Messenger = UltilsHelper.GetMessageByErrorCode(responseStatus), DataResponse = JsonConvert.SerializeObject(bookConfig) };
+            }
+            catch (Exception ex)
+            {
+                await _logger.LogError("Books-AddFeaturedBookConfig{}", ex.ToString()).ConfigureAwait(false);
+            }
+            return Ok(response);
+        }
+
+        [HttpPost]
+        [Route("RemoveFeaturedBookData")]
+        public async Task<IActionResult> RemoveFeaturedBookData(FeaturedBookDataModel model)
+        {
+            int checkRole = await _tokenManager.CheckRoleActionAsync(ERole.Administrator, Request);
+            if (checkRole < 0)
+                return Ok(new ResponseApiModel<string>() { Status = checkRole, Messenger = UltilsHelper.GetMessageByErrorCode(checkRole) });
+            var response = new ResponseApiModel<string>() { Status = EStatusCode.SYSTEM_ERROR, Messenger = UltilsHelper.GetMessageByErrorCode(EStatusCode.SYSTEM_ERROR) };
+            try
+            {
+                int responseStatus = StoreBookSqlInstance.Inst.RemoveFeatureBookData(model);
+                if (responseStatus == EStatusCode.SUCCESS)
+                {
+                    string keyRedis = "GetFeaturedBookData:" + model.FeatureType;
+                    await RedisGatewayCacheManager.Inst.DeleteArrayKeyAsync(keyRedis);
+                }
+                response = new ResponseApiModel<string>() { Status = responseStatus, Messenger = UltilsHelper.GetMessageByErrorCode(responseStatus)};
+            }
+            catch (Exception ex)
+            {
+                await _logger.LogError("Books-RemoveFeaturedBookData{}", ex.ToString()).ConfigureAwait(false);
             }
             return Ok(response);
         }
