@@ -10,5 +10,6 @@ namespace ShareData.DB.Books
         public string ImageLink { get; set; }
         public string BookName { get; set; }
         public string Tags { get; set; }
+        public int ColorId { get; set; }
     }
 }

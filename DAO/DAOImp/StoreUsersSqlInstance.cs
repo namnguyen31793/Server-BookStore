@@ -212,14 +212,14 @@ namespace DAO.DAOImp
             }
             return response;
         }
-        public AccountModelDb UpdateInfo(long AccountId, string NickName, string AvataId, string PhoneNumber, string BirthDay, string Adress, ref int responseStatus)
+        public AccountModelDb UpdateInfo(long AccountId, string NickName, string AvataId, string PhoneNumber, DateTime BirthDay, string Adress, ref int responseStatus)
         {
             DBHelper db = null;
             var response = new AccountModelDb();
             if (string.IsNullOrEmpty(NickName)) NickName = "";
             if (string.IsNullOrEmpty(AvataId)) AvataId = "";
             if (string.IsNullOrEmpty(PhoneNumber)) PhoneNumber = "";
-            if (string.IsNullOrEmpty(BirthDay)) BirthDay = "";
+            if (BirthDay == null) BirthDay = DateTime.Now;
             if (string.IsNullOrEmpty(Adress)) Adress = "";
             try
             {

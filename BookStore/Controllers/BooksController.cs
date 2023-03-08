@@ -335,6 +335,41 @@ namespace BookStore.Controllers
             }
             return Ok(response);
         }
+
+        [HttpGet]
+        [Route("GetAllTag")]
+        [ResponseCache(Duration = 60)]
+        public async Task<IActionResult> GetAllTag()
+        {
+            var response = new ResponseApiModel<string>() { Status = EStatusCode.SYSTEM_ERROR, Messenger = UltilsHelper.GetMessageByErrorCode(EStatusCode.SYSTEM_ERROR) };
+            int responseStatus = EStatusCode.DATABASE_ERROR;
+            try
+            {
+                string keyRedis = "CacheAllTag";
+                string jsonListSimpleBook = await RedisGatewayCacheManager.Inst.GetDataFromCacheAsync(keyRedis);
+                if (string.IsNullOrEmpty(jsonListSimpleBook))
+                {
+                    var listBook = StoreBookSqlInstance.Inst.GetAllTagConfig(out responseStatus);
+                    if (responseStatus == EStatusCode.SUCCESS)
+                    {
+                        jsonListSimpleBook = JsonConvert.SerializeObject(listBook);
+                        await RedisGatewayCacheManager.Inst.SaveDataAsync(keyRedis, jsonListSimpleBook, 10);
+                    }
+                }
+                else
+                {
+                    responseStatus = EStatusCode.SUCCESS;
+                }
+                response = new ResponseApiModel<string>() { Status = responseStatus, Messenger = UltilsHelper.GetMessageByErrorCode(responseStatus), DataResponse = jsonListSimpleBook };
+
+            }
+            catch (Exception ex)
+            {
+                await _logger.LogError("Books-GetAllTag{}", ex.ToString()).ConfigureAwait(false);
+            }
+            return Ok(response);
+        }
+
         [HttpGet]
         [Route("GetListSimpleBookbyTag")]
         [ResponseCache(Duration = 60)]

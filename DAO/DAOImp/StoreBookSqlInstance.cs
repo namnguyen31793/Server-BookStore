@@ -254,7 +254,7 @@ namespace DAO.DAOImp
             {
                 db = new DBHelper(ConfigDb.StoreBookConnectionString);
                 var pars = new SqlParameter[4];
-                pars[0] = new SqlParameter("@_BookName", Tag);
+                pars[0] = new SqlParameter("@_Tag", Tag);
                 pars[1] = new SqlParameter("@_Index", page);
                 pars[2] = new SqlParameter("@_NUMBER_GET", row);
                 pars[3] = new SqlParameter("@_ResponseStatus", SqlDbType.Int) { Direction = ParameterDirection.Output };
