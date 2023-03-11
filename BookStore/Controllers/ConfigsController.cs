@@ -1,4 +1,5 @@
-﻿using BookStore.Utils;
+﻿using BookStore.Interfaces;
+using BookStore.Utils;
 using DAO.DAOImp;
 using LoggerService;
 using Microsoft.AspNetCore.Http;
@@ -22,9 +23,11 @@ namespace BookStore.Controllers
     {
 
         private ILoggerManager _logger;
-        public ConfigsController(ILoggerManager logger)
+        private ITokenManager _tokenManager;
+        public ConfigsController(ILoggerManager logger, ITokenManager token)
         {
             _logger = logger;
+            _tokenManager = token;
         }
 
         [HttpGet]
@@ -78,6 +81,18 @@ namespace BookStore.Controllers
                 await _logger.LogError("Configs-GetCcu{}", ex.ToString()).ConfigureAwait(false);
             }
             return Ok(response);
+        }
+
+        [HttpPost]
+        [Route("UploadAvata")]
+        [RequestSizeLimit(5*1024*1024)]
+        public async Task<IActionResult> UploadAvata(IFormFile file)
+        {
+            long accountId = await _tokenManager.GetAccountIdByAccessTokenAsync(Request);
+            if (accountId <= 0)
+                return Ok(new ResponseApiModel<string>() { Status = accountId, Messenger = UltilsHelper.GetMessageByErrorCode((int)accountId) });
+
+            return Ok();
         }
     }
 }

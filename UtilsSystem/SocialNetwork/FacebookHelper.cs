@@ -45,9 +45,19 @@ namespace UtilsSystem.SocialNetwork
             return string.Empty;
         }
 
+        public static async Task<TokenFbModel> GetFacebookModelAsync(string facebookToken)
+        {
+            //lay rieng
+            var facebookAccountId = await GetFacebookUserIdAsync(facebookToken);
+            var modelToken = JsonConvert.DeserializeObject<TokenFbModel>(facebookAccountId);
+            if (modelToken != null)
+                return modelToken;
+            return null;
+        }
+
         //public static string GetFacebookUserNam
 
-        public static string GetFacebookPassword(string userName)
+        public static string GetMd5Password(string userName)
         {
             var password = userName + "Facebook@";
             return password;

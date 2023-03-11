@@ -37,6 +37,15 @@ namespace UtilsSystem.SocialNetwork
                 return "GG_" + modelToken.sub;
             return string.Empty;
         }
+        public static async Task<TokenGoogleModel> GetGoogleModelAsync(string access_token)
+        {
+            //lay rieng
+            var ggAccountId = await GetGoogleUserIdAsync(access_token);
+            var modelToken = JsonConvert.DeserializeObject<TokenGoogleModel>(ggAccountId);
+            if (modelToken != null && !string.IsNullOrEmpty(modelToken.sub))
+                return modelToken;
+            return null;
+        }
         public static async Task<string> GetGoogleUserIdByJwtAsync(string Jwt)
         {
             var cancellationTokenSource = new CancellationTokenSource();
@@ -66,6 +75,15 @@ namespace UtilsSystem.SocialNetwork
                 return "GG_" + modelToken.sub;
             return string.Empty;
         }
+        public static async Task<TokenGoogleModel2> GetGoogleModelByJwtAsync(string jwt)
+        {
+            //lay rieng
+            var ggAccountId = await GetGoogleUserIdByJwtAsync(jwt);
+            var modelToken = JsonConvert.DeserializeObject<TokenGoogleModel2>(ggAccountId);
+            if (modelToken != null && !string.IsNullOrEmpty(modelToken.sub))
+                return modelToken;
+            return null;
+        }
     }
     public class TokenGoogleModel
     {
@@ -75,6 +93,7 @@ namespace UtilsSystem.SocialNetwork
         public string family_name { get; set; }
         public string email { get; set; }
         public string locale { get; set; }
+        public string picture { get; set; }
     }
     public class TokenGoogleModel2
     {

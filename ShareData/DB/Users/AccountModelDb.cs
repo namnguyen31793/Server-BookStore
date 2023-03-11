@@ -20,6 +20,7 @@ namespace ShareData.DB.Users
         public string Email { get; set; }
         public DateTime BirthDay { get; set; }
         public string Adress { get; set; }
+        public bool? Sex { get; set; }
     }
 
     public class AccountModel
@@ -32,6 +33,7 @@ namespace ShareData.DB.Users
         public string Email { get; set; }
         public DateTime BirthDay { get; set; }
         public string Adress { get; set; }
+        public bool? Sex { get; set; }
         public AccountModel() {
         }
         public AccountModel(AccountModelDb model) {
@@ -43,6 +45,7 @@ namespace ShareData.DB.Users
             Email = model.Email;
             BirthDay = model.BirthDay;
             Adress = model.Adress;
+            Sex = model.Sex;
         }
     }
 }

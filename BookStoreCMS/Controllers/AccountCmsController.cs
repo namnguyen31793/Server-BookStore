@@ -76,7 +76,7 @@ namespace BookStoreCMS.Controllers
             var facebookUserName = await FacebookHelper.GetFacebookUserNameAsync(requestLogin.Token);
             if (string.IsNullOrEmpty(facebookUserName))
                 return Ok(new ResponseApiModel<string>() { Status = EStatusCode.SYSTEM_ERROR, Messenger = UltilsHelper.GetMessageByErrorCode(EStatusCode.SYSTEM_ERROR) });
-            var fbPassword = FacebookHelper.GetFacebookPassword(facebookUserName);
+            var fbPassword = FacebookHelper.GetMd5Password(facebookUserName);
             var passMd5 = AccountUtils.EncryptPasswordMd5(fbPassword);
 
             RequestAuthenModel request = new RequestAuthenModel()

@@ -69,18 +69,19 @@ namespace DAO.DAOImp
             return accountId;
         }
 
-        public int Register(int registerType, string accountName, string nickName, string passwordMd5, int merchantId, string remoteIp, string deviceId, int platfromId, string phoneNumber, string email, out int accountId)
+        public int Register(int registerType, string accountName, string nickName, string passwordMd5, int merchantId, string remoteIp, string deviceId, int platfromId, string phoneNumber, string email, string avata, out int accountId)
         {
             if (string.IsNullOrEmpty(deviceId)) deviceId = "Webgl";
             if (string.IsNullOrEmpty(phoneNumber)) phoneNumber = "";
             if (string.IsNullOrEmpty(email)) email = "";
+            if (string.IsNullOrEmpty(avata)) avata = "";
             DBHelper db = null;
             var response = -9999;
             accountId = 0;
             try
             {
                 db = new DBHelper(ConfigDb.StoreUsersConnectionString);
-                var pars = new SqlParameter[12];
+                var pars = new SqlParameter[13];
                 pars[0] = new SqlParameter("@_RegisterType", registerType);
                 pars[1] = new SqlParameter("@_UserName", accountName);
                 pars[2] = new SqlParameter("@_NickName", nickName);
@@ -91,11 +92,12 @@ namespace DAO.DAOImp
                 pars[7] = new SqlParameter("@_PlatformId", platfromId);
                 pars[8] = new SqlParameter("@_PhoneNumber", phoneNumber);
                 pars[9] = new SqlParameter("@_Email", email);
-                pars[10] = new SqlParameter("@_AccountId", SqlDbType.BigInt) { Direction = ParameterDirection.Output };
-                pars[11] = new SqlParameter("@_ResponseStatus", SqlDbType.BigInt) { Direction = ParameterDirection.Output };
+                pars[10] = new SqlParameter("@_Avata", avata);
+                pars[11] = new SqlParameter("@_AccountId", SqlDbType.BigInt) { Direction = ParameterDirection.Output };
+                pars[12] = new SqlParameter("@_ResponseStatus", SqlDbType.BigInt) { Direction = ParameterDirection.Output };
                 db.ExecuteNonQuerySP("SP_Store_Users_Register", 4, pars);
-                response = Convert.ToInt32(pars[11].Value);
-                accountId = Convert.ToInt32(pars[10].Value);
+                response = Convert.ToInt32(pars[12].Value);
+                accountId = Convert.ToInt32(pars[11].Value);
             }
             catch (Exception exception)
             {
@@ -198,8 +200,7 @@ namespace DAO.DAOImp
                 pars[0] = new SqlParameter("@_AccountId", AccountId);
                 pars[1] = new SqlParameter("@_Email", email);
                 pars[2] = new SqlParameter("@_ResponseStatus", SqlDbType.BigInt) { Direction = ParameterDirection.Output };
-                db.ExecuteNonQuerySP("SP_Store_Users_CheckRefreshToken", 4, pars);
-                response = db.GetInstanceSP<AccountModelDb>("SP_Store_Users_CheckRefreshToken", 4, pars);
+                response = db.GetInstanceSP<AccountModelDb>("SP_Store_Users_Update_UserInfoMail", 4, pars);
                 responseStatus = Convert.ToInt32(pars[2].Value);
             }
             catch (Exception exception)
@@ -212,28 +213,28 @@ namespace DAO.DAOImp
             }
             return response;
         }
-        public AccountModelDb UpdateInfo(long AccountId, string NickName, string AvataId, string PhoneNumber, DateTime BirthDay, string Adress, ref int responseStatus)
+        public AccountModelDb UpdateInfo(long AccountId, string NickName, string PhoneNumber, DateTime BirthDay, string Adress, bool Sex, string AvataLink, ref int responseStatus)
         {
             DBHelper db = null;
             var response = new AccountModelDb();
             if (string.IsNullOrEmpty(NickName)) NickName = "";
-            if (string.IsNullOrEmpty(AvataId)) AvataId = "";
             if (string.IsNullOrEmpty(PhoneNumber)) PhoneNumber = "";
             if (BirthDay == null) BirthDay = DateTime.Now;
             if (string.IsNullOrEmpty(Adress)) Adress = "";
             try
             {
                 db = new DBHelper(ConfigDb.StoreUsersConnectionString);
-                var pars = new SqlParameter[7];
+                var pars = new SqlParameter[8];
                 pars[0] = new SqlParameter("@_AccountId", AccountId);
                 pars[1] = new SqlParameter("@_Nickname", NickName);
-                pars[2] = new SqlParameter("@_AvatarId", AvataId);
-                pars[3] = new SqlParameter("@_PhoneNumber", PhoneNumber);
-                pars[4] = new SqlParameter("@_BirthDay", BirthDay);
-                pars[5] = new SqlParameter("@_Adress", Adress);
-                pars[6] = new SqlParameter("@_ResponseStatus", SqlDbType.BigInt) { Direction = ParameterDirection.Output };
+                pars[2] = new SqlParameter("@_PhoneNumber", PhoneNumber);
+                pars[3] = new SqlParameter("@_BirthDay", BirthDay);
+                pars[4] = new SqlParameter("@_Adress", Adress);
+                pars[5] = new SqlParameter("@_Avata", AvataLink);
+                pars[6] = new SqlParameter("@_Sex", Sex);
+                pars[7] = new SqlParameter("@_ResponseStatus", SqlDbType.BigInt) { Direction = ParameterDirection.Output };
                 response = db.GetInstanceSP<AccountModelDb>("SP_Store_Users_Update_UserInfo", 4, pars);
-                responseStatus = Convert.ToInt32(pars[6].Value);
+                responseStatus = Convert.ToInt32(pars[7].Value);
             }
             catch (Exception exception)
             {

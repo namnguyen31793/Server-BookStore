@@ -88,24 +88,29 @@ namespace BookStore.Controllers
                 string key = "SPAM:LOGINGG" + clientInfo.TrueClientIp + "-" + clientInfo.DeviceId;
                 if (RedisGatewayCacheManager.Inst.CheckExistKey(key))
                     return Ok(new ResponseApiModel<string>() { Status = EStatusCode.TRANSACTION_SPAM, Messenger = UltilsHelper.GetMessageByErrorCode(EStatusCode.TRANSACTION_SPAM) });
-                await RedisGatewayCacheManager.Inst.SaveDataSecond(key, "1", 3).ConfigureAwait(false);
 
-                var facebookUserName = await GoogleHelper.GetGoogleUserNameAsync(requestLogin.Token);
-                await _logger.LogError("Account-LoginGoogle{}", requestLogin.Token+" - "+ facebookUserName).ConfigureAwait(false);
+                await RedisGatewayCacheManager.Inst.SaveDataSecond(key, "1", 3).ConfigureAwait(false);
+                var googleUserName = "";
+                var googleModel = await GoogleHelper.GetGoogleModelAsync(requestLogin.Token);
                 var responseCode = -99;
-                if (string.IsNullOrEmpty(facebookUserName))
+                if (googleModel == null)
                     return Ok(new ResponseApiModel<string>() { Status = EStatusCode.SYSTEM_ERROR, Messenger = UltilsHelper.GetMessageByErrorCode(EStatusCode.SYSTEM_ERROR) });
-                var fbPassword = FacebookHelper.GetFacebookPassword(facebookUserName);
-                var passMd5 = AccountUtils.EncryptPasswordMd5(fbPassword);
+                googleUserName = "GG_" + googleModel.sub;
+                //var facebookUserName = await GoogleHelper.GetGoogleUserNameAsync(requestLogin.Token);
+                //var responseCode = -99;
+                //if (string.IsNullOrEmpty(facebookUserName))
+                //    return Ok(new ResponseApiModel<string>() { Status = EStatusCode.SYSTEM_ERROR, Messenger = UltilsHelper.GetMessageByErrorCode(EStatusCode.SYSTEM_ERROR) });
+                var ggPassword = FacebookHelper.GetMd5Password(googleUserName);
+                var passMd5 = AccountUtils.EncryptPasswordMd5(ggPassword);
                 responseCode = await Task.Run(async () =>
                 {
                     int accountId = 0;
-                    var res = StoreUsersSqlInstance.Inst.Register(REGISTER_TYPE.FACEBOOK_TYPE, facebookUserName, requestLogin.NickName, passMd5, clientInfo.MerchantId, clientInfo.TrueClientIp, clientInfo.DeviceId, (int)clientInfo.OsType,
-                        requestLogin.PhoneNumber, requestLogin.Email, out accountId);
+                    var res = StoreUsersSqlInstance.Inst.Register(REGISTER_TYPE.GOOGLE_TYPE, googleUserName, requestLogin.NickName, passMd5, clientInfo.MerchantId, clientInfo.TrueClientIp, clientInfo.DeviceId, (int)clientInfo.OsType,
+                        requestLogin.PhoneNumber, requestLogin.Email, googleModel.picture, out accountId);
 
                     if (responseCode == (int)EStatusCode.SUCCESS)
                     {
-                        await _logger.LogInfo("Account-LoginGoogle{}", facebookUserName + " " + res, res.ToString()).ConfigureAwait(false);
+                        await _logger.LogInfo("Account-LoginGoogle{}", googleUserName + " " + res, res.ToString()).ConfigureAwait(false);
                         MailInstance.Inst.SendMailRegis(accountId);
                         if (AccountUtils.IsValidEmail(requestLogin.Email))
                             await SendMailAsync(requestLogin.Email, accountId).ConfigureAwait(false);
@@ -122,8 +127,8 @@ namespace BookStore.Controllers
                     //do login
                     RequestAuthenModel request = new RequestAuthenModel()
                     {
-                        AccountName = facebookUserName,
-                        Password = fbPassword,
+                        AccountName = googleUserName,
+                        Password = ggPassword,
                     };
                     var response = await LoginAsync(request, clientInfo);
                     return Ok(response);
@@ -162,22 +167,23 @@ namespace BookStore.Controllers
                     return Ok(new ResponseApiModel<string>() { Status = EStatusCode.TRANSACTION_SPAM, Messenger = UltilsHelper.GetMessageByErrorCode(EStatusCode.TRANSACTION_SPAM) });
                 await RedisGatewayCacheManager.Inst.SaveDataSecond(key, "1", 3).ConfigureAwait(false);
 
-                var facebookUserName = await GoogleHelper.GetGoogleUserNameByJwtAsync(requestLogin.Token);
-                await _logger.LogError("Account-LoginGoogleJWT{}", requestLogin.Token + " - " + facebookUserName).ConfigureAwait(false);
+                var googleUserName = "";
+                var googleModel = await GoogleHelper.GetGoogleModelByJwtAsync(requestLogin.Token); 
                 var responseCode = -99;
-                if (string.IsNullOrEmpty(facebookUserName))
+                if (googleModel == null)
                     return Ok(new ResponseApiModel<string>() { Status = EStatusCode.SYSTEM_ERROR, Messenger = UltilsHelper.GetMessageByErrorCode(EStatusCode.SYSTEM_ERROR) });
-                var fbPassword = FacebookHelper.GetFacebookPassword(facebookUserName);
+                googleUserName = "GG_" + googleModel.sub;
+                var fbPassword = FacebookHelper.GetMd5Password(googleUserName);
                 var passMd5 = AccountUtils.EncryptPasswordMd5(fbPassword);
                 responseCode = await Task.Run(async () =>
                 {
                     int accountId = 0;
-                    var res = StoreUsersSqlInstance.Inst.Register(REGISTER_TYPE.FACEBOOK_TYPE, facebookUserName, requestLogin.NickName, passMd5, clientInfo.MerchantId, clientInfo.TrueClientIp, clientInfo.DeviceId, (int)clientInfo.OsType,
-                        requestLogin.PhoneNumber, requestLogin.Email, out accountId);
+                    var res = StoreUsersSqlInstance.Inst.Register(REGISTER_TYPE.GOOGLE_TYPE, googleUserName, requestLogin.NickName, passMd5, clientInfo.MerchantId, clientInfo.TrueClientIp, clientInfo.DeviceId, (int)clientInfo.OsType,
+                        requestLogin.PhoneNumber, requestLogin.Email, googleModel.picture, out accountId);
 
                     if (responseCode == (int)EStatusCode.SUCCESS)
                     {
-                        await _logger.LogInfo("Account-LoginGoogle{}", facebookUserName + " " + res, res.ToString()).ConfigureAwait(false);
+                        await _logger.LogInfo("Account-LoginGoogleJWT{}", googleUserName + " " + res, res.ToString()).ConfigureAwait(false);
                         MailInstance.Inst.SendMailRegis(accountId);
                         if (AccountUtils.IsValidEmail(requestLogin.Email))
                             await SendMailAsync(requestLogin.Email, accountId).ConfigureAwait(false);
@@ -194,7 +200,7 @@ namespace BookStore.Controllers
                     //do login
                     RequestAuthenModel request = new RequestAuthenModel()
                     {
-                        AccountName = facebookUserName,
+                        AccountName = googleUserName,
                         Password = fbPassword,
                     };
                     var response = await LoginAsync(request, clientInfo);
@@ -236,18 +242,25 @@ namespace BookStore.Controllers
                     return Ok(new ResponseApiModel<string>() { Status = EStatusCode.TRANSACTION_SPAM, Messenger = UltilsHelper.GetMessageByErrorCode(EStatusCode.TRANSACTION_SPAM) });
                 await RedisGatewayCacheManager.Inst.SaveDataSecond(key, "1", 3).ConfigureAwait(false);
 
-                var facebookUserName = await FacebookHelper.GetFacebookUserNameAsync(requestLogin.Token);
+                string facebookUserName = "";
+                string facebookName = "";
+                var modelToken = await FacebookHelper.GetFacebookModelAsync(requestLogin.Token);
+                if (modelToken != null)
+                {
+                    facebookName = modelToken.name;
+                    facebookUserName = "FB_" + modelToken.id;
+                }
                 await _logger.LogError("Account-Register{}", facebookUserName).ConfigureAwait(false);
                 var responseCode = -99;
                 if (string.IsNullOrEmpty(facebookUserName))
                     return Ok(new ResponseApiModel<string>() { Status = EStatusCode.SYSTEM_ERROR, Messenger = UltilsHelper.GetMessageByErrorCode(EStatusCode.SYSTEM_ERROR) });
-                var fbPassword = FacebookHelper.GetFacebookPassword(facebookUserName);
+                var fbPassword = FacebookHelper.GetMd5Password(facebookUserName);
                 var passMd5 = AccountUtils.EncryptPasswordMd5(fbPassword);
                 responseCode = await Task.Run(async () =>
                 {
                     int accountId = 0;
-                    var res = StoreUsersSqlInstance.Inst.Register(REGISTER_TYPE.FACEBOOK_TYPE, facebookUserName, requestLogin.NickName, passMd5, clientInfo.MerchantId, clientInfo.TrueClientIp, clientInfo.DeviceId, (int)clientInfo.OsType,
-                        requestLogin.PhoneNumber, requestLogin.Email, out accountId);
+                    var res = StoreUsersSqlInstance.Inst.Register(REGISTER_TYPE.FACEBOOK_TYPE, facebookUserName, facebookName, passMd5, clientInfo.MerchantId, clientInfo.TrueClientIp, clientInfo.DeviceId, (int)clientInfo.OsType,
+                        requestLogin.PhoneNumber, requestLogin.Email, "", out accountId);
 
                     if (responseCode == (int)EStatusCode.SUCCESS)
                     {
@@ -312,8 +325,11 @@ namespace BookStore.Controllers
                 responseCode = await Task.Run(async () =>
                 {
                     int accountId = 0;
-                    var res = StoreUsersSqlInstance.Inst.Register(REGISTER_TYPE.NORMAL_TYPE, requestRegis.AccountName, "", AccountUtils.EncryptPasswordMd5(requestRegis.Password), clientInfo.MerchantId, clientInfo.TrueClientIp, clientInfo.DeviceId, (int)clientInfo.OsType,
-                        requestRegis.PhoneNumber, requestRegis.Email, out accountId);
+                    string nickName = "";
+                    if (!string.IsNullOrEmpty(requestRegis.Email))
+                        nickName = requestRegis.Email.Split("@")[0];
+                    var res = StoreUsersSqlInstance.Inst.Register(REGISTER_TYPE.NORMAL_TYPE, requestRegis.AccountName, nickName, AccountUtils.EncryptPasswordMd5(requestRegis.Password), clientInfo.MerchantId, clientInfo.TrueClientIp, clientInfo.DeviceId, (int)clientInfo.OsType,
+                        requestRegis.PhoneNumber, requestRegis.Email, "", out accountId);
 
                     if (responseCode == (int)EStatusCode.SUCCESS)
                     {
@@ -446,7 +462,6 @@ namespace BookStore.Controllers
                 {
                     accessToken = values.FirstOrDefault();
                 }
-                await _logger.LogInfo("Account-GetAccountInfo{}", accessToken+" - " +accountId , "0").ConfigureAwait(false);
                 if (accountId <= 0)
                     return Ok(new ResponseApiModel<string>() { Status = accountId, Messenger = UltilsHelper.GetMessageByErrorCode((int)accountId) });
                 response = StoreUsersSqlInstance.Inst.GetAccountInfo(accountId, ref responseStatus);
@@ -474,14 +489,14 @@ namespace BookStore.Controllers
                     return Ok(new ResponseApiModel<string>() { Status = accountId, Messenger = UltilsHelper.GetMessageByErrorCode((int)accountId) });
                 response = StoreUsersSqlInstance.Inst.UpdateEmail(accountId, Email, ref responseStatus);
                 await _logger.LogInfo("Account-UpdateEmail{}", Email + " - accountId:" + accountId + " - " + response, response.ToString()).ConfigureAwait(false);
-                if (responseStatus == 0)
-                {
-                    await SendMailAsync(Email, accountId);
-                    message = UltilsHelper.GetMessageByErrorCode(EStatusCode.EMAIL_SEND);
-                }
-                else {
+                //if (responseStatus == 0)
+                //{
+                //    await SendMailAsync(Email, accountId);
+                //    message = UltilsHelper.GetMessageByErrorCode(EStatusCode.EMAIL_SEND);
+                //}
+                //else {
                     message = UltilsHelper.GetMessageByErrorCode(responseStatus);
-                }
+                //}
             }
             catch (Exception ex)
             {
@@ -502,7 +517,7 @@ namespace BookStore.Controllers
                 long accountId = await _tokenManager.GetAccountIdByAccessTokenAsync(Request);
                 if (accountId <= 0)
                     return Ok(new ResponseApiModel<string>() { Status = accountId, Messenger = UltilsHelper.GetMessageByErrorCode((int)accountId) });
-                response = StoreUsersSqlInstance.Inst.UpdateInfo(accountId, model.Nickname, model.AvatarId, model.PhoneNumber, model.BirthDay, model.Adress, ref responseStatus);
+                response = StoreUsersSqlInstance.Inst.UpdateInfo(accountId, model.Nickname, model.PhoneNumber, model.BirthDay, model.Adress, model.Sex, model.AvataLink, ref responseStatus);
                 await _logger.LogInfo("Account-UpdateInfo{}", JsonConvert.SerializeObject(model) + " - accountId:" + accountId + " - " + response, response.ToString()).ConfigureAwait(false);
             }
             catch (Exception ex)
