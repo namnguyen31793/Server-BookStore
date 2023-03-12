@@ -517,7 +517,11 @@ namespace BookStore.Controllers
                 long accountId = await _tokenManager.GetAccountIdByAccessTokenAsync(Request);
                 if (accountId <= 0)
                     return Ok(new ResponseApiModel<string>() { Status = accountId, Messenger = UltilsHelper.GetMessageByErrorCode((int)accountId) });
-                response = StoreUsersSqlInstance.Inst.UpdateInfo(accountId, model.Nickname, model.PhoneNumber, model.BirthDay, model.Adress, model.Sex, model.AvataLink, ref responseStatus);
+
+                if(model.Sex != null)
+                    response = StoreUsersSqlInstance.Inst.UpdateInfoSex(accountId, model.Nickname, model.PhoneNumber, model.BirthDay, model.Adress, model.Sex, model.AvataLink, ref responseStatus);
+                else
+                    response = StoreUsersSqlInstance.Inst.UpdateInfo(accountId, model.Nickname, model.PhoneNumber, model.BirthDay, model.Adress, model.AvataLink, ref responseStatus);
                 await _logger.LogInfo("Account-UpdateInfo{}", JsonConvert.SerializeObject(model) + " - accountId:" + accountId + " - " + response, response.ToString()).ConfigureAwait(false);
             }
             catch (Exception ex)

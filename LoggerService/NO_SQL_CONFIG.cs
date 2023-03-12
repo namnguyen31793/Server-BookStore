@@ -25,6 +25,10 @@ namespace LoggerService
         public static readonly string API_LOG_NORMAL_COLLECTION = "ApiNormalLog_Collection";
         public static readonly string API_LOG_BUY_BOOK_COLLECTION = "BuyBookLog_Collection";
         public static readonly string API_LOG_CCU_COLLECTION = "CcuLog_Collection";
+        public static readonly string API_LOG_TRACKING_ACTION_HOME = "Tracking_Action_Home_Collection";
+        public static readonly string API_LOG_TRACKING_ACTION_USER = "Tracking_Action_User_Collection";
+        public static readonly string API_LOG_TRACKING_LISTEN_AUDIO = "Tracking_Action_Listen_Audio_Collection";
+        public static readonly string API_LOG_TRACKING_FIND_BOOK = "Tracking_Action_Find_Book_Collection";
         #endregion
 
     }

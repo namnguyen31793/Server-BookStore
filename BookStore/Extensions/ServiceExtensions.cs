@@ -2,6 +2,7 @@
 using BookStore.Interfaces;
 using BookStore.Utils;
 using LoggerService;
+using LoggerService.Interfaces;
 using Marvin.Cache.Headers;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Mvc;
@@ -55,6 +56,9 @@ namespace BookStore.Extensions
 
         public static void ConfigureTokenService(this IServiceCollection services) =>
             services.AddSingleton<ITokenManager, TokenManager>();
+
+        public static void ConfigureReportService(this IServiceCollection services) =>
+         services.AddSingleton<IReportLog, ReportManager>();
 
         public static void ConfigureResponseCaching(this IServiceCollection services) =>
             services.AddResponseCaching();

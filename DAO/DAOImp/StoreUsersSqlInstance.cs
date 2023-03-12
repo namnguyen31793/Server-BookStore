@@ -213,13 +213,46 @@ namespace DAO.DAOImp
             }
             return response;
         }
-        public AccountModelDb UpdateInfo(long AccountId, string NickName, string PhoneNumber, DateTime BirthDay, string Adress, bool Sex, string AvataLink, ref int responseStatus)
+        public AccountModelDb UpdateInfo(long AccountId, string NickName, string PhoneNumber, DateTime? BirthDay, string Adress, string AvataLink, ref int responseStatus)
         {
             DBHelper db = null;
             var response = new AccountModelDb();
             if (string.IsNullOrEmpty(NickName)) NickName = "";
             if (string.IsNullOrEmpty(PhoneNumber)) PhoneNumber = "";
-            if (BirthDay == null) BirthDay = DateTime.Now;
+            if (BirthDay == null) BirthDay = DateTime.Now.AddMonths(1);
+            if (string.IsNullOrEmpty(Adress)) Adress = "";
+            try
+            {
+                db = new DBHelper(ConfigDb.StoreUsersConnectionString);
+                var pars = new SqlParameter[7];
+                pars[0] = new SqlParameter("@_AccountId", AccountId);
+                pars[1] = new SqlParameter("@_Nickname", NickName);
+                pars[2] = new SqlParameter("@_PhoneNumber", PhoneNumber);
+                pars[3] = new SqlParameter("@_BirthDay", BirthDay);
+                pars[4] = new SqlParameter("@_Adress", Adress);
+                pars[5] = new SqlParameter("@_Avata", AvataLink);
+                pars[6] = new SqlParameter("@_ResponseStatus", SqlDbType.BigInt) { Direction = ParameterDirection.Output };
+                response = db.GetInstanceSP<AccountModelDb>("SP_Store_Users_Update_UserInfo", 4, pars);
+                responseStatus = Convert.ToInt32(pars[6].Value);
+            }
+            catch (Exception exception)
+            {
+                Task.Run(async () => await _logger.LogError("SQL-UpdateInfo()", exception.ToString()).ConfigureAwait(false));
+            }
+            finally
+            {
+                db?.Close();
+            }
+            return response;
+        }
+
+        public AccountModelDb UpdateInfoSex(long AccountId, string NickName, string PhoneNumber, DateTime? BirthDay, string Adress, bool? Sex, string AvataLink, ref int responseStatus)
+        {
+            DBHelper db = null;
+            var response = new AccountModelDb();
+            if (string.IsNullOrEmpty(NickName)) NickName = "";
+            if (string.IsNullOrEmpty(PhoneNumber)) PhoneNumber = "";
+            if (BirthDay == null) BirthDay = DateTime.Now.AddMonths(1);
             if (string.IsNullOrEmpty(Adress)) Adress = "";
             try
             {
@@ -233,12 +266,12 @@ namespace DAO.DAOImp
                 pars[5] = new SqlParameter("@_Avata", AvataLink);
                 pars[6] = new SqlParameter("@_Sex", Sex);
                 pars[7] = new SqlParameter("@_ResponseStatus", SqlDbType.BigInt) { Direction = ParameterDirection.Output };
-                response = db.GetInstanceSP<AccountModelDb>("SP_Store_Users_Update_UserInfo", 4, pars);
+                response = db.GetInstanceSP<AccountModelDb>("SP_Store_Users_Update_UserInfo_Sex", 4, pars);
                 responseStatus = Convert.ToInt32(pars[7].Value);
             }
             catch (Exception exception)
             {
-                Task.Run(async () => await _logger.LogError("SQL-UpdateInfo()", exception.ToString()).ConfigureAwait(false));
+                Task.Run(async () => await _logger.LogError("SQL-UpdateInfoSex()", exception.ToString()).ConfigureAwait(false));
             }
             finally
             {
