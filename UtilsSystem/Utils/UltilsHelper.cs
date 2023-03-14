@@ -121,6 +121,9 @@ namespace UtilsSystem.Utils
                 case EStatusCode.ID_NOT_EXITS:
                     message = "Id không tồn tại!";
                     break;
+                case EStatusCode.TRANSACTION_SEND_MAIL_SPAM:
+                    message = "Vui lòng thực hiện gửi mail lại sau 5p!";
+                    break;
                 case EStatusCode.TRANSACTION_SPAM:
                     message = "Thao tác quá nhanh!";
                     break;

@@ -71,10 +71,18 @@ namespace UtilsSystem.Utils
 
         public static string EncryptPasswordMd5(string password)
         {
-            var dataEncrypt = StaticData.SecretPassKey + password;
-            var response = Security.MD5Encrypt(dataEncrypt);
+            //var dataEncrypt = StaticData.SecretPassKey + password;
+            //var response = Security.MD5Encrypt(dataEncrypt);
+            var response = Security.EncryptPlainTextToCipherText(password, "@Gamma");
             return response;
         }
+
+        public static string DecryptPasswordMd5(string passwordMd5)
+        {
+            var response = Security.DecryptCipherTextToPlainText(passwordMd5, "@Gamma");
+            return response;
+        }
+
         public static bool IsLoginRequestTrue(RequestAuthenModel requestAuthen)
         {
             if (requestAuthen == null) return false;

@@ -426,5 +426,63 @@ namespace DAO.DAOImp
             return listConfig;
         }
         #endregion
+        #region PASS
+        public int Changepass(long accountId, string oldPassMd5, string newPassMd5)
+        {
+            DBHelper db = null;
+            var response = -9999;
+            try
+            {
+                db = new DBHelper(ConfigDb.StoreUsersConnectionString);
+                var pars = new SqlParameter[4];
+                pars[0] = new SqlParameter("@_AccountId", accountId);
+                pars[1] = new SqlParameter("@_OldPassword", oldPassMd5);
+                pars[2] = new SqlParameter("@_NewPassword", newPassMd5);
+                pars[3] = new SqlParameter("@_ResponseStatus", SqlDbType.Int) { Direction = ParameterDirection.Output };
+                db.ExecuteNonQuerySP("SP_Store_Users_Change_Password", 4, pars);
+                response = Convert.ToInt32(pars[3].Value);
+            }
+            catch (Exception exception)
+            {
+                Task.Run(async () => await _logger.LogError("SQL-Changepass()", exception.ToString()).ConfigureAwait(false));
+            }
+            finally
+            {
+                db?.Close();
+            }
+            return response;
+        }
+        public int ForgotPass(string username, out string email, out string passMd5)
+        {
+            DBHelper db = null;
+            var response = -9999;
+            email = "";
+            passMd5 = "";
+            try
+            {
+                db = new DBHelper(ConfigDb.StoreUsersConnectionString);
+                var pars = new SqlParameter[4];
+                pars[0] = new SqlParameter("@_UserName", username);
+                pars[1] = new SqlParameter("@_Mail", SqlDbType.NVarChar, 50) { Direction = ParameterDirection.Output };
+                pars[2] = new SqlParameter("@_PasswordMD5", SqlDbType.NVarChar, 100) { Direction = ParameterDirection.Output };
+                pars[3] = new SqlParameter("@_ResponseStatus", SqlDbType.Int) { Direction = ParameterDirection.Output };
+                db.ExecuteNonQuerySP("SP_Store_Users_CheckMail", 4, pars);
+                response = Convert.ToInt32(pars[3].Value);
+                if (response == 0) {
+                    email = pars[1].Value.ToString();
+                    passMd5 = pars[2].Value.ToString();
+                }
+            }
+            catch (Exception exception)
+            {
+                Task.Run(async () => await _logger.LogError("SQL-ForgotPass()", exception.ToString()).ConfigureAwait(false));
+            }
+            finally
+            {
+                db?.Close();
+            }
+            return response;
+        }
+        #endregion
     }
 }

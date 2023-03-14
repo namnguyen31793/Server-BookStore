@@ -14,6 +14,7 @@ namespace ShareData.DB.Users
         public string RegisterIp { get; set; }
         public string DeviceId { get; set; }
         public int BlockType { get; set; }
+        public int RegisType { get; set; }
         public int IsValidate { get; set; }
         public string AvatarId { get; set; }
         public string PhoneNumber { get; set; }
@@ -34,6 +35,7 @@ namespace ShareData.DB.Users
         public DateTime? BirthDay { get; set; }
         public string Adress { get; set; }
         public bool? Sex { get; set; }
+        public int RegisType { get; set; }
         public AccountModel() {
         }
         public AccountModel(AccountModelDb model) {
@@ -46,6 +48,7 @@ namespace ShareData.DB.Users
             BirthDay = model.BirthDay;
             Adress = model.Adress;
             Sex = model.Sex;
+            RegisType = model.RegisType;
         }
     }
 }

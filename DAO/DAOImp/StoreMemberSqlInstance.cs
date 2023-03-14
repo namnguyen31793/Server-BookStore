@@ -37,7 +37,7 @@ namespace DAO.DAOImp
             }
         }
 
-        public int IncPointAccountByBook(long accountId, long Point, out long CurrentPoint, out long CurrentVip, out bool isNextLevel, out string vipName, out string rewardLevelUp)
+        public int IncPointAccountByBook(long accountId, long Point, out long CurrentPoint, out long CurrentVip, out bool isNextLevel, out string vipName, out string rewardLevelUp, out int VourcherId, out string VourcherName)
         {
             DBHelper db = null;
             var reponseStatus = EStatusCode.DATABASE_ERROR;
@@ -46,10 +46,12 @@ namespace DAO.DAOImp
             isNextLevel = false;
             rewardLevelUp = "";
             vipName = "";
+            VourcherId = 0;
+            VourcherName = "";
             try
             {
                 db = new DBHelper(ConfigDb.StoreMemberConnectionString);
-                var pars = new SqlParameter[9];
+                var pars = new SqlParameter[11];
                 pars[0] = new SqlParameter("@_AccountId", accountId);
                 pars[1] = new SqlParameter("@_Point", Point);
                 pars[2] = new SqlParameter("@_CurrentPoint", SqlDbType.BigInt) { Direction = ParameterDirection.Output };
@@ -58,14 +60,18 @@ namespace DAO.DAOImp
                 pars[5] = new SqlParameter("@_IsFirstTime", SqlDbType.Bit) { Direction = ParameterDirection.Output };
                 pars[6] = new SqlParameter("@_Reward", SqlDbType.VarChar, 50) { Direction = ParameterDirection.Output };
                 pars[7] = new SqlParameter("@_VipName", SqlDbType.VarChar, 50) { Direction = ParameterDirection.Output };
-                pars[8] = new SqlParameter("@_ResponseStatus", SqlDbType.Int) { Direction = ParameterDirection.Output };
+                pars[8] = new SqlParameter("@_VourcherId", SqlDbType.Int, 50) { Direction = ParameterDirection.Output };
+                pars[9] = new SqlParameter("@_VourcherName", SqlDbType.NVarChar, 50) { Direction = ParameterDirection.Output };
+                pars[10] = new SqlParameter("@_ResponseStatus", SqlDbType.Int) { Direction = ParameterDirection.Output };
                 db.ExecuteNonQuerySP("SP_StoreMember_Account_Inc_Point", 4, pars);
-                reponseStatus = Convert.ToInt32(pars[8].Value);
+                reponseStatus = Convert.ToInt32(pars[10].Value);
                 CurrentPoint = Convert.ToInt64(pars[2].Value);
                 CurrentVip = Convert.ToInt64(pars[3].Value);
                 isNextLevel = Convert.ToBoolean(pars[4].Value);
                 rewardLevelUp = pars[6].Value.ToString();
-                vipName = pars[7].Value.ToString(); 
+                vipName = pars[7].Value.ToString();
+                VourcherId = Convert.ToInt32(pars[8].Value);
+                VourcherName = pars[9].Value.ToString();
             }
             catch (Exception exception)
             {

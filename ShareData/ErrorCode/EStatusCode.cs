@@ -44,6 +44,7 @@ namespace ShareData.ErrorCode
         public const int VOURCHER_NAME_ESXIST = -77;
 
         public const int TOKEN_EXPIRES = -86;
+        public const int TRANSACTION_SEND_MAIL_SPAM = -87;
 
         public const int DATABASE_ERROR = -99;
         public const int CONNECT_ERROR = -100;

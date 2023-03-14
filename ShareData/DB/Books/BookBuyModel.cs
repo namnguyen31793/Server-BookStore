@@ -8,5 +8,6 @@ namespace ShareData.DB.Books
     {
         public long AccountId { get; set; }
         public string Barcode { get; set; }
+        public string BookName { get; set; }
     }
 }

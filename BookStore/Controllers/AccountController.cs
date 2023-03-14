@@ -112,8 +112,8 @@ namespace BookStore.Controllers
                     {
                         await _logger.LogInfo("Account-LoginGoogle{}", googleUserName + " " + res, res.ToString()).ConfigureAwait(false);
                         MailInstance.Inst.SendMailRegis(accountId);
-                        if (AccountUtils.IsValidEmail(requestLogin.Email))
-                            await SendMailAsync(requestLogin.Email, accountId).ConfigureAwait(false);
+                        //if (AccountUtils.IsValidEmail(requestLogin.Email))
+                        //    await SendMailAsync(requestLogin.Email, accountId).ConfigureAwait(false);
                     }
                     return res;
 
@@ -185,8 +185,8 @@ namespace BookStore.Controllers
                     {
                         await _logger.LogInfo("Account-LoginGoogleJWT{}", googleUserName + " " + res, res.ToString()).ConfigureAwait(false);
                         MailInstance.Inst.SendMailRegis(accountId);
-                        if (AccountUtils.IsValidEmail(requestLogin.Email))
-                            await SendMailAsync(requestLogin.Email, accountId).ConfigureAwait(false);
+                        //if (AccountUtils.IsValidEmail(requestLogin.Email))
+                        //    await SendMailAsync(requestLogin.Email, accountId).ConfigureAwait(false);
                     }
                     return res;
 
@@ -266,8 +266,8 @@ namespace BookStore.Controllers
                     {
                         await _logger.LogInfo("Account-RegisterFB{}", facebookUserName + " " + res, res.ToString()).ConfigureAwait(false);
                         MailInstance.Inst.SendMailRegis(accountId);
-                        if (AccountUtils.IsValidEmail(requestLogin.Email))
-                            await SendMailAsync(requestLogin.Email, accountId).ConfigureAwait(false);
+                        //if (AccountUtils.IsValidEmail(requestLogin.Email))
+                        //    await SendMailAsync(requestLogin.Email, accountId).ConfigureAwait(false);
                     }
                     return res;
 
@@ -335,8 +335,8 @@ namespace BookStore.Controllers
                     {
                         await _logger.LogInfo("Account-Register{}", requestRegis.AccountName + " " + res, res.ToString()).ConfigureAwait(false);
                         MailInstance.Inst.SendMailRegis(accountId);
-                        if (AccountUtils.IsValidEmail(requestRegis.Email))
-                            await SendMailAsync(requestRegis.Email, accountId).ConfigureAwait(false);
+                        //if (AccountUtils.IsValidEmail(requestRegis.Email))
+                        //    await SendMailAsync(requestRegis.Email, accountId).ConfigureAwait(false);
                     }
                     return res;
 
@@ -373,8 +373,10 @@ namespace BookStore.Controllers
                 res = await Task.Run(async () =>
                 {
                     var accountId = StoreUsersSqlInstance.Inst.DoLogin(requestLogin.AccountName, AccountUtils.EncryptPasswordMd5(requestLogin.Password), clientInfo.MerchantId, clientInfo.TrueClientIp, (int)clientInfo.OsType, ref res);
-
-                    await _logger.LogInfo("Account-LoginAsync{}", requestLogin.AccountName + " - accountId:" + accountId + " - res:" + res, res.ToString()).ConfigureAwait(false);
+                  
+                    //var passMd5 = AccountUtils.EncryptPassword(requestLogin.Password);
+                    //var passDeMd5 = AccountUtils.DecryptPasswordMd5(passMd5);
+                    //await _logger.LogInfo("Account-LoginAsync{}", requestLogin.AccountName + " - accountId:" + accountId + " - res:" + res + "  - passMd5: " + passMd5 + "  - passDeMd5: " + passDeMd5, res.ToString()).ConfigureAwait(false);
                     if (accountId >= 0)
                     {
                         //create refresh token -> save db
@@ -505,6 +507,68 @@ namespace BookStore.Controllers
 
             return Ok(new ResponseApiModel<AccountModel>() { Status = responseStatus, Messenger = message, DataResponse = new AccountModel(response) });
         }
+
+        [HttpPost]
+        [Route("ChangePass")]
+        [ResponseCache(Duration = 0, Location = ResponseCacheLocation.None, NoStore = true)]
+        public async Task<IActionResult> ChangePass(RequestChangePass model)
+        {
+            int responseStatus = -99;
+            try
+            {
+                long accountId = await _tokenManager.GetAccountIdByAccessTokenAsync(Request);
+                if (accountId <= 0)
+                    return Ok(new ResponseApiModel<string>() { Status = accountId, Messenger = UltilsHelper.GetMessageByErrorCode((int)accountId) });
+                var oldPassMd5 = AccountUtils.EncryptPasswordMd5(model.OldPass);
+                var newPassMd5 = AccountUtils.EncryptPasswordMd5(model.NewPass);
+                responseStatus = StoreUsersSqlInstance.Inst.Changepass(accountId, oldPassMd5, newPassMd5);
+                
+                await _logger.LogInfo("Account-ChangePass{}", JsonConvert.SerializeObject(model)+ " - oldPassMd5 "+ oldPassMd5 + " - newPassMd5 " + newPassMd5 + " - accountId: " + accountId + " - " + responseStatus, responseStatus.ToString()).ConfigureAwait(false);
+            }
+            catch (Exception ex)
+            {
+                await _logger.LogError("Account-UpdateInfo{}", ex.ToString()).ConfigureAwait(false);
+            }
+            return Ok(new ResponseApiModel<AccountModel>() { Status = responseStatus, Messenger = UltilsHelper.GetMessageByErrorCode(responseStatus) });
+        }
+
+        [HttpPost]
+        [Route("ForgotPass")]
+        [ResponseCache(Duration = 0, Location = ResponseCacheLocation.None, NoStore = true)]
+        public async Task<IActionResult> ForgotPass(RequestForgot model)
+        {
+            int responseStatus = -99;
+            string passwordMd5 = "";
+            string passDeMd5 = "";
+            string email = "";
+            try
+            {
+                var clientInfo = new ClientRequestInfo(Request);
+                //check cache send mail
+                string key = "SPAM:ForgotPass" + clientInfo.TrueClientIp + "-" + clientInfo.DeviceId;
+                if (RedisGatewayCacheManager.Inst.CheckExistKey(key))
+                    return Ok(new ResponseApiModel<string>() { Status = EStatusCode.TRANSACTION_SEND_MAIL_SPAM, Messenger = UltilsHelper.GetMessageByErrorCode(EStatusCode.TRANSACTION_SEND_MAIL_SPAM) });
+                await RedisGatewayCacheManager.Inst.SaveDataSecond(key, "1", 300).ConfigureAwait(false);
+                //call db get mail
+                responseStatus = StoreUsersSqlInstance.Inst.ForgotPass(model.mail, out email, out passwordMd5);
+                passDeMd5 = AccountUtils.DecryptPasswordMd5(passwordMd5);
+                // send old pas to mail (md5 )
+                var message = new Message(new string[] { email }, "Quên mật khẩu Gamma Books", 
+                    "Xin chào " + email + "!" + Environment.NewLine +
+                    "Mật khẩu bạn cần dùng để truy cập vào Tài khoản Gamma Books của mình là:" + Environment.NewLine + passDeMd5 + Environment.NewLine +
+                    "Nếu bạn không yêu cầu thao tác này thì có thể là ai đó đang tìm cách truy cập vào Tài khoản Gamma Books của bạn. Không chuyển tiếp hoặc cung cấp mật khẩu này cho bất kỳ ai." + Environment.NewLine +
+                    "Trân trọng!"
+                    );
+                await _emailSender.SendEmailAsync(message);
+                await _logger.LogInfo("Account-ForgotPass{}", passwordMd5 + " - email:"+ email + " "+ responseStatus, responseStatus.ToString()).ConfigureAwait(false);
+            }
+            catch (Exception ex)
+            {
+                await _logger.LogError("Account-UpdateInfo{}", passwordMd5+" - "+ ex.ToString()).ConfigureAwait(false);
+            }
+            return Ok(new ResponseApiModel<string>() { Status = responseStatus, Messenger = UltilsHelper.GetMessageByErrorCode(responseStatus)});
+        }
+
         [HttpPost]
         [Route("UpdateInfo")]
         [ResponseCache(Duration = 0, Location = ResponseCacheLocation.None, NoStore = true)]
@@ -619,6 +683,8 @@ namespace BookStore.Controllers
             bool isNextLevel = false;
             long point = 0;
             string vipName = "";
+            int vourcherId = 0;
+            string vourcherName = "";
             try
             {
                 long accountId = await _tokenManager.GetAccountIdByAccessTokenAsync(Request);
@@ -633,7 +699,7 @@ namespace BookStore.Controllers
                     await RedisGatewayCacheManager.Inst.DeleteDataFromCacheAsync(keyRedis).ConfigureAwait(false);
                     //update vip value
                     string rewardLevelUp = "";
-                    var responseStatusMail = StoreMemberSqlInstance.Inst.IncPointAccountByBook(accountId, (long)(point/1000), out curentPoint, out curentVip, out isNextLevel, out vipName, out rewardLevelUp);
+                    var responseStatusMail = StoreMemberSqlInstance.Inst.IncPointAccountByBook(accountId, (long)(point/1000), out curentPoint, out curentVip, out isNextLevel, out vipName, out rewardLevelUp, out vourcherId, out vourcherName);
                     if (isNextLevel) {
                         keyRedis = "CacheMail:" + accountId;
                         await RedisGatewayCacheManager.Inst.DeleteDataFromCacheAsync(keyRedis).ConfigureAwait(false);
@@ -644,7 +710,7 @@ namespace BookStore.Controllers
                     await _logger.LogBuyBook("Account-BuyBook{}", accountId, barcode, point).ConfigureAwait(false);
 
                 }
-                ResponseBuyBook responseBuyBook = new ResponseBuyBook() { modelBook = model, modelMember = new ResponseMemberVip() { CurrentPoint = curentPoint, CurrentVip = curentVip, VipName = vipName }, pointBook = (long)(point / 1000), levelUp = isNextLevel };
+                ResponseBuyBook responseBuyBook = new ResponseBuyBook() { modelBook = model, modelMember = new ResponseMemberVip() { CurrentPoint = curentPoint, CurrentVip = curentVip, VipName = vipName }, pointBook = (long)(point / 1000), levelUp = isNextLevel, vourcherId = vourcherId, vourcherName = vourcherName};
                 response = new ResponseApiModel<string>() { Status = responseStatus, Messenger = UltilsHelper.GetMessageByErrorCode(responseStatus), DataResponse = JsonConvert.SerializeObject(responseBuyBook) };
             }
             catch (Exception ex)
@@ -808,7 +874,6 @@ namespace BookStore.Controllers
         //}
 
         private async Task SendMailAsync(string toAdress, long AccountId){
-            return;
             string key = HttpUtility.UrlEncode(await _tokenManager.GenerateKeyTokenValidateAsync(AccountId, toAdress));
             string url = CONFIG.BaseLink + CONFIG.FunctionValidateEmail+ key;
 

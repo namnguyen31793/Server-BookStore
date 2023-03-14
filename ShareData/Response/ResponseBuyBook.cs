@@ -11,5 +11,7 @@ namespace ShareData.Response
         public ResponseMemberVip modelMember { get; set; }
         public long pointBook { get; set; }   
         public bool levelUp { get; set; }   //true call get mail
+        public int vourcherId { get; set; }
+        public string vourcherName { get; set; }
     }
 }

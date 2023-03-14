@@ -905,7 +905,7 @@ namespace DAO.DAOImp
                 pars[1] = new SqlParameter("@_Index", page);
                 pars[2] = new SqlParameter("@_NUMBER_GET", row);
                 pars[3] = new SqlParameter("@_ResponseStatus", SqlDbType.Int) { Direction = ParameterDirection.Output };
-                modelData = db.GetListSP<LikeBookModel>("SP_Store_Book_Like_Account_Get", 4, pars);
+                modelData = db.GetListSP<LikeBookModel>("SP_Store_Book_Like_Account_Get_Join", 4, pars);
                 reponseStatus = Convert.ToInt32(pars[3].Value);
             }
             catch (Exception exception)
