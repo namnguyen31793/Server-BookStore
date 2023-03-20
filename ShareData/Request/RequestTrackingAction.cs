@@ -11,6 +11,8 @@ namespace ShareData.Request
         public long AccountId { get; set; }
         [JsonProperty("A")]
         public string Action { get; set; }
+        [JsonProperty("E")]
+        public string Extension { get; set; }
         [JsonProperty("C")]
         public long Count { get; set; }
     }
@@ -22,6 +24,8 @@ namespace ShareData.Request
         public int Deep { get; set; }
         [JsonProperty("A")]
         public string Action { get; set; }
+        [JsonProperty("E")]
+        public string Extension { get; set; }
         [JsonProperty("C")]
         public long Count { get; set; }
     }

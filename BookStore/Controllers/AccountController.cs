@@ -3,6 +3,7 @@ using BookStore.Interfaces;
 using BookStore.Utils;
 using DAO.DAOImp;
 using LoggerService;
+using LoggerService.Interfaces;
 using Microsoft.AspNetCore.Mvc;
 using Newtonsoft.Json;
 using RedisSystem;
@@ -26,15 +27,16 @@ namespace BookStore.Controllers
     [ApiController]
     public class AccountController : ControllerBase
     {
-
+        private IReportLog _report;
         private ILoggerManager _logger;
         private IEmailSender _emailSender;
         private ITokenManager _tokenManager;
-        public AccountController(ILoggerManager logger, IEmailSender emailSender, ITokenManager tokenManager)
+        public AccountController(ILoggerManager logger, IEmailSender emailSender, ITokenManager tokenManager, IReportLog reportManager)
         {
             _logger = logger;
             _emailSender = emailSender;
             _tokenManager = tokenManager;
+            _report = reportManager;
         }
         private string token = string.Empty;
 
@@ -386,6 +388,7 @@ namespace BookStore.Controllers
                         {
                             var accessToken = await _tokenManager.GenerateAccessTokenAsync(accountId, clientInfo);
                             model.DataResponse = new TokenInfo() { AccountId = accountId, Access_token = accessToken, Refresh_token = refreshToken };
+                            await _report.LogOnline(accountId, 5).ConfigureAwait(false);
                         }
                         else
                         {
@@ -432,6 +435,7 @@ namespace BookStore.Controllers
                     {
                         var accessToken = await _tokenManager.GenerateAccessTokenAsync(accountId, clientInfo);
                         model.DataResponse = new TokenInfo() { AccountId = accountId, Access_token = accessToken, Refresh_token = data.Refresh_token };
+                        await _report.LogOnline(accountId, 5).ConfigureAwait(false);
                         return res;
                     });
                     model.Status = res;
@@ -459,11 +463,6 @@ namespace BookStore.Controllers
             try
             {
                 long accountId = await _tokenManager.GetAccountIdByAccessTokenAsync(Request);
-                string accessToken = "";
-                if (Request.Headers.TryGetValue("Authorization", out var values))
-                {
-                    accessToken = values.FirstOrDefault();
-                }
                 if (accountId <= 0)
                     return Ok(new ResponseApiModel<string>() { Status = accountId, Messenger = UltilsHelper.GetMessageByErrorCode((int)accountId) });
                 response = StoreUsersSqlInstance.Inst.GetAccountInfo(accountId, ref responseStatus);
@@ -685,6 +684,8 @@ namespace BookStore.Controllers
             string vipName = "";
             int vourcherId = 0;
             string vourcherName = "";
+            int vourcherType = 0;
+            string vourcherReward = "";
             try
             {
                 long accountId = await _tokenManager.GetAccountIdByAccessTokenAsync(Request);
@@ -699,7 +700,7 @@ namespace BookStore.Controllers
                     await RedisGatewayCacheManager.Inst.DeleteDataFromCacheAsync(keyRedis).ConfigureAwait(false);
                     //update vip value
                     string rewardLevelUp = "";
-                    var responseStatusMail = StoreMemberSqlInstance.Inst.IncPointAccountByBook(accountId, (long)(point/1000), out curentPoint, out curentVip, out isNextLevel, out vipName, out rewardLevelUp, out vourcherId, out vourcherName);
+                    var responseStatusMail = StoreMemberSqlInstance.Inst.IncPointAccountByBook(accountId, (long)(point/1000), out curentPoint, out curentVip, out isNextLevel, out vipName, out rewardLevelUp, out vourcherId, out vourcherName, out vourcherType, out vourcherReward);
                     if (isNextLevel) {
                         keyRedis = "CacheMail:" + accountId;
                         await RedisGatewayCacheManager.Inst.DeleteDataFromCacheAsync(keyRedis).ConfigureAwait(false);
@@ -710,7 +711,8 @@ namespace BookStore.Controllers
                     await _logger.LogBuyBook("Account-BuyBook{}", accountId, barcode, point).ConfigureAwait(false);
 
                 }
-                ResponseBuyBook responseBuyBook = new ResponseBuyBook() { modelBook = model, modelMember = new ResponseMemberVip() { CurrentPoint = curentPoint, CurrentVip = curentVip, VipName = vipName }, pointBook = (long)(point / 1000), levelUp = isNextLevel, vourcherId = vourcherId, vourcherName = vourcherName};
+                ResponseBuyBook responseBuyBook = new ResponseBuyBook() { modelBook = model, modelMember = new ResponseMemberVip() { CurrentPoint = curentPoint, CurrentVip = curentVip, VipName = vipName }, 
+                    pointBook = (long)(point / 1000), levelUp = isNextLevel, vourcherId = vourcherId, vourcherName = vourcherName, vourcherType = vourcherType, vourcherReward = vourcherReward};
                 response = new ResponseApiModel<string>() { Status = responseStatus, Messenger = UltilsHelper.GetMessageByErrorCode(responseStatus), DataResponse = JsonConvert.SerializeObject(responseBuyBook) };
             }
             catch (Exception ex)

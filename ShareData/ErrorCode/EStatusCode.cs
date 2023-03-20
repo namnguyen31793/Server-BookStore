@@ -41,10 +41,17 @@ namespace ShareData.ErrorCode
         public const int ACOUNT_EXIST_BARCODE = -74;
         public const int BARCODE_NOT_EXIST = -75;
         public const int ACOUNT_NOT_EXIST_BARCODE = -76;
-        public const int VOURCHER_NAME_ESXIST = -77;
+        public const int VOURCHER_NAME_EXIST = -77;
+        public const int VOURCHER_NOT_ACCEPT = -78;
 
         public const int TOKEN_EXPIRES = -86;
         public const int TRANSACTION_SEND_MAIL_SPAM = -87;
+        public const int MAX_CUSTOMER_INFO_ORDER = -88;
+        public const int DELIVERY_SQL_ERROR = -89;
+        public const int CART_SQL_ERROR = -90;
+        public const int PAY_SQL_ERROR = -91;
+        public const int ORDER_NOT_EXIST = -92;
+        public const int ORDER_NOT_DATA = -93;
 
         public const int DATABASE_ERROR = -99;
         public const int CONNECT_ERROR = -100;

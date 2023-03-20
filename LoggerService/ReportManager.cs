@@ -97,6 +97,40 @@ namespace LoggerService
             }
         }
 
+        public async Task LogOnline(long AccountId, long time)
+        {
+            var database = _client.GetDatabase(NO_SQL_CONFIG.API_TRACKING_SYSTEM_DATABASE_NAME);
+            try
+            {
+                var document = new BsonDocument {
+                { "AccountId", AccountId },
+                { "Time", time },
+                { "StartActionTime", DateTime.Now },
+                { "EndActionTime", DateTime.Now.AddMinutes(time) },
+                { "ExpireAt", DateTime.SpecifyKind(DateTime.Now.AddDays(7), DateTimeKind.Local) } };
+                IMongoCollection<BsonDocument> trackingCollection = database.GetCollection<BsonDocument>(NO_SQL_CONFIG.API_LOG_TRACKING_ONLINE);
+
+                var indexBuilder = Builders<BsonDocument>.IndexKeys;
+                var key = indexBuilder.Ascending("ExpireAt");
+                var options = new CreateIndexOptions
+                {
+                    ExpireAfter = new TimeSpan(0),
+                    Name = "ExpireAtIndex",
+
+                };
+                await trackingCollection.Indexes.CreateOneAsync(key, options).ConfigureAwait(false);
+
+                await trackingCollection.InsertOneAsync(document);
+            }
+            catch (Exception)
+            {
+            }
+            finally
+            {
+                database = null;
+            }
+        }
+
         public async Task TrackingActionHome(string data)
         {
             if (string.IsNullOrEmpty(data))
@@ -112,6 +146,7 @@ namespace LoggerService
                     listDocument.Add(new BsonDocument {
                         { "AccountId", listAction[i].AccountId },
                         { "Action", listAction[i].Action },
+                        { "Extension", listAction[i].Extension },
                         { "Deep", listAction[i].Deep },
                         { "Count", listAction[i].Count },
                         { "ActionTime", DateTime.Now.ToString("MM/dd/yyyy") } ,
@@ -156,6 +191,7 @@ namespace LoggerService
                     listDocument.Add(new BsonDocument {
                         { "AccountId", listAction[i].AccountId },
                         { "Action", listAction[i].Action },
+                        { "Extension", listAction[i].Extension },
                         { "Count", listAction[i].Count },
                         { "ActionTime", DateTime.Now.ToString("MM/dd/yyyy") },
                         { "ExpireAt", DateTime.SpecifyKind(DateTime.Now.AddMonths(2), DateTimeKind.Local) }});

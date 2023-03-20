@@ -9,7 +9,7 @@ namespace LoggerService.Interfaces
     {
         Task LogBuyBook(string title, long AccountId, string barcode, long price);
         Task LogCCu(DateTime time, long ccu);
-
+        Task LogOnline(long AccountId, long time);
         Task TrackingActionUser(string data);
         Task TrackingActionHome(string data);
         Task TrackingFindBook(string data);

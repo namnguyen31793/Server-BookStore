@@ -13,5 +13,7 @@ namespace ShareData.Response
         public bool levelUp { get; set; }   //true call get mail
         public int vourcherId { get; set; }
         public string vourcherName { get; set; }
+        public int vourcherType { get; set; }
+        public string vourcherReward { get; set; }
     }
 }

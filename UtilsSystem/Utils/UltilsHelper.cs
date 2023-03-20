@@ -169,8 +169,29 @@ namespace UtilsSystem.Utils
                 case EStatusCode.ACOUNT_NOT_EXIST_BARCODE:
                     message = "Tài khoản chưa mua sách này";
                     break;
-                case EStatusCode.VOURCHER_NAME_ESXIST:
+                case EStatusCode.VOURCHER_NAME_EXIST:
                     message = "Vourcher đã tồn tại";
+                    break;
+                case EStatusCode.VOURCHER_NOT_ACCEPT:
+                    message = "Tài khoản không đủ điều kiện sử dụng vourcher";
+                    break; 
+                case EStatusCode.MAX_CUSTOMER_INFO_ORDER:
+                    message = "Mỗi tài khoản chỉ được lưu tối đa 5 địa chỉ nhận hàng!";
+                    break;
+                case EStatusCode.DELIVERY_SQL_ERROR:
+                    message = "Có lỗi xảy ra khi tạo thông tin giao hàng";
+                    break;
+                case EStatusCode.CART_SQL_ERROR:
+                    message = "Có lỗi xảy ra khi tạo giỏ hàng";
+                    break;
+                case EStatusCode.PAY_SQL_ERROR:
+                    message = "Có lỗi xảy ra khi tạo thông tin thanh toán";
+                    break;
+                case EStatusCode.ORDER_NOT_EXIST:
+                    message = "Không tìm được id giao dịch";
+                    break;
+                case EStatusCode.ORDER_NOT_DATA:
+                    message = "Thông tin đặt hàng không chính xác";
                     break;
             }
             return message;
