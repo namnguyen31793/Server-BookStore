@@ -1,5 +1,6 @@
 ﻿using DAO.Utitlities;
 using LoggerService;
+using ShareData.DB.Statstical;
 using ShareData.DB.Users;
 using ShareData.ErrorCode;
 using System;
@@ -482,6 +483,74 @@ namespace DAO.DAOImp
                 db?.Close();
             }
             return response;
+        }
+        #endregion
+
+        #region Statistical
+        public AgeAvgModel GetAgeAvg(out int reponseStatus)
+        {
+            DBHelper db = null;
+            AgeAvgModel modelReturn = new AgeAvgModel() { CountUpdateAge = 0, Age = 0};
+            reponseStatus = EStatusCode.DATABASE_ERROR;
+            try
+            {
+                db = new DBHelper(ConfigDb.StoreUsersConnectionString);
+                var pars = new SqlParameter[3];
+                pars[0] = new SqlParameter("@_CountUpdateAge", SqlDbType.BigInt) { Direction = ParameterDirection.Output };
+                pars[1] = new SqlParameter("@_Age", SqlDbType.Float) { Direction = ParameterDirection.Output };
+                pars[2] = new SqlParameter("@_ResponseStatus", SqlDbType.Int) { Direction = ParameterDirection.Output };
+                db.ExecuteNonQuerySP("SP_Store_Users_statistical_Age", 4, pars);
+                reponseStatus = Convert.ToInt32(pars[2].Value);
+                if (reponseStatus == 0)
+                {
+                    float countAvg = 0;
+                    float.TryParse(pars[1].Value.ToString(), out countAvg);
+                    modelReturn.Age = countAvg;
+                    int count = 0;
+                    int.TryParse(pars[0].Value.ToString(), out count);
+                    modelReturn.CountUpdateAge = count;
+                }
+            }
+            catch (Exception exception)
+            {
+                Task.Run(async () => await _logger.LogError("SQL-GetAgeAvg()", exception.ToString()).ConfigureAwait(false));
+            }
+            finally
+            {
+                db?.Close();
+            }
+            return modelReturn;
+        }
+        public long GetRegisByTime(int type, DateTime startTime, DateTime endTime, out int reponseStatus)
+        {
+            DBHelper db = null;
+            long countRegis = 0;
+            reponseStatus = EStatusCode.DATABASE_ERROR;
+            try
+            {
+                db = new DBHelper(ConfigDb.StoreUsersConnectionString);
+                var pars = new SqlParameter[5];
+                pars[0] = new SqlParameter("@_Type", type);
+                pars[1] = new SqlParameter("@_StartTime", startTime);
+                pars[2] = new SqlParameter("@_EndTime", endTime);
+                pars[3] = new SqlParameter("@_Count", SqlDbType.BigInt) { Direction = ParameterDirection.Output };
+                pars[4] = new SqlParameter("@_ResponseStatus", SqlDbType.Int) { Direction = ParameterDirection.Output };
+                db.ExecuteNonQuerySP("SP_Store_Users_Statistical_Regis_By_Time", 4, pars);
+                reponseStatus = Convert.ToInt32(pars[4].Value);
+                if (reponseStatus == 0)
+                {
+                    long.TryParse(pars[3].Value.ToString(), out countRegis);
+                }
+            }
+            catch (Exception exception)
+            {
+                Task.Run(async () => await _logger.LogError("SQL-GetRegisByTime()", exception.ToString()).ConfigureAwait(false));
+            }
+            finally
+            {
+                db?.Close();
+            }
+            return countRegis;
         }
         #endregion
     }

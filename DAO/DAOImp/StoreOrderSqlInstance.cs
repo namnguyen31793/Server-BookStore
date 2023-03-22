@@ -39,7 +39,7 @@ namespace DAO.DAOImp
             }
         }
 
-        public OrderInfoObject CreateNewOrder(long AccountId,long CustomerId, string type, string Description, string Barcodes, string Numbers, int VourcherId, string PaymentMethod, out int reponseStatus)
+        public OrderInfoObject CreateNewOrder(long AccountId,long CustomerId, string type, string Description, string Barcodes, string Numbers, int VourcherId, string PaymentMethod, int CityCode, out int reponseStatus)
         {
             DBHelper db = null;
             OrderInfoObject modelData = null;
@@ -56,6 +56,7 @@ namespace DAO.DAOImp
                 pars[5] = new SqlParameter("@_Numbers", Numbers);
                 pars[6] = new SqlParameter("@_VourcherId", VourcherId);
                 pars[7] = new SqlParameter("@_PaymentMethod", PaymentMethod);
+                pars[6] = new SqlParameter("@_CityCode", CityCode);
                 pars[8] = new SqlParameter("@_ResponseStatus", SqlDbType.Int) { Direction = ParameterDirection.Output };
                 modelData = db.GetInstanceSP<OrderInfoObject>("SP_Store_Order_Order_New", 4, pars);
                 reponseStatus = Convert.ToInt32(pars[8].Value);
@@ -117,6 +118,30 @@ namespace DAO.DAOImp
             catch (Exception exception)
             {
                 Task.Run(async () => await _logger.LogError("SQL-EndOrder()", exception.ToString()).ConfigureAwait(false));
+            }
+            finally
+            {
+                db?.Close();
+            }
+            return modelData;
+        }
+        public List<OrderInfoObject> GetOrderByAccountId(long AccountId, out int reponseStatus)
+        {
+            DBHelper db = null;
+            List<OrderInfoObject> modelData = null;
+            reponseStatus = EStatusCode.DATABASE_ERROR;
+            try
+            {
+                db = new DBHelper(ConfigDb.StoreOrderConnectionString);
+                var pars = new SqlParameter[2];
+                pars[0] = new SqlParameter("@_AccountId", AccountId);
+                pars[1] = new SqlParameter("@_ResponseStatus", SqlDbType.Int) { Direction = ParameterDirection.Output };
+                modelData = db.GetListSP<OrderInfoObject>("SP_Store_Order_Order_Get_By_Account_Id", 4, pars);
+                reponseStatus = Convert.ToInt32(pars[1].Value);
+            }
+            catch (Exception exception)
+            {
+                Task.Run(async () => await _logger.LogError("SQL-GetOrderByAccountId()", exception.ToString()).ConfigureAwait(false));
             }
             finally
             {
@@ -224,6 +249,37 @@ namespace DAO.DAOImp
             catch (Exception exception)
             {
                 Task.Run(async () => await _logger.LogError("SQL-GetCustomerInfo()", exception.ToString()).ConfigureAwait(false));
+            }
+            finally
+            {
+                db?.Close();
+            }
+            return modelData;
+        }
+        public List<CustomerInfoModel> UpdateCustomerInfo(long CustomerId, string CustomerName, string CustomerMobile, string CustomerEmail, string CustomerAddress, bool Defaut, out int reponseStatus)
+        {
+            DBHelper db = null;
+            bool status = true;
+            List<CustomerInfoModel> modelData = null;
+            reponseStatus = EStatusCode.DATABASE_ERROR;
+            try
+            {
+                db = new DBHelper(ConfigDb.StoreOrderConnectionString);
+                var pars = new SqlParameter[8];
+                pars[0] = new SqlParameter("@_CustomerId", CustomerId);
+                pars[1] = new SqlParameter("@_CustomerName", CustomerName);
+                pars[2] = new SqlParameter("@_CustomerMobile", CustomerMobile);
+                pars[3] = new SqlParameter("@_CustomerEmail", CustomerEmail);
+                pars[4] = new SqlParameter("@_CustomerAddress", CustomerAddress);
+                pars[5] = new SqlParameter("@_Defaut", Defaut);
+                pars[6] = new SqlParameter("@_Status", status);
+                pars[7] = new SqlParameter("@_ResponseStatus", SqlDbType.Int) { Direction = ParameterDirection.Output };
+                modelData = db.GetListSP<CustomerInfoModel>("SP_Store_Order_Customer_Update", 4, pars);
+                reponseStatus = Convert.ToInt32(pars[6].Value);
+            }
+            catch (Exception exception)
+            {
+                Task.Run(async () => await _logger.LogError("SQL-UpdateCustomerInfo()", exception.ToString()).ConfigureAwait(false));
             }
             finally
             {

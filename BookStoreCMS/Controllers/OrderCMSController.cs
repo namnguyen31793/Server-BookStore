@@ -72,7 +72,7 @@ namespace BookStoreCMS.Controllers
             {
                 return Ok(new ResponseApiModel<string>() { Status = EStatusCode.ORDER_NOT_DATA, Messenger = UltilsHelper.GetMessageByErrorCode(EStatusCode.ORDER_NOT_DATA) });
             }
-            var data = StoreOrderSqlInstance.Inst.CreateNewOrder(request.AccountId, request.CustomerId, request.Type, request.Description, request.Barcodes, request.Numbers, request.VourcherId, request.PaymentMethod, out responseStatus);
+            var data = StoreOrderSqlInstance.Inst.CreateNewOrder(request.AccountId, request.CustomerId, request.Type, request.Description, request.Barcodes, request.Numbers, request.VourcherId, request.PaymentMethod, request.cityCode, out responseStatus);
 
             return Ok(new ResponseApiModel<OrderInfoObject>() { Status = responseStatus, Messenger = UltilsHelper.GetMessageByErrorCode(responseStatus), DataResponse = data });
         }

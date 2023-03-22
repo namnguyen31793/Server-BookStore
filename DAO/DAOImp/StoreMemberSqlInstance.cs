@@ -145,5 +145,37 @@ namespace DAO.DAOImp
             }
             return listConfig;
         }
+
+        public long GetVipCountByTime(int vip, DateTime startTime, DateTime endTime, out int reponseStatus)
+        {
+            DBHelper db = null;
+            long countRegis = 0;
+            reponseStatus = EStatusCode.DATABASE_ERROR;
+            try
+            {
+                db = new DBHelper(ConfigDb.StoreMemberConnectionString);
+                var pars = new SqlParameter[5];
+                pars[0] = new SqlParameter("@_Vip", vip);
+                pars[1] = new SqlParameter("@_StartTime", startTime);
+                pars[2] = new SqlParameter("@_EndTime", endTime);
+                pars[3] = new SqlParameter("@_Count", SqlDbType.BigInt) { Direction = ParameterDirection.Output };
+                pars[4] = new SqlParameter("@_ResponseStatus", SqlDbType.Int) { Direction = ParameterDirection.Output };
+                db.ExecuteNonQuerySP("SP_Store_Users_Statistical_Regis_By_Time", 4, pars);
+                reponseStatus = Convert.ToInt32(pars[4].Value);
+                if (reponseStatus == 0)
+                {
+                    long.TryParse(pars[3].Value.ToString(), out countRegis);
+                }
+            }
+            catch (Exception exception)
+            {
+                Task.Run(async () => await _logger.LogError("SQL-GetVipCountByTime()", exception.ToString()).ConfigureAwait(false));
+            }
+            finally
+            {
+                db?.Close();
+            }
+            return countRegis;
+        }
     }
 }
