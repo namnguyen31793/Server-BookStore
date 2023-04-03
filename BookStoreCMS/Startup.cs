@@ -53,7 +53,8 @@ namespace CoreWebApi
 
         private void SetupConfig(IConfiguration Configuration)
         {
-            NO_SQL_CONFIG.Initialize(Configuration.GetSection("Mongo")["IpAddress"]);
+            NO_SQL_CONFIG.InitializeCMS(Configuration.GetSection("Mongo")["IpAddress"], Configuration.GetSection("GHN")["CONNECTION"], Configuration.GetSection("GHN")["Token"], Configuration.GetSection("GHN")["ShopId"],
+                Configuration.GetSection("Adress")["from_name"], Configuration.GetSection("Adress")["from_phone"], Configuration.GetSection("Adress")["from_address"], Configuration.GetSection("Adress")["from_ward_name"], Configuration.GetSection("Adress")["from_district_name"], Configuration.GetSection("Adress")["from_district_code"], Configuration.GetSection("Adress")["from_province_name"]);
             RedisConfig.Initialize(Configuration.GetSection("RedisConfig")["RedisIp"], Configuration.GetSection("RedisConfig")["RedisPort"], Configuration.GetSection("RedisConfig")["RedisPassword"]);
             ConfigDb.Initialize(Configuration.GetSection("DbConfig")["CONNECTION"], Configuration.GetSection("DbConfig")["SQLPASS"]);
             var emailConfig = Configuration.GetSection("EmailConfiguration").Get<EmailConfiguration>();

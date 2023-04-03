@@ -1,5 +1,6 @@
 ﻿using BookStore.Instance;
 using BookStore.Interfaces;
+using BookStore.Schedule;
 using BookStore.Utils;
 using LoggerService;
 using LoggerService.Interfaces;
@@ -9,6 +10,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Versioning;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Net.Http.Headers;
+using Quartz;
 using StackExchange.Redis.Extensions.Core.Abstractions;
 using System;
 using System.Collections.Generic;

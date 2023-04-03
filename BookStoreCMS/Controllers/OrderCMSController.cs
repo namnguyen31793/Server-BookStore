@@ -78,6 +78,24 @@ namespace BookStoreCMS.Controllers
         }
 
         [HttpPost]
+        [Route("GetserviceIdGhn")]
+        [ResponseCache(Duration = 0, Location = ResponseCacheLocation.None, NoStore = true)]
+        public async Task<IActionResult> GetserviceIdGhn(int todistrict)
+        {
+            int responseStatus = -99;
+            var dataGhn = await GhnInstance.Inst.SendGetserviceIdGhn(NO_SQL_CONFIG.from_district_code, todistrict);
+            ResponseGhnModel<ServiceId[]> modelResponseGghn = JsonConvert.DeserializeObject<ResponseGhnModel<ServiceId[]>>(dataGhn);
+            if (modelResponseGghn.code == 200)
+            {
+                return Ok(new ResponseApiModel<ServiceId[]>() { Status = responseStatus, Messenger = UltilsHelper.GetMessageByErrorCode(responseStatus), DataResponse = modelResponseGghn.data });
+            }
+            else
+            {
+                return Ok(new ResponseApiModel<OrderInfoObject>() { Status = modelResponseGghn.code, Messenger = modelResponseGghn.message });
+            }
+        }
+
+        [HttpPost]
         [Route("ChangeOrderProcess")]
         [ResponseCache(Duration = 0, Location = ResponseCacheLocation.None, NoStore = true)]
         public async Task<IActionResult> ChangeOrderProcess(RequestProcessOrderModel requestchange)
@@ -92,10 +110,36 @@ namespace BookStoreCMS.Controllers
             int checkRole = await _tokenManager.CheckRoleActionAsync(ERole.Administrator, Request);
             if (checkRole < 0)
                 return Ok(new ResponseApiModel<string>() { Status = checkRole, Messenger = UltilsHelper.GetMessageByErrorCode(checkRole) });
+            //get info Order by id
+            var listModel = StoreOrderSqlInstance.Inst.GetOrderById(requestchange.OrderId, out responseStatus);
+            var modelOrder = listModel.FirstOrDefault();
+            if (modelOrder == null) {
+                return Ok(new ResponseApiModel<string>() { Status = EStatusCode.ID_NOT_EXITS, Messenger = UltilsHelper.GetMessageByErrorCode(EStatusCode.ID_NOT_EXITS) });
+            }
+            if(string.IsNullOrEmpty(modelOrder.CustomerAddress))
+                return Ok(new ResponseApiModel<string>() { Status = EStatusCode.ADRESS_NOT_EXITS, Messenger = UltilsHelper.GetMessageByErrorCode(EStatusCode.ADRESS_NOT_EXITS) });
+            //list item
+            ItemGhnModel[] listItem = null;
+            //parse model adress
+            AdressModel modelAdress = JsonConvert.DeserializeObject<AdressModel>(modelOrder.CustomerAddress);
+            //send GHN
+            var dataGhn = await GhnInstance.Inst.SendCreateOrderGhn(modelOrder.Description, modelOrder.CustomerName, modelOrder.CustomerMobile, modelAdress.AdrDetail, modelAdress.AdrWard, modelAdress.AdrdDistrict, modelAdress.AdrCity, modelOrder.TotalMoney, 
+                requestchange.PrivateDescription, requestchange.weight, requestchange.length, requestchange.width, requestchange.height, listItem, requestchange.service_id, requestchange.service_type_id);
 
-            var data = StoreOrderSqlInstance.Inst.ChangeOrderProcess(requestchange.OrderId, requestchange.ShipMoney, requestchange.PrivateDescription, requestchange.AllowTest, out responseStatus);
-
-            return Ok(new ResponseApiModel<OrderInfoObject>() { Status = responseStatus, Messenger = UltilsHelper.GetMessageByErrorCode(responseStatus), DataResponse = data });
+            await _logger.LogError("Account-ChangeOrderProcess GHN{}", dataGhn + "  " + JsonConvert.SerializeObject(modelOrder) + "  "+JsonConvert.SerializeObject(requestchange)).ConfigureAwait(false);
+            ResponseGhnModel<ResponseGhnData> modelResponseGghn = JsonConvert.DeserializeObject<ResponseGhnModel<ResponseGhnData>>(dataGhn);
+            if (modelResponseGghn.code == 200)
+            {
+                long totalFee = 0;
+                long.TryParse(modelResponseGghn.data.total_fee, out totalFee);
+                //save to db
+                var data = StoreOrderSqlInstance.Inst.ChangeOrderProcess(requestchange.OrderId, totalFee, modelResponseGghn.data.order_code, requestchange.AllowTest, out responseStatus);
+                return Ok(new ResponseApiModel<OrderInfoObject>() { Status = responseStatus, Messenger = UltilsHelper.GetMessageByErrorCode(responseStatus), DataResponse = data });
+            }
+            else
+            {
+                return Ok(new ResponseApiModel<OrderInfoObject>() { Status = modelResponseGghn.code, Messenger = modelResponseGghn.message});
+            }
         }
 
         [HttpPost]

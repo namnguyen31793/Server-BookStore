@@ -47,7 +47,7 @@ namespace DAO.DAOImp
             try
             {
                 db = new DBHelper(ConfigDb.StoreOrderConnectionString);
-                var pars = new SqlParameter[9];
+                var pars = new SqlParameter[10];
                 pars[0] = new SqlParameter("@_AccountId", AccountId);
                 pars[1] = new SqlParameter("@_CustomerId", CustomerId);
                 pars[2] = new SqlParameter("@_Type", type);
@@ -56,10 +56,10 @@ namespace DAO.DAOImp
                 pars[5] = new SqlParameter("@_Numbers", Numbers);
                 pars[6] = new SqlParameter("@_VourcherId", VourcherId);
                 pars[7] = new SqlParameter("@_PaymentMethod", PaymentMethod);
-                pars[6] = new SqlParameter("@_CityCode", CityCode);
-                pars[8] = new SqlParameter("@_ResponseStatus", SqlDbType.Int) { Direction = ParameterDirection.Output };
-                modelData = db.GetInstanceSP<OrderInfoObject>("SP_Store_Order_Order_New", 4, pars);
-                reponseStatus = Convert.ToInt32(pars[8].Value);
+                pars[8] = new SqlParameter("@_CityCode", CityCode);
+                pars[9] = new SqlParameter("@_ResponseStatus", SqlDbType.Int) { Direction = ParameterDirection.Output };
+                modelData = db.GetInstanceSP<OrderInfoObject>("SP_Store_Order_Order_New", 10, pars);
+                reponseStatus = Convert.ToInt32(pars[9].Value);
             }
             catch (Exception exception)
             {
@@ -125,6 +125,31 @@ namespace DAO.DAOImp
             }
             return modelData;
         }
+        public List<OrderInfoObject> GetOrderById(long OrderId, out int reponseStatus)
+        {
+            DBHelper db = null;
+            List<OrderInfoObject> modelData = null;
+            reponseStatus = EStatusCode.DATABASE_ERROR;
+            try
+            {
+                db = new DBHelper(ConfigDb.StoreOrderConnectionString);
+                var pars = new SqlParameter[2];
+                pars[0] = new SqlParameter("@_OrderId", OrderId);
+                pars[1] = new SqlParameter("@_ResponseStatus", SqlDbType.Int) { Direction = ParameterDirection.Output };
+                modelData = db.GetListSP<OrderInfoObject>("SP_Store_Order_Order_Get_By_Id", 4, pars);
+                reponseStatus = Convert.ToInt32(pars[1].Value);
+            }
+            catch (Exception exception)
+            {
+                Task.Run(async () => await _logger.LogError("SQL-GetOrderByAccountId()", exception.ToString()).ConfigureAwait(false));
+            }
+            finally
+            {
+                db?.Close();
+            }
+            return modelData;
+        }
+
         public List<OrderInfoObject> GetOrderByAccountId(long AccountId, out int reponseStatus)
         {
             DBHelper db = null;
@@ -275,7 +300,7 @@ namespace DAO.DAOImp
                 pars[6] = new SqlParameter("@_Status", status);
                 pars[7] = new SqlParameter("@_ResponseStatus", SqlDbType.Int) { Direction = ParameterDirection.Output };
                 modelData = db.GetListSP<CustomerInfoModel>("SP_Store_Order_Customer_Update", 4, pars);
-                reponseStatus = Convert.ToInt32(pars[6].Value);
+                reponseStatus = Convert.ToInt32(pars[7].Value);
             }
             catch (Exception exception)
             {

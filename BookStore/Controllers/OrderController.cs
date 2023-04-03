@@ -49,11 +49,11 @@ namespace BookStore.Controllers
             string key = "SPAM:CREATE_ORDER_INFO" + clientInfo.TrueClientIp + "-" + clientInfo.DeviceId;
             if (RedisGatewayCacheManager.Inst.CheckExistKey(key))
                 return Ok(new ResponseApiModel<string>() { Status = EStatusCode.TRANSACTION_SPAM, Messenger = UltilsHelper.GetMessageByErrorCode(EStatusCode.TRANSACTION_SPAM) });
-            await RedisGatewayCacheManager.Inst.SaveDataSecond(key, "1", 5).ConfigureAwait(false);
             long accountId = await _tokenManager.GetAccountIdByAccessTokenAsync(Request);
             if (accountId <= 0)
                 return Ok(new ResponseApiModel<string>() { Status = accountId, Messenger = UltilsHelper.GetMessageByErrorCode((int)accountId) });
-           
+            await RedisGatewayCacheManager.Inst.SaveDataSecond(key, "1", 3).ConfigureAwait(false);
+
             var data = StoreOrderSqlInstance.Inst.CreateCustomerInfo(accountId, request.CustomerName, request.CustomerMobile, request.CustomerEmail, request.CustomerAddress, request.Defaut, out responseStatus);
             //update cache
             if (responseStatus == EStatusCode.SUCCESS) {
@@ -70,13 +70,15 @@ namespace BookStore.Controllers
         {
             int responseStatus = -99;
             var clientInfo = new ClientRequestInfo(Request);
-            string key = "SPAM:CREATE_ORDER_INFO" + clientInfo.TrueClientIp + "-" + clientInfo.DeviceId;
+            string key = "SPAM:UPDATE_ORDER_INFO" + clientInfo.TrueClientIp + "-" + clientInfo.DeviceId;
             if (RedisGatewayCacheManager.Inst.CheckExistKey(key))
                 return Ok(new ResponseApiModel<string>() { Status = EStatusCode.TRANSACTION_SPAM, Messenger = UltilsHelper.GetMessageByErrorCode(EStatusCode.TRANSACTION_SPAM) });
-            await RedisGatewayCacheManager.Inst.SaveDataSecond(key, "1", 5).ConfigureAwait(false);
             long accountId = await _tokenManager.GetAccountIdByAccessTokenAsync(Request);
             if (accountId <= 0)
                 return Ok(new ResponseApiModel<string>() { Status = accountId, Messenger = UltilsHelper.GetMessageByErrorCode((int)accountId) });
+            await RedisGatewayCacheManager.Inst.SaveDataSecond(key, "1", 3).ConfigureAwait(false);
+            if (request.CustomerId <= 0)
+                return Ok(new ResponseApiModel<List<CustomerInfoModel>>() { Status = EStatusCode.DATA_INVAILD, Messenger = UltilsHelper.GetMessageByErrorCode(EStatusCode.DATA_INVAILD) });
 
             var data = StoreOrderSqlInstance.Inst.UpdateCustomerInfo(request.CustomerId, request.CustomerName, request.CustomerMobile, request.CustomerEmail, request.CustomerAddress, request.Defaut, out responseStatus);
             //update cache
@@ -152,10 +154,10 @@ namespace BookStore.Controllers
             string key = "SPAM:CREATE_ORDER" + clientInfo.TrueClientIp + "-" + clientInfo.DeviceId;
             if (RedisGatewayCacheManager.Inst.CheckExistKey(key))
                 return Ok(new ResponseApiModel<string>() { Status = EStatusCode.TRANSACTION_SPAM, Messenger = UltilsHelper.GetMessageByErrorCode(EStatusCode.TRANSACTION_SPAM) });
-            await RedisGatewayCacheManager.Inst.SaveDataSecond(key, "1", 5).ConfigureAwait(false);
             long accountId = await _tokenManager.GetAccountIdByAccessTokenAsync(Request);
             if (accountId <= 0)
                 return Ok(new ResponseApiModel<string>() { Status = accountId, Messenger = UltilsHelper.GetMessageByErrorCode((int)accountId) });
+            await RedisGatewayCacheManager.Inst.SaveDataSecond(key, "1", 3).ConfigureAwait(false);
             //check barcode
             if (string.IsNullOrEmpty(request.Barcodes) || string.IsNullOrEmpty(request.Numbers))
                 return Ok(new ResponseApiModel<string>() { Status = EStatusCode.ORDER_NOT_DATA, Messenger = UltilsHelper.GetMessageByErrorCode(EStatusCode.ORDER_NOT_DATA) });
@@ -175,7 +177,11 @@ namespace BookStore.Controllers
                 return Ok(new ResponseApiModel<string>() { Status = EStatusCode.ORDER_NOT_DATA, Messenger = UltilsHelper.GetMessageByErrorCode(EStatusCode.ORDER_NOT_DATA) });
             }
             var data = StoreOrderSqlInstance.Inst.CreateNewOrder(accountId, request.CustomerId, request.Type, request.Description, request.Barcodes, request.Numbers, request.VourcherId, request.PaymentMethod, request.cityCode, out responseStatus);
-
+            if (responseStatus == EStatusCode.SUCCESS)
+            {
+                string keyRedis = "ORDER:" + accountId;
+                await RedisGatewayCacheManager.Inst.DeleteDataFromCacheAsync(keyRedis).ConfigureAwait(false);
+            }
             return Ok(new ResponseApiModel<OrderInfoObject>() { Status = responseStatus, Messenger = UltilsHelper.GetMessageByErrorCode(responseStatus), DataResponse = data });
         }
 

@@ -33,6 +33,10 @@ D:\Server\Server-BookStore\BookStore\obj\Release\netcoreapp3.1\PubTmp\Out\NETCor
 D:\Server\Server-BookStore\BookStore\obj\Release\netcoreapp3.1\PubTmp\Out\Newtonsoft.Json.dll
 D:\Server\Server-BookStore\BookStore\obj\Release\netcoreapp3.1\PubTmp\Out\Pipelines.Sockets.Unofficial.dll
 D:\Server\Server-BookStore\BookStore\obj\Release\netcoreapp3.1\PubTmp\Out\BouncyCastle.Crypto.dll
+D:\Server\Server-BookStore\BookStore\obj\Release\netcoreapp3.1\PubTmp\Out\Quartz.dll
+D:\Server\Server-BookStore\BookStore\obj\Release\netcoreapp3.1\PubTmp\Out\Quartz.AspNetCore.dll
+D:\Server\Server-BookStore\BookStore\obj\Release\netcoreapp3.1\PubTmp\Out\Quartz.Extensions.DependencyInjection.dll
+D:\Server\Server-BookStore\BookStore\obj\Release\netcoreapp3.1\PubTmp\Out\Quartz.Extensions.Hosting.dll
 D:\Server\Server-BookStore\BookStore\obj\Release\netcoreapp3.1\PubTmp\Out\RestSharp.dll
 D:\Server\Server-BookStore\BookStore\obj\Release\netcoreapp3.1\PubTmp\Out\SharpCompress.dll
 D:\Server\Server-BookStore\BookStore\obj\Release\netcoreapp3.1\PubTmp\Out\Snappier.dll
@@ -41,6 +45,7 @@ D:\Server\Server-BookStore\BookStore\obj\Release\netcoreapp3.1\PubTmp\Out\StackE
 D:\Server\Server-BookStore\BookStore\obj\Release\netcoreapp3.1\PubTmp\Out\StackExchange.Redis.Extensions.Core.dll
 D:\Server\Server-BookStore\BookStore\obj\Release\netcoreapp3.1\PubTmp\Out\System.Configuration.ConfigurationManager.dll
 D:\Server\Server-BookStore\BookStore\obj\Release\netcoreapp3.1\PubTmp\Out\System.Data.SqlClient.dll
+D:\Server\Server-BookStore\BookStore\obj\Release\netcoreapp3.1\PubTmp\Out\System.Diagnostics.DiagnosticSource.dll
 D:\Server\Server-BookStore\BookStore\obj\Release\netcoreapp3.1\PubTmp\Out\System.Diagnostics.PerformanceCounter.dll
 D:\Server\Server-BookStore\BookStore\obj\Release\netcoreapp3.1\PubTmp\Out\System.Drawing.Common.dll
 D:\Server\Server-BookStore\BookStore\obj\Release\netcoreapp3.1\PubTmp\Out\System.IO.Pipelines.dll

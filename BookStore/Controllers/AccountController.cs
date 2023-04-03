@@ -324,25 +324,25 @@ namespace BookStore.Controllers
             var responseCode = -99;
             try
             {
-                responseCode = await Task.Run(async () =>
+                int accountId = 0;
+                string nickName = "";
+                if (!string.IsNullOrEmpty(requestRegis.Email))
+                    nickName = requestRegis.Email.Split("@")[0];
+                responseCode = StoreUsersSqlInstance.Inst.Register(REGISTER_TYPE.NORMAL_TYPE, requestRegis.AccountName, nickName, AccountUtils.EncryptPasswordMd5(requestRegis.Password), clientInfo.MerchantId, clientInfo.TrueClientIp, clientInfo.DeviceId, (int)clientInfo.OsType,
+                    requestRegis.PhoneNumber, requestRegis.Email, "", out accountId);
+
+                if (responseCode == (int)EStatusCode.SUCCESS)
                 {
-                    int accountId = 0;
-                    string nickName = "";
-                    if (!string.IsNullOrEmpty(requestRegis.Email))
-                        nickName = requestRegis.Email.Split("@")[0];
-                    var res = StoreUsersSqlInstance.Inst.Register(REGISTER_TYPE.NORMAL_TYPE, requestRegis.AccountName, nickName, AccountUtils.EncryptPasswordMd5(requestRegis.Password), clientInfo.MerchantId, clientInfo.TrueClientIp, clientInfo.DeviceId, (int)clientInfo.OsType,
-                        requestRegis.PhoneNumber, requestRegis.Email, "", out accountId);
+                    await _logger.LogInfo("Account-Register{}", requestRegis.AccountName + " " + responseCode, responseCode.ToString()).ConfigureAwait(false);
+                    MailInstance.Inst.SendMailRegis(accountId);
+                    //if (AccountUtils.IsValidEmail(requestRegis.Email))
+                    //    await SendMailAsync(requestRegis.Email, accountId).ConfigureAwait(false);
+                }
+                else
+                {
+                    await _logger.LogError("Account-Register{}", JsonConvert.SerializeObject(requestRegis)+ " - "+ accountId + " - " + responseCode).ConfigureAwait(false);
+                }
 
-                    if (responseCode == (int)EStatusCode.SUCCESS)
-                    {
-                        await _logger.LogInfo("Account-Register{}", requestRegis.AccountName + " " + res, res.ToString()).ConfigureAwait(false);
-                        MailInstance.Inst.SendMailRegis(accountId);
-                        //if (AccountUtils.IsValidEmail(requestRegis.Email))
-                        //    await SendMailAsync(requestRegis.Email, accountId).ConfigureAwait(false);
-                    }
-                    return res;
-
-                });
                 if (responseCode == (int)EStatusCode.ACCOUNT_EXITS || responseCode == (int)EStatusCode.SUCCESS)
                 {
                     //do login
@@ -356,7 +356,7 @@ namespace BookStore.Controllers
                 }
                 else
                 {
-                    return Ok(new ResponseApiModel<string>() { Status = EStatusCode.SYSTEM_ERROR, Messenger = UltilsHelper.GetMessageByErrorCode(EStatusCode.SYSTEM_ERROR) });
+                    return Ok(new ResponseApiModel<string>() { Status = responseCode, Messenger = UltilsHelper.GetMessageByErrorCode(responseCode) });
                 }
             }
             catch (Exception ex)

@@ -52,6 +52,7 @@ namespace ShareData.ErrorCode
         public const int PAY_SQL_ERROR = -91;
         public const int ORDER_NOT_EXIST = -92;
         public const int ORDER_NOT_DATA = -93;
+        public const int ADRESS_NOT_EXITS = -94;
 
         public const int DATABASE_ERROR = -99;
         public const int CONNECT_ERROR = -100;

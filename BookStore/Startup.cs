@@ -20,6 +20,10 @@ using ShareData.Helper;
 using LoggerService;
 using BookStore.Utils;
 using BookStore.Instance;
+using Quartz.Spi;
+using Quartz;
+using BookStore.Schedule;
+using Quartz.Impl;
 
 namespace CoreWebApi
 {
@@ -62,6 +66,13 @@ namespace CoreWebApi
             services.ConfigureMailService();
             services.ConfigureTokenService();
             services.ConfigureReportService();
+            //job
+            //services.AddSingleton<IJobFactory, CustomQuartzJobFactory>();
+            //services.AddSingleton<ISchedulerFactory, StdSchedulerFactory>();
+            //services.AddSingleton<SaveLogJob>();
+            //services.AddSingleton(new JobMetadata(Guid.NewGuid(), typeof(SaveLogJob), "SaveLogJob Job", "* 0/5 * * * ?")); //5 min
+            //services.AddHostedService<QuartzHostedService>();
+
 
             services.AddControllers().AddJsonOptions(options =>
                 {

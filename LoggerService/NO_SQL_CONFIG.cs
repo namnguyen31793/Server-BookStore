@@ -10,9 +10,38 @@ namespace LoggerService
         {
             HOST_CONFIG = IpAddress;
         }
+        public static void InitializeCMS(string IpAddress, string Ghn_Url, string Ghn_Token, string Ghn_Id, string from_name, string from_phone, string from_address, string from_ward_name, string from_district_name, string From_district_code, string from_province_name)
+        {
+            HOST_CONFIG = IpAddress;
+            GHN_Url = Ghn_Url;
+            GHN_Token = Ghn_Token;
+            GHN_Id = Ghn_Id;
+            From_name = from_name;
+            From_phone = from_phone;
+            From_address = from_address;
+            From_ward_name = from_ward_name;
+            From_district_name = from_district_name;
+            from_district_code = int.Parse(From_district_code);
+            From_province_name = from_province_name;
+        }
         public static string HOST_CONFIG = "mongodb://localhost:27017";
         public static readonly string LOG_SYSTEM_DATABASE = "LogSystem";
         public static readonly string SLOT_MACHINE_SPIN_LOG_COLLECTION = "SlotMachine_SpinLog";
+
+        #region GHN
+        public static string GHN_Url = "";
+        public static string GHN_Token = "";
+        public static string GHN_Id = "";
+        #endregion
+        #region Adress
+        public static string From_name = "";
+        public static string From_phone = "";
+        public static string From_address = "";
+        public static string From_ward_name = "";
+        public static string From_district_name = "";
+        public static int from_district_code = 0;
+        public static string From_province_name = "";
+        #endregion
 
         #region Log
         public static readonly string API_LOG_SYSTEM_DATABASE_NAME = "ApiLogSystem";
@@ -30,6 +59,7 @@ namespace LoggerService
         public static readonly string API_LOG_TRACKING_LISTEN_AUDIO = "Tracking_Action_Listen_Audio_Collection";
         public static readonly string API_LOG_TRACKING_FIND_BOOK = "Tracking_Action_Find_Book_Collection";
         public static readonly string API_LOG_TRACKING_ONLINE = "Tracking_Action_Online";
+        public static readonly string API_LOG_TRACKING_ONLINE_BY_HOURS = "Tracking_Action_Online_By_Hours";
         #endregion
 
     }

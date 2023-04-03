@@ -54,7 +54,7 @@ namespace DAO.DAOImp
                 pars[4] = new SqlParameter("@_SourceId", merchantId);
                 pars[5] = new SqlParameter("@_AccountId", SqlDbType.BigInt) { Direction = ParameterDirection.Output };
                 pars[6] = new SqlParameter("@_ResponseStatus", SqlDbType.BigInt) { Direction = ParameterDirection.Output };
-                db.ExecuteNonQuerySP("SP_Store_Users_DoLogin", 4, pars);
+                db.ExecuteNonQuerySP("SP_Store_Users_DoLogin", 10, pars);
                 responseStatus = Convert.ToInt32(pars[6].Value.ToString());
                 accountId = Convert.ToInt64(pars[5].Value.ToString());
             }
@@ -96,7 +96,7 @@ namespace DAO.DAOImp
                 pars[10] = new SqlParameter("@_Avata", avata);
                 pars[11] = new SqlParameter("@_AccountId", SqlDbType.BigInt) { Direction = ParameterDirection.Output };
                 pars[12] = new SqlParameter("@_ResponseStatus", SqlDbType.BigInt) { Direction = ParameterDirection.Output };
-                db.ExecuteNonQuerySP("SP_Store_Users_Register", 4, pars);
+                db.ExecuteNonQuerySP("SP_Store_Users_Register", 10, pars);
                 response = Convert.ToInt32(pars[12].Value);
                 accountId = Convert.ToInt32(pars[11].Value);
             }

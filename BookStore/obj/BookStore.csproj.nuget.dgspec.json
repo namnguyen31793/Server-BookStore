@@ -79,6 +79,10 @@
               "target": "Package",
               "version": "[13.0.2, )"
             },
+            "Quartz.AspNetCore": {
+              "target": "Package",
+              "version": "[3.6.2, )"
+            },
             "RestSharp": {
               "target": "Package",
               "version": "[108.0.2, )"

@@ -193,6 +193,9 @@ namespace UtilsSystem.Utils
                 case EStatusCode.ORDER_NOT_DATA:
                     message = "Thông tin đặt hàng không chính xác";
                     break;
+                case EStatusCode.ADRESS_NOT_EXITS:
+                    message = "Địa chỉ không tồn tại!";
+                    break;
             }
             return message;
         }
