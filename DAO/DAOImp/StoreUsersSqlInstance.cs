@@ -175,7 +175,7 @@ namespace DAO.DAOImp
                 db = new DBHelper(ConfigDb.StoreUsersConnectionString);
                 var pars = new SqlParameter[2];
                 pars[0] = new SqlParameter("@_AccountId", accountId);
-                pars[1] = new SqlParameter("@_ResponseStatus", SqlDbType.BigInt) { Direction = ParameterDirection.Output };
+                pars[1] = new SqlParameter("@_ResponseStatus", SqlDbType.Int) { Direction = ParameterDirection.Output };
                 response = db.GetInstanceSP<AccountModelDb>("SP_Store_Users_Get_UserInfo", 4, pars);
                 responseStatus = Convert.ToInt32(pars[1].Value);
             }

@@ -182,6 +182,8 @@ namespace BookStoreCMS.Controllers
             {
                 await _logger.LogError("Account-GetAccountInfo{}", ex.ToString()).ConfigureAwait(false);
             }
+            if(response ==  null)
+                return Ok(new ResponseApiModel<AccountModel>() { Status = responseStatus, Messenger = UltilsHelper.GetMessageByErrorCode(responseStatus) });
 
             return Ok(new ResponseApiModel<AccountModel>() { Status = responseStatus, Messenger = UltilsHelper.GetMessageByErrorCode(responseStatus), DataResponse = new AccountModel(response) });
         }
