@@ -254,5 +254,119 @@ namespace DAO.DAOImp
                 db?.Close();
             }
         }
+
+        #region EMAIL
+        public List<EmailObject> GetListEmailAdmin()
+        {
+            DBHelper db = null;
+            List<EmailObject> mCurrentMail = null;
+            int responseStatus = EStatusCode.DATABASE_ERROR;
+            try
+            {
+                db = new DBHelper(ConfigDb.StoreMailConnectionString);
+                var pars = new SqlParameter[1];
+                pars[0] = new SqlParameter("@_ResponseStatus", SqlDbType.Int) { Direction = ParameterDirection.Output };
+                mCurrentMail = db.GetListSP<EmailObject>("SP_Store_List_Email_GetListEmail", 4, pars);
+                responseStatus = Convert.ToInt32(pars[0].Value);
+            }
+            catch (Exception exception)
+            {
+                Task.Run(async () => await _logger.LogError("SQL-GetListEmailAdmin()", exception.ToString()).ConfigureAwait(false));
+            }
+            finally
+            {
+                db?.Close();
+            }
+            return mCurrentMail;
+        }
+
+        public EmailObject AddEmailAdmin(string Username, string Password, bool Status, out int responseStatus)
+        {
+            DBHelper db = null;
+            EmailObject mCurrentMail = null;
+            responseStatus = EStatusCode.DATABASE_ERROR;
+            try
+            {
+                db = new DBHelper(ConfigDb.StoreMailConnectionString);
+                var pars = new SqlParameter[4];
+                pars[0] = new SqlParameter("@_Username", Username);
+                pars[1] = new SqlParameter("@_Password", Password);
+                pars[2] = new SqlParameter("@_Status", Status);
+                pars[3] = new SqlParameter("@_ResponseStatus", SqlDbType.Int) { Direction = ParameterDirection.Output };
+                mCurrentMail = db.GetInstanceSP<EmailObject>("SP_Store_List_Email_AddEmail", 4, pars);
+                responseStatus = Convert.ToInt32(pars[3].Value);
+            }
+            catch (Exception exception)
+            {
+                Task.Run(async () => await _logger.LogError("SQL-AddEmailAdmin()", exception.ToString()).ConfigureAwait(false));
+                return mCurrentMail;
+            }
+            finally
+            {
+                db?.Close();
+            }
+            return mCurrentMail;
+        }
+
+        public List<EmailObject> UpdateEmailAdmin(long EmailId, string Username, string Password, bool Status, out int responseStatus)
+        {
+            DBHelper db = null;
+            List<EmailObject> mCurrentMail = new List<EmailObject>();
+            responseStatus = EStatusCode.DATABASE_ERROR;
+            try
+            {
+                db = new DBHelper(ConfigDb.StoreMailConnectionString);
+                var pars = new SqlParameter[5];
+                pars[0] = new SqlParameter("@_Username", EmailId);
+                pars[1] = new SqlParameter("@_Username", Username);
+                pars[2] = new SqlParameter("@_Password", Password);
+                pars[3] = new SqlParameter("@_Status", Status);
+                pars[4] = new SqlParameter("@_ResponseStatus", SqlDbType.Int) { Direction = ParameterDirection.Output };
+                mCurrentMail = db.GetListSP<EmailObject>("SP_Store_List_Email_UpdateEmail", 4, pars);
+                responseStatus = Convert.ToInt32(pars[4].Value);
+            }
+            catch (Exception exception)
+            {
+                Task.Run(async () => await _logger.LogError("SQL-UpdateEmailAdmin()", exception.ToString()).ConfigureAwait(false));
+                return mCurrentMail;
+            }
+            finally
+            {
+                db?.Close();
+            }
+            return mCurrentMail;
+        }
+
+        public int GetEmailSaveDatabase(out string Username, out string Password) {
+            int responseStatus = EStatusCode.DATABASE_ERROR;
+            Username = "";
+            Password = "";
+            DBHelper db = null;
+            try
+            {
+                db = new DBHelper(ConfigDb.StoreMailConnectionString);
+                var pars = new SqlParameter[3];
+                pars[0] = new SqlParameter("@_Username", SqlDbType.NVarChar, 512) { Direction = ParameterDirection.Output };
+                pars[1] = new SqlParameter("@_Password", SqlDbType.NVarChar, 512) { Direction = ParameterDirection.Output };
+                pars[2] = new SqlParameter("@_ResponseStatus", SqlDbType.Int) { Direction = ParameterDirection.Output };
+                db.ExecuteNonQuerySP("SP_Store_List_Email_GetEmail", 4, pars);
+                responseStatus = Convert.ToInt32(pars[2].Value);
+                if (responseStatus >= 0)
+                {
+                    Username = pars[0].Value.ToString();
+                    Password = pars[1].Value.ToString();
+                }
+            }
+            catch (Exception exception)
+            {
+                Task.Run(async () => await _logger.LogError("SQL-GetEmailSaveDatabase()", exception.ToString()).ConfigureAwait(false));
+            }
+            finally
+            {
+                db?.Close();
+            }
+            return responseStatus;
+        }
+        #endregion
     }
 }

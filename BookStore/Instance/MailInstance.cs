@@ -144,9 +144,15 @@ namespace BookStore.Instance
             {
                 try
                 {
+                    string username = "";
+                    string Password = "";
+                    var responseCode = StoreMailSqlInstance.Inst.GetEmailSaveDatabase(out username, out Password);
+                    if (responseCode < 0)
+                        return;
                     await client.ConnectAsync(CONFIG.EmailConfig.SmtpServer, CONFIG.EmailConfig.Port, true);
                     client.AuthenticationMechanisms.Remove("XOAUTH2");
-                    await client.AuthenticateAsync(CONFIG.EmailConfig.UserName, CONFIG.EmailConfig.Password);
+                    await client.AuthenticateAsync(username, Password);
+                    //await client.AuthenticateAsync(CONFIG.EmailConfig.UserName, CONFIG.EmailConfig.Password);
                     await client.SendAsync(mailMessage);
                 }
                 catch

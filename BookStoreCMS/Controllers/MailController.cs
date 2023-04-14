@@ -108,5 +108,76 @@ namespace BookStoreCMS.Controllers
 
             return Ok(response);
         }
+
+        #region EMAIL
+        [HttpGet]
+        [ResponseCache(Duration = 5)]
+        [Route("GetListEmailAdmin")]
+        public async Task<IActionResult> GetListEmailAdmin()
+        {
+            var response = new ResponseApiModel<string>() { Status = EStatusCode.SYSTEM_ERROR, Messenger = UltilsHelper.GetMessageByErrorCode(EStatusCode.SYSTEM_ERROR) };
+            try
+            {
+                int checkRole = await _tokenManager.CheckRoleActionAsync(ERole.Administrator, Request);
+                if (checkRole < 0)
+                    return Ok(new ResponseApiModel<string>() { Status = checkRole, Messenger = UltilsHelper.GetMessageByErrorCode(checkRole) });
+                var model = StoreMailSqlInstance.Inst.GetListEmailAdmin();
+
+                response = new ResponseApiModel<string>() { Status = EStatusCode.SUCCESS, Messenger = UltilsHelper.GetMessageByErrorCode(EStatusCode.SUCCESS), DataResponse = JsonConvert.SerializeObject(model) };
+            }
+            catch (Exception ex)
+            {
+                await _logger.LogError("Account-GetMailUser{}", ex.ToString()).ConfigureAwait(false);
+            }
+
+            return Ok(response);
+        }
+
+        [HttpPost]
+        [Route("AddEmailAdmin")]
+        public async Task<IActionResult> AddEmailAdmin(RequestEmaiModel request)
+        {
+            var response = new ResponseApiModel<string>() { Status = EStatusCode.SYSTEM_ERROR, Messenger = UltilsHelper.GetMessageByErrorCode(EStatusCode.SYSTEM_ERROR) };
+            int responseStatus = 0;
+            try
+            {
+                int checkRole = await _tokenManager.CheckRoleActionAsync(ERole.Administrator, Request);
+                if (checkRole < 0)
+                    return Ok(new ResponseApiModel<string>() { Status = checkRole, Messenger = UltilsHelper.GetMessageByErrorCode(checkRole) });
+                var model = StoreMailSqlInstance.Inst.AddEmailAdmin(request.Username, request.Password, request.Status, out responseStatus);
+
+                response = new ResponseApiModel<string>() { Status = responseStatus, Messenger = UltilsHelper.GetMessageByErrorCode(responseStatus), DataResponse = JsonConvert.SerializeObject(model) };
+            }
+            catch (Exception ex)
+            {
+                await _logger.LogError("Account-GetMailUser{}", ex.ToString()).ConfigureAwait(false);
+            }
+
+            return Ok(response);
+        }
+
+        [HttpPost]
+        [Route("UpdateEmailAdmin")]
+        public async Task<IActionResult> UpdateEmailAdmin(RequestEmaiModel request)
+        {
+            var response = new ResponseApiModel<string>() { Status = EStatusCode.SYSTEM_ERROR, Messenger = UltilsHelper.GetMessageByErrorCode(EStatusCode.SYSTEM_ERROR) };
+            int responseStatus = 0;
+            try
+            {
+                int checkRole = await _tokenManager.CheckRoleActionAsync(ERole.Administrator, Request);
+                if (checkRole < 0)
+                    return Ok(new ResponseApiModel<string>() { Status = checkRole, Messenger = UltilsHelper.GetMessageByErrorCode(checkRole) });
+                var model = StoreMailSqlInstance.Inst.UpdateEmailAdmin(request.MailId, request.Username, request.Password, request.Status, out responseStatus);
+
+                response = new ResponseApiModel<string>() { Status = responseStatus, Messenger = UltilsHelper.GetMessageByErrorCode(responseStatus), DataResponse = JsonConvert.SerializeObject(model) };
+            }
+            catch (Exception ex)
+            {
+                await _logger.LogError("Account-GetMailUser{}", ex.ToString()).ConfigureAwait(false);
+            }
+
+            return Ok(response);
+        }
+        #endregion
     }
 }

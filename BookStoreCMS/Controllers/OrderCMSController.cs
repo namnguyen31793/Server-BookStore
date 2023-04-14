@@ -72,26 +72,34 @@ namespace BookStoreCMS.Controllers
             {
                 return Ok(new ResponseApiModel<string>() { Status = EStatusCode.ORDER_NOT_DATA, Messenger = UltilsHelper.GetMessageByErrorCode(EStatusCode.ORDER_NOT_DATA) });
             }
-            var data = StoreOrderSqlInstance.Inst.CreateNewOrder(request.AccountId, request.CustomerId, request.Type, request.Description, request.Barcodes, request.Numbers, request.VourcherId, request.PaymentMethod, request.cityCode, out responseStatus);
+            var data = StoreOrderSqlInstance.Inst.CreateNewOrderCMS(request.AccountId, request.CustomerName, request.CustomerMobile, request.CustomerEmail, request.CustomerAddress, request.Type, request.Description, request.Barcodes, request.Numbers, request.PaymentMethod, request.ShipMoney, request.TotalDiscountMoney, request.VourcherMoney, out responseStatus);
 
             return Ok(new ResponseApiModel<OrderInfoObject>() { Status = responseStatus, Messenger = UltilsHelper.GetMessageByErrorCode(responseStatus), DataResponse = data });
         }
 
-        [HttpPost]
+        [HttpGet]
         [Route("GetserviceIdGhn")]
         [ResponseCache(Duration = 0, Location = ResponseCacheLocation.None, NoStore = true)]
         public async Task<IActionResult> GetserviceIdGhn(int todistrict)
         {
-            int responseStatus = -99;
-            var dataGhn = await GhnInstance.Inst.SendGetserviceIdGhn(NO_SQL_CONFIG.from_district_code, todistrict);
-            ResponseGhnModel<ServiceId[]> modelResponseGghn = JsonConvert.DeserializeObject<ResponseGhnModel<ServiceId[]>>(dataGhn);
-            if (modelResponseGghn.code == 200)
+            string dataGhn = "";
+            try
             {
-                return Ok(new ResponseApiModel<ServiceId[]>() { Status = responseStatus, Messenger = UltilsHelper.GetMessageByErrorCode(responseStatus), DataResponse = modelResponseGghn.data });
+                dataGhn = await GhnInstance.Inst.SendGetserviceIdGhn(NO_SQL_CONFIG.from_district_code, todistrict);
+                ResponseGhnModel<ServiceId[]> modelResponseGghn = JsonConvert.DeserializeObject<ResponseGhnModel<ServiceId[]>>(dataGhn);
+                if (modelResponseGghn.code == 200)
+                {
+                    return Ok(new ResponseApiModel<ServiceId[]>() { Status = 0, Messenger = UltilsHelper.GetMessageByErrorCode(0), DataResponse = modelResponseGghn.data });
+                }
+                else
+                {
+                    return Ok(new ResponseApiModel<OrderInfoObject>() { Status = modelResponseGghn.code, Messenger = modelResponseGghn.message });
+                }
             }
-            else
+            catch (Exception ex)
             {
-                return Ok(new ResponseApiModel<OrderInfoObject>() { Status = modelResponseGghn.code, Messenger = modelResponseGghn.message });
+                await _logger.LogError("GetserviceIdGhn", ex.ToString()+" - "+dataGhn).ConfigureAwait(false);
+                return Ok(new ResponseApiModel<OrderInfoObject>() { Status = EStatusCode.DATA_INVAILD, Messenger = UltilsHelper.GetMessageByErrorCode(EStatusCode.DATA_INVAILD) });
             }
         }
 
@@ -182,6 +190,72 @@ namespace BookStoreCMS.Controllers
 
             return Ok(new ResponseApiModel<List<OrderInfoObject>>() { Status = responseStatus, Messenger = UltilsHelper.GetMessageByErrorCode(responseStatus), DataResponse = data });
         }
+
+
+        #region INFO SHIP
+        [HttpPost]
+        [Route("CreateOrderInfo")]
+        [ResponseCache(Duration = 0, Location = ResponseCacheLocation.None, NoStore = true)]
+        public async Task<IActionResult> CreateOrderInfo(RequestCreateOrderInfoModelCMS request)
+        {
+            int responseStatus = -99;
+            var clientInfo = new ClientRequestInfo(Request);
+            string key = "SPAM:CREATE_ORDER_INFO" + clientInfo.TrueClientIp + "-" + clientInfo.DeviceId;
+            if (RedisGatewayCacheManager.Inst.CheckExistKey(key))
+                return Ok(new ResponseApiModel<string>() { Status = EStatusCode.TRANSACTION_SPAM, Messenger = UltilsHelper.GetMessageByErrorCode(EStatusCode.TRANSACTION_SPAM) });
+
+            int checkRole = await _tokenManager.CheckRoleActionAsync(ERole.Administrator, Request);
+            if (checkRole < 0)
+                return Ok(new ResponseApiModel<string>() { Status = checkRole, Messenger = UltilsHelper.GetMessageByErrorCode(checkRole) });
+
+            await RedisGatewayCacheManager.Inst.SaveDataSecond(key, "1", 3).ConfigureAwait(false);
+
+            var data = StoreOrderSqlInstance.Inst.CreateCustomerInfo(request.AccountId, request.CustomerName, request.CustomerMobile, request.CustomerEmail, request.CustomerAddress, request.Defaut, out responseStatus);
+            //update cache
+            if (responseStatus == EStatusCode.SUCCESS)
+            {
+                string keyRedis = "CUSTOMER:" + request.AccountId;
+                await RedisGatewayCacheManager.Inst.SaveDataSecond(keyRedis, JsonConvert.SerializeObject(data), 300).ConfigureAwait(false);
+            }
+            return Ok(new ResponseApiModel<List<CustomerInfoModel>>() { Status = responseStatus, Messenger = UltilsHelper.GetMessageByErrorCode(responseStatus), DataResponse = data });
+        }
+
+        [HttpGet]
+        [Route("GetOrderInfo")]
+        [ResponseCache(Duration = 5)]
+        public async Task<IActionResult> GetOrderInfo(long AccountId)
+        {
+            int checkRole = await _tokenManager.CheckRoleActionAsync(ERole.Administrator, Request);
+            if (checkRole < 0)
+                return Ok(new ResponseApiModel<string>() { Status = checkRole, Messenger = UltilsHelper.GetMessageByErrorCode(checkRole) });
+
+            int responseStatus = EStatusCode.DATABASE_ERROR;
+            string keyRedis = "CUSTOMER:" + AccountId;
+            string jsonTag = await RedisGatewayCacheManager.Inst.GetDataFromCacheAsync(keyRedis);
+            try
+            {
+                if (string.IsNullOrEmpty(jsonTag))
+                {
+                    var data = StoreOrderSqlInstance.Inst.GetCustomerInfo(AccountId, out responseStatus);
+                    //update cache
+                    if (responseStatus == EStatusCode.SUCCESS)
+                    {
+                        jsonTag = JsonConvert.SerializeObject(data);
+                        await RedisGatewayCacheManager.Inst.SaveDataSecond(keyRedis, jsonTag, 300).ConfigureAwait(false);
+                    }
+                }
+                else
+                {
+                    responseStatus = EStatusCode.SUCCESS;
+                }
+            }
+            catch
+            {
+
+            }
+            return Ok(new ResponseApiModel<string>() { Status = responseStatus, Messenger = UltilsHelper.GetMessageByErrorCode(responseStatus), DataResponse = jsonTag });
+        }
+        #endregion
     }
 
 }

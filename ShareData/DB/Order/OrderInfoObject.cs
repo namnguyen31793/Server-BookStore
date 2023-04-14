@@ -29,5 +29,6 @@ namespace ShareData.DB.Order
         public DateTime? TimeUpdate { get; set; }
         public string TempBarcodes { get; set; }
         public string TempNumbers { get; set; }
+        public int VourcherId { get; set; }
     }
 }

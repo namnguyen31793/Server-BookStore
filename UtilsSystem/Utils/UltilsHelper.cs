@@ -196,6 +196,12 @@ namespace UtilsSystem.Utils
                 case EStatusCode.ADRESS_NOT_EXITS:
                     message = "Địa chỉ không tồn tại!";
                     break;
+                case EStatusCode.REFRESH_TOKEN_EXPIRES:
+                    message = "Refresh token hết hạn!";
+                    break;
+                case EStatusCode.EMAIL_NOT_ENOUGH:
+                    message = "Đã sử dụng hết email trong kho!";
+                    break;
             }
             return message;
         }

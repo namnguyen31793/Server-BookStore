@@ -53,6 +53,8 @@ namespace ShareData.ErrorCode
         public const int ORDER_NOT_EXIST = -92;
         public const int ORDER_NOT_DATA = -93;
         public const int ADRESS_NOT_EXITS = -94;
+        public const int REFRESH_TOKEN_EXPIRES = -95;
+        public const int EMAIL_NOT_ENOUGH = -96;
 
         public const int DATABASE_ERROR = -99;
         public const int CONNECT_ERROR = -100;

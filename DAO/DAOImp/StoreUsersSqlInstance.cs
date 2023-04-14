@@ -53,7 +53,7 @@ namespace DAO.DAOImp
                 pars[3] = new SqlParameter("@_PlatformId", ostype);
                 pars[4] = new SqlParameter("@_SourceId", merchantId);
                 pars[5] = new SqlParameter("@_AccountId", SqlDbType.BigInt) { Direction = ParameterDirection.Output };
-                pars[6] = new SqlParameter("@_ResponseStatus", SqlDbType.BigInt) { Direction = ParameterDirection.Output };
+                pars[6] = new SqlParameter("@_ResponseStatus", SqlDbType.Int) { Direction = ParameterDirection.Output };
                 db.ExecuteNonQuerySP("SP_Store_Users_DoLogin", 10, pars);
                 responseStatus = Convert.ToInt32(pars[6].Value.ToString());
                 accountId = Convert.ToInt64(pars[5].Value.ToString());
@@ -182,6 +182,30 @@ namespace DAO.DAOImp
             catch (Exception exception)
             {
                 Task.Run(async () => await _logger.LogError("SQL-GetAccountInfo()", exception.ToString()).ConfigureAwait(false));
+            }
+            finally
+            {
+                db?.Close();
+            }
+            return response;
+        }
+        public AccountModelDb GetAccountInfoByMail(string email, ref int responseStatus)
+        {
+            DBHelper db = null;
+            var response = new AccountModelDb();
+            try
+            {
+
+                db = new DBHelper(ConfigDb.StoreUsersConnectionString);
+                var pars = new SqlParameter[2];
+                pars[0] = new SqlParameter("@_Email", email);
+                pars[1] = new SqlParameter("@_ResponseStatus", SqlDbType.Int) { Direction = ParameterDirection.Output };
+                response = db.GetInstanceSP<AccountModelDb>("SP_Store_Users_Get_UserInfo_ByMail", 4, pars);
+                responseStatus = Convert.ToInt32(pars[1].Value);
+            }
+            catch (Exception exception)
+            {
+                Task.Run(async () => await _logger.LogError("SQL-GetAccountInfoByMail()", exception.ToString()).ConfigureAwait(false));
             }
             finally
             {

@@ -38,6 +38,42 @@ namespace DAO.DAOImp
                 return _inst;
             }
         }
+        public OrderInfoObject CreateNewOrderCMS(long AccountId, string CustomerName, string CustomerMobile, string CustomerEmail, string CustomerAddress, string type, string Description, string Barcodes, string Numbers, string PaymentMethod, long ShipMoney, long TotalDiscountMoney, long VourcherMoney, out int reponseStatus)
+        {
+            DBHelper db = null;
+            OrderInfoObject modelData = null;
+            reponseStatus = EStatusCode.DATABASE_ERROR;
+            try
+            {
+                db = new DBHelper(ConfigDb.StoreOrderConnectionString);
+                var pars = new SqlParameter[14];
+                pars[0] = new SqlParameter("@_AccountId", AccountId);
+                pars[1] = new SqlParameter("@_CustomerName", CustomerName);
+                pars[2] = new SqlParameter("@_CustomerMobile", CustomerMobile);
+                pars[3] = new SqlParameter("@_CustomerEmail", CustomerEmail);
+                pars[4] = new SqlParameter("@_CustomerAddress", CustomerAddress);
+                pars[5] = new SqlParameter("@_Type", type);
+                pars[6] = new SqlParameter("@_Description", Description);
+                pars[7] = new SqlParameter("@_Barcodes", Barcodes);
+                pars[8] = new SqlParameter("@_Numbers", Numbers);
+                pars[9] = new SqlParameter("@_PaymentMethod", PaymentMethod);
+                pars[10] = new SqlParameter("@_ShipMoney", ShipMoney);
+                pars[11] = new SqlParameter("@_TotalDiscountMoney", TotalDiscountMoney);
+                pars[12] = new SqlParameter("@_VourcherMoney", VourcherMoney);
+                pars[13] = new SqlParameter("@_ResponseStatus", SqlDbType.Int) { Direction = ParameterDirection.Output };
+                modelData = db.GetInstanceSP<OrderInfoObject>("SP_Store_Order_CMS_Order_New", 10, pars);
+                reponseStatus = Convert.ToInt32(pars[13].Value);
+            }
+            catch (Exception exception)
+            {
+                Task.Run(async () => await _logger.LogError("SQL-CreateNewOrderCMS()", exception.ToString()).ConfigureAwait(false));
+            }
+            finally
+            {
+                db?.Close();
+            }
+            return modelData;
+        }
 
         public OrderInfoObject CreateNewOrder(long AccountId,long CustomerId, string type, string Description, string Barcodes, string Numbers, int VourcherId, string PaymentMethod, int CityCode, out int reponseStatus)
         {
