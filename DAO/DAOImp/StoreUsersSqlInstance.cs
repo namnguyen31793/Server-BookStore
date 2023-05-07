@@ -576,6 +576,37 @@ namespace DAO.DAOImp
             }
             return countRegis;
         }
+        public long GetCountRegis(int Os, DateTime startTime, DateTime endTime, out int reponseStatus)
+        {
+            DBHelper db = null;
+            long countRegis = 0;
+            reponseStatus = EStatusCode.DATABASE_ERROR;
+            try
+            {
+                db = new DBHelper(ConfigDb.StoreUsersConnectionString);
+                var pars = new SqlParameter[5];
+                pars[0] = new SqlParameter("@_Type", Os);
+                pars[1] = new SqlParameter("@_StartTime", startTime);
+                pars[2] = new SqlParameter("@_EndTime", endTime);
+                pars[3] = new SqlParameter("@_Count", SqlDbType.BigInt) { Direction = ParameterDirection.Output };
+                pars[4] = new SqlParameter("@_ResponseStatus", SqlDbType.Int) { Direction = ParameterDirection.Output };
+                db.ExecuteNonQuerySP("SP_Store_Users_Statistical_Count_Regis", 4, pars);
+                reponseStatus = Convert.ToInt32(pars[4].Value);
+                if (reponseStatus == 0)
+                {
+                    long.TryParse(pars[3].Value.ToString(), out countRegis);
+                }
+            }
+            catch (Exception exception)
+            {
+                Task.Run(async () => await _logger.LogError("SQL-GetCountRegis()", exception.ToString()).ConfigureAwait(false));
+            }
+            finally
+            {
+                db?.Close();
+            }
+            return countRegis;
+        }
         #endregion
     }
 }

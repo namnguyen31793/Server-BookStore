@@ -43,7 +43,7 @@ namespace BookStoreCMS.Controllers
 
         [HttpGet]
         [Route("GetAgeAvg")]
-        [ResponseCache(Duration = 60)]
+        [ResponseCache(Duration = 0, Location = ResponseCacheLocation.None, NoStore = true)]
         public async Task<IActionResult> GetAgeAvg()
         {
             int responseStatus = -99;
@@ -63,9 +63,9 @@ namespace BookStoreCMS.Controllers
         }
 
         [HttpPost]
-        [Route("GetCountRegis")]
-        [ResponseCache(Duration = 60)]
-        public async Task<IActionResult> GetCountRegis(RequestGetRegisCmsModel requestRegis)
+        [Route("GetCountRegisType")]
+        [ResponseCache(Duration = 0, Location = ResponseCacheLocation.None, NoStore = true)]
+        public async Task<IActionResult> GetCountRegisType(RequestGetRegisCmsModel requestRegis)
         {
             int responseStatus = -99;
             int checkRole = await _tokenManager.CheckRoleActionAsync(ERole.Administrator, Request);
@@ -79,7 +79,7 @@ namespace BookStoreCMS.Controllers
 
         [HttpPost]
         [Route("GetCountMember")]
-        [ResponseCache(Duration = 60)]
+        [ResponseCache(Duration = 0, Location = ResponseCacheLocation.None, NoStore = true)]
         public async Task<IActionResult> GetCountMember(RequestGetMemberCmsModel requestMember)
         {
             int responseStatus = -99;
@@ -91,5 +91,63 @@ namespace BookStoreCMS.Controllers
 
             return Ok(new ResponseApiModel<long>() { Status = responseStatus, Messenger = UltilsHelper.GetMessageByErrorCode(responseStatus), DataResponse = data });
         }
+
+        [HttpPost]
+        [Route("GetCountRegis")]
+        [ResponseCache(Duration = 0, Location = ResponseCacheLocation.None, NoStore = true)]
+        public async Task<IActionResult> GetCountRegis(RequestGetCountRegis request)
+        {
+            int responseStatus = -99;
+            int checkRole = await _tokenManager.CheckRoleActionAsync(ERole.Administrator, Request);
+            if (checkRole < 0)
+                return Ok(new ResponseApiModel<string>() { Status = checkRole, Messenger = UltilsHelper.GetMessageByErrorCode(checkRole) });
+
+            var data = StoreUsersSqlInstance.Inst.GetCountRegis(request.Os, request.StartTime, request.EndTime, out responseStatus);
+
+            return Ok(new ResponseApiModel<long>() { Status = responseStatus, Messenger = UltilsHelper.GetMessageByErrorCode(responseStatus), DataResponse = data });
+        }
+
+        [HttpPost]
+        [Route("GetActionUser")]
+        [ResponseCache(Duration = 0, Location = ResponseCacheLocation.None, NoStore = true)]
+        public async Task<IActionResult> GetActionUser(RequestGetAction request)
+        {
+            //int checkRole = await _tokenManager.CheckRoleActionAsync(ERole.Administrator, Request);
+            //if (checkRole < 0)
+            //    return Ok(new ResponseApiModel<string>() { Status = checkRole, Messenger = UltilsHelper.GetMessageByErrorCode(checkRole) });
+
+            var data = TrackingLogSystemInstance.Inst.Get_ActionUser(request.Action, request.StartTime, request.EndTime);
+
+            return Ok(new ResponseApiModel<string>() { Status = 0, Messenger = "", DataResponse = JsonConvert.SerializeObject(data) });
+        }
+
+        [HttpPost]
+        [Route("GetActionHome")]
+        [ResponseCache(Duration = 0, Location = ResponseCacheLocation.None, NoStore = true)]
+        public async Task<IActionResult> GetActionHome(RequestGetAction request)
+        {
+            //int checkRole = await _tokenManager.CheckRoleActionAsync(ERole.Administrator, Request);
+            //if (checkRole < 0)
+            //    return Ok(new ResponseApiModel<string>() { Status = checkRole, Messenger = UltilsHelper.GetMessageByErrorCode(checkRole) });
+
+            var data = TrackingLogSystemInstance.Inst.Get_ActionHome(request.Action, request.StartTime, request.EndTime);
+
+            return Ok(new ResponseApiModel<string>() { Status = 0, Messenger = "", DataResponse = JsonConvert.SerializeObject(data) });
+        }
+
+        [HttpPost]
+        [Route("GetActionFindBook")]
+        [ResponseCache(Duration = 0, Location = ResponseCacheLocation.None, NoStore = true)]
+        public async Task<IActionResult> GetActionFindBook(RequestGetAction request)
+        {
+            //int checkRole = await _tokenManager.CheckRoleActionAsync(ERole.Administrator, Request);
+            //if (checkRole < 0)
+            //    return Ok(new ResponseApiModel<string>() { Status = checkRole, Messenger = UltilsHelper.GetMessageByErrorCode(checkRole) });
+
+            var data = TrackingLogSystemInstance.Inst.Get_ActionFindBook(request.Action, request.StartTime, request.EndTime);
+
+            return Ok(new ResponseApiModel<string>() { Status = 0, Messenger = "", DataResponse = JsonConvert.SerializeObject(data) });
+        }
+
     }
 }

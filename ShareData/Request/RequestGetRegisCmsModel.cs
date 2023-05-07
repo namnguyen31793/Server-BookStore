@@ -17,4 +17,16 @@ namespace ShareData.Request
         public DateTime StartTime { get; set; }
         public DateTime EndTime { get; set; }
     }
+    public class RequestGetCountRegis
+    {
+        public int Os { get; set; }   // 0 ALl, 1 web, 2 IOS, 3 Android
+        public DateTime StartTime { get; set; }
+        public DateTime EndTime { get; set; }
+    }
+    public class RequestGetAction
+    {
+        public string Action { get; set; } 
+        public DateTime StartTime { get; set; }
+        public DateTime EndTime { get; set; }
+    }
 }
