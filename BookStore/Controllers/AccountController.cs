@@ -308,6 +308,76 @@ namespace BookStore.Controllers
                 return Ok(new ResponseApiModel<string>() { Status = EStatusCode.SYSTEM_ERROR, Messenger = UltilsHelper.GetMessageByErrorCode(EStatusCode.SYSTEM_ERROR), DataResponse = ex.ToString() });
             }
         }
+        [HttpPost]
+        [Route("LoginApple")]
+        [ResponseCache(Duration = 0, Location = ResponseCacheLocation.None, NoStore = true)]
+        public async Task<IActionResult> LoginApple(RequestRegisterModel requestLogin)
+        {
+            if (!AccountUtils.IsRegisterRequestTrue(requestLogin))
+            {
+                return Ok(new ResponseApiModel<string>() { Status = EStatusCode.DATA_INVAILD, Messenger = UltilsHelper.GetMessageByErrorCode(EStatusCode.DATA_INVAILD) });
+            }
+            if (!string.IsNullOrEmpty(requestLogin.Email))
+                if (!AccountUtils.IsValidEmail(requestLogin.Email))
+                    return Ok(new ResponseApiModel<string>() { Status = EStatusCode.EMAIL_INVAILD, Messenger = UltilsHelper.GetMessageByErrorCode(EStatusCode.EMAIL_INVAILD) });
+            if (!string.IsNullOrEmpty(requestLogin.PhoneNumber))
+                if (!AccountUtils.IsPhoneNumber(requestLogin.PhoneNumber))
+                    return Ok(new ResponseApiModel<string>() { Status = EStatusCode.PHONE_INVAILD, Messenger = UltilsHelper.GetMessageByErrorCode(EStatusCode.PHONE_INVAILD) });
+
+            try
+            {
+                var clientInfo = new ClientRequestInfo(Request);
+                //check spam request
+                string key = "SPAM:LOGINFB" + clientInfo.TrueClientIp + "-" + clientInfo.DeviceId;
+                if (RedisGatewayCacheManager.Inst.CheckExistKey(key))
+                    return Ok(new ResponseApiModel<string>() { Status = EStatusCode.TRANSACTION_SPAM, Messenger = UltilsHelper.GetMessageByErrorCode(EStatusCode.TRANSACTION_SPAM) });
+                await RedisGatewayCacheManager.Inst.SaveDataSecond(key, "1", 3).ConfigureAwait(false);
+
+                var responseCode = -99;
+                responseCode = await Task.Run(async () =>
+                {
+                    int accountId = 0;
+                    string nickName = "";
+                    if (!string.IsNullOrEmpty(requestLogin.Email))
+                        nickName = requestLogin.Email.Split("@")[0];
+                    var res = StoreUsersSqlInstance.Inst.Register(REGISTER_TYPE.APPLE_TYPE, requestLogin.AccountName, nickName, AccountUtils.EncryptPasswordMd5(requestLogin.Password), clientInfo.MerchantId, clientInfo.TrueClientIp, clientInfo.DeviceId, (int)clientInfo.OsType,
+                        requestLogin.PhoneNumber, requestLogin.Email, "", out accountId);
+
+                    if (res == (int)EStatusCode.SUCCESS)
+                    {
+                        await _logger.LogInfo("Account-RegisterFB{}", requestLogin.AccountName + " " + res, res.ToString()).ConfigureAwait(false);
+                        MailInstance.Inst.SendMailRegis(accountId);
+                        //if (AccountUtils.IsValidEmail(requestLogin.Email))
+                        //    await SendMailAsync(requestLogin.Email, accountId).ConfigureAwait(false);
+                    }
+                    return res;
+
+                });
+                if (responseCode == (int)EStatusCode.SUCCESS)
+                {
+                    //TrackingDAO.Inst.TrackingRegis();
+                }
+                if (responseCode == (int)EStatusCode.ACCOUNT_EXITS || responseCode == (int)EStatusCode.SUCCESS)
+                {
+                    //do login
+                    RequestAuthenModel request = new RequestAuthenModel()
+                    {
+                        AccountName = requestLogin.AccountName,
+                        Password = requestLogin.Password,
+                    };
+                    var response = await LoginAsync(request, clientInfo);
+                    return Ok(response);
+                }
+                else
+                {
+                    return Ok(new ResponseApiModel<string>() { Status = EStatusCode.SYSTEM_ERROR, Messenger = UltilsHelper.GetMessageByErrorCode(EStatusCode.SYSTEM_ERROR) });
+                }
+            }
+            catch (Exception ex)
+            {
+                return Ok(new ResponseApiModel<string>() { Status = EStatusCode.SYSTEM_ERROR, Messenger = UltilsHelper.GetMessageByErrorCode(EStatusCode.SYSTEM_ERROR), DataResponse = ex.ToString() });
+            }
+        }
 
         [HttpPost]
         [Route("Register")]
