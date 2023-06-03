@@ -469,9 +469,42 @@ namespace BookStore.Controllers
             }
             return Ok(response);
         }
+
+        [HttpGet]
+        [Route("{TagId}/GetTagConfig")]
+        [ResponseCache(Duration = 60)]
+        public async Task<IActionResult> GetTagConfig2(int TagId)
+        {
+            var response = new ResponseApiModel<string>() { Status = EStatusCode.SYSTEM_ERROR, Messenger = UltilsHelper.GetMessageByErrorCode(EStatusCode.SYSTEM_ERROR) };
+            int responseStatus = EStatusCode.DATABASE_ERROR;
+            try
+            {
+                string keyRedis = "TagConfig:" + TagId;
+                string jsonTag = await RedisGatewayCacheManager.Inst.GetDataFromCacheAsync(keyRedis);
+                if (string.IsNullOrEmpty(jsonTag))
+                {
+                    var tagModel = StoreBookSqlInstance.Inst.GetTagConfig(TagId, out responseStatus);
+                    if (responseStatus == EStatusCode.SUCCESS)
+                    {
+                        jsonTag = JsonConvert.SerializeObject(tagModel);
+                        await RedisGatewayCacheManager.Inst.SaveDataAsync(keyRedis, jsonTag, 5);
+                    }
+                }
+                else
+                {
+                    responseStatus = EStatusCode.SUCCESS;
+                }
+                response = new ResponseApiModel<string>() { Status = responseStatus, Messenger = UltilsHelper.GetMessageByErrorCode(responseStatus), DataResponse = jsonTag };
+            }
+            catch (Exception ex)
+            {
+                await _logger.LogError("Books-GetListSimpleBookSameName{}", ex.ToString()).ConfigureAwait(false);
+            }
+            return Ok(response);
+        }
+
         [HttpGet]
         [Route("GetTagConfig")]
-        [ResponseCache(Duration = 60)]
         public async Task<IActionResult> GetTagConfig(int TagId)
         {
             var response = new ResponseApiModel<string>() { Status = EStatusCode.SYSTEM_ERROR, Messenger = UltilsHelper.GetMessageByErrorCode(EStatusCode.SYSTEM_ERROR) };
