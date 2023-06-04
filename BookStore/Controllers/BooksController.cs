@@ -603,5 +603,46 @@ namespace BookStore.Controllers
         }
 
         #endregion
+
+        #region REPRINT
+
+        [HttpGet]
+        [Route("{barcode}/CheckReprintBook")]
+        [ResponseCache(Duration = 10)]
+        public async Task<IActionResult> CheckReprintBook(string barcode)
+        {
+            var response = new ResponseApiModel<bool>() { Status = EStatusCode.SYSTEM_ERROR, Messenger = UltilsHelper.GetMessageByErrorCode(EStatusCode.SYSTEM_ERROR) };
+            int responseStatus = EStatusCode.DATABASE_ERROR;
+            try
+            {
+                var bookData = StoreBookSqlInstance.Inst.CheckReprintBook(barcode);
+                response = new ResponseApiModel<bool>() { Status = responseStatus, Messenger = UltilsHelper.GetMessageByErrorCode(responseStatus), DataResponse = bookData };
+            }
+            catch (Exception ex)
+            {
+                await _logger.LogError("Books-GetFeaturedBookData{}", ex.ToString()).ConfigureAwait(false);
+            }
+            return Ok(response);
+        }
+
+        [HttpGet]
+        [Route("GetReprintBook")]
+        [ResponseCache(Duration = 60)]
+        public async Task<IActionResult> GetReprintBook()
+        {
+            var response = new ResponseApiModel<string>() { Status = EStatusCode.SYSTEM_ERROR, Messenger = UltilsHelper.GetMessageByErrorCode(EStatusCode.SYSTEM_ERROR) };
+            int responseStatus = EStatusCode.DATABASE_ERROR;
+            try
+            {
+                var bookConfig = StoreBookSqlInstance.Inst.GetAllReprintBook(out responseStatus);
+                response = new ResponseApiModel<string>() { Status = responseStatus, Messenger = UltilsHelper.GetMessageByErrorCode(responseStatus), DataResponse = JsonConvert.SerializeObject(bookConfig) };
+            }
+            catch (Exception ex)
+            {
+                await _logger.LogError("Books-GetReprintBook{}", ex.ToString()).ConfigureAwait(false);
+            }
+            return Ok(response);
+        }
+        #endregion
     }
 }

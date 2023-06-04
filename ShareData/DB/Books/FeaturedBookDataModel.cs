@@ -10,4 +10,8 @@ namespace ShareData.DB.Books
         public int FeatureType { get; set; }
         public string Barcode { get; set; }
     }
+    public class ReprintBookDataModel
+    {
+        public string Barcode { get; set; }
+    }
 }

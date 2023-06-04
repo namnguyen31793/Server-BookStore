@@ -526,5 +526,65 @@ namespace BookStoreCMS.Controllers
             return Ok(response);
         }
         #endregion
+        #region Reprint book 
+        [HttpGet]
+        [Route("GetReprintBook")]
+        public async Task<IActionResult> GetReprintBook()
+        {
+            var response = new ResponseApiModel<string>() { Status = EStatusCode.SYSTEM_ERROR, Messenger = UltilsHelper.GetMessageByErrorCode(EStatusCode.SYSTEM_ERROR) };
+            int responseStatus = EStatusCode.DATABASE_ERROR;
+            try
+            {
+                var bookConfig = StoreBookSqlInstance.Inst.GetAllReprintBook(out responseStatus);
+                response = new ResponseApiModel<string>() { Status = responseStatus, Messenger = UltilsHelper.GetMessageByErrorCode(responseStatus), DataResponse = JsonConvert.SerializeObject(bookConfig) };
+            }
+            catch (Exception ex)
+            {
+                await _logger.LogError("Books-GetReprintBook{}", ex.ToString()).ConfigureAwait(false);
+            }
+            return Ok(response);
+        }
+        [HttpPost]
+        [Route("AddReprintBook")]
+        public async Task<IActionResult> AddReprintBook(string barcode)
+        {
+            int checkRole = await _tokenManager.CheckRoleActionAsync(ERole.Administrator, Request);
+            if (checkRole < 0)
+                return Ok(new ResponseApiModel<string>() { Status = checkRole, Messenger = UltilsHelper.GetMessageByErrorCode(checkRole) });
+            var response = new ResponseApiModel<string>() { Status = EStatusCode.SYSTEM_ERROR, Messenger = UltilsHelper.GetMessageByErrorCode(EStatusCode.SYSTEM_ERROR) };
+            int responseStatus = EStatusCode.DATABASE_ERROR;
+            try
+            {
+                StoreBookSqlInstance.Inst.AddReprintBook(barcode, out responseStatus);
+                response = new ResponseApiModel<string>() { Status = responseStatus, Messenger = UltilsHelper.GetMessageByErrorCode(responseStatus) };
+            }
+            catch (Exception ex)
+            {
+                await _logger.LogError("Books-AddReprintBook{}", ex.ToString()).ConfigureAwait(false);
+            }
+            return Ok(response);
+        }
+
+        [HttpPost]
+        [Route("RemoveReprintBook")]
+        public async Task<IActionResult> RemoveReprintBook(string barcode)
+        {
+            int checkRole = await _tokenManager.CheckRoleActionAsync(ERole.Administrator, Request);
+            if (checkRole < 0)
+                return Ok(new ResponseApiModel<string>() { Status = checkRole, Messenger = UltilsHelper.GetMessageByErrorCode(checkRole) });
+            var response = new ResponseApiModel<string>() { Status = EStatusCode.SYSTEM_ERROR, Messenger = UltilsHelper.GetMessageByErrorCode(EStatusCode.SYSTEM_ERROR) };
+            int responseStatus = EStatusCode.DATABASE_ERROR;
+            try
+            {
+                StoreBookSqlInstance.Inst.RemoveReprintBook(barcode, out responseStatus);
+                response = new ResponseApiModel<string>() { Status = responseStatus, Messenger = UltilsHelper.GetMessageByErrorCode(responseStatus) };
+            }
+            catch (Exception ex)
+            {
+                await _logger.LogError("Books-RemoveReprintBook{}", ex.ToString()).ConfigureAwait(false);
+            }
+            return Ok(response);
+        }
+        #endregion
     }
 }

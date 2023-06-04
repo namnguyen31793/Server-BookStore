@@ -1150,6 +1150,103 @@ namespace DAO.DAOImp
         }
         #endregion
 
+        #region Reprint
+        public bool CheckReprintBook(string barcode)
+        {
+            DBHelper db = null;
+            bool check = false;
+            int reponseStatus = EStatusCode.DATABASE_ERROR;
+            try
+            {
+                db = new DBHelper(ConfigDb.StoreBookConnectionString);
+                var pars = new SqlParameter[3];
+                pars[0] = new SqlParameter("@_Barcode", barcode);
+                pars[1] = new SqlParameter("@_Check", SqlDbType.Bit) { Direction = ParameterDirection.Output };
+                pars[2] = new SqlParameter("@_ResponseStatus", SqlDbType.Int) { Direction = ParameterDirection.Output };
+                db.ExecuteNonQuerySP("SP_Store_Book_Reprint_Check_BarCode", 4, pars);
+                check = Convert.ToBoolean(pars[1].Value);
+            }
+            catch (Exception exception)
+            {
+                Task.Run(async () => await _logger.LogError("SQL-SP_Store_Book_Reprint_Check_BarCode()", exception.ToString()).ConfigureAwait(false));
+            }
+            finally
+            {
+                db?.Close();
+            }
+            return check;
+        }
+        public void AddReprintBook(string barcode, out int reponseStatus)
+        {
+            DBHelper db = null;
+            reponseStatus = EStatusCode.DATABASE_ERROR;
+            try
+            {
+                db = new DBHelper(ConfigDb.StoreBookConnectionString);
+                var pars = new SqlParameter[3];
+                pars[0] = new SqlParameter("@_Barcode", barcode);
+                pars[1] = new SqlParameter("@_Status", true);
+                pars[2] = new SqlParameter("@_ResponseStatus", SqlDbType.Int) { Direction = ParameterDirection.Output };
+                db.ExecuteNonQuerySP("SP_Store_Book_Reprint_Add", 4, pars);
+                reponseStatus = Convert.ToInt32(pars[2].Value);
+            }
+            catch (Exception exception)
+            {
+                Task.Run(async () => await _logger.LogError("SQL-SP_Store_Book_Reprint_Add()", exception.ToString()).ConfigureAwait(false));
+            }
+            finally
+            {
+                db?.Close();
+            }
+        }
+        public void RemoveReprintBook(string barcode, out int reponseStatus)
+        {
+            DBHelper db = null;
+            reponseStatus = EStatusCode.DATABASE_ERROR;
+            try
+            {
+                db = new DBHelper(ConfigDb.StoreBookConnectionString);
+                var pars = new SqlParameter[2];
+                pars[0] = new SqlParameter("@_Barcode", barcode);
+                pars[1] = new SqlParameter("@_ResponseStatus", SqlDbType.Int) { Direction = ParameterDirection.Output };
+                db.ExecuteNonQuerySP("SP_Store_Book_Reprint_Data_Remove", 4, pars);
+                reponseStatus = Convert.ToInt32(pars[1].Value);
+            }
+            catch (Exception exception)
+            {
+                Task.Run(async () => await _logger.LogError("SQL-SP_Store_Book_Reprint_Data_Remove()", exception.ToString()).ConfigureAwait(false));
+            }
+            finally
+            {
+                db?.Close();
+            }
+        }
+        public List<ReprintBookDataModel> GetAllReprintBook(out int reponseStatus)
+        {
+            DBHelper db = null;
+            List<ReprintBookDataModel> data = null;
+            reponseStatus = EStatusCode.DATABASE_ERROR;
+            try
+            {
+                db = new DBHelper(ConfigDb.StoreBookConnectionString);
+                var pars = new SqlParameter[1];
+                pars[0] = new SqlParameter("@_ResponseStatus", SqlDbType.Int) { Direction = ParameterDirection.Output };
+                data = db.GetListSP<ReprintBookDataModel>("SP_Store_Book_Reprint_Get_All", 4, pars);
+                reponseStatus = Convert.ToInt32(pars[0].Value);
+            }
+            catch (Exception exception)
+            {
+                Task.Run(async () => await _logger.LogError("SQL-SP_Store_Book_Reprint_Get_All()", exception.ToString()).ConfigureAwait(false));
+            }
+            finally
+            {
+                db?.Close();
+            }
+            return data;
+        }
+
+        #endregion
+
         private string GetDataString(string data) {
             if (!string.IsNullOrEmpty(data))
                 return data;
