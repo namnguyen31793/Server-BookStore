@@ -50,8 +50,7 @@ namespace BookStore.Controllers
             {
                 return Ok(new ResponseApiModel<string>() { Status = EStatusCode.DATA_INVAILD, Messenger = UltilsHelper.GetMessageByErrorCode(EStatusCode.DATA_INVAILD) });
             }
-            try
-            {
+
                 var clientInfo = new ClientRequestInfo(Request);
                 //check spam request
                 string key = "SPAM:LOGIN" + clientInfo.TrueClientIp + "-" + clientInfo.DeviceId;
@@ -59,11 +58,7 @@ namespace BookStore.Controllers
                     return Ok(new ResponseApiModel<string>() { Status = EStatusCode.TRANSACTION_SPAM, Messenger = UltilsHelper.GetMessageByErrorCode(EStatusCode.TRANSACTION_SPAM) });
                 await RedisGatewayCacheManager.Inst.SaveDataSecond(key, "1", 3).ConfigureAwait(false);
                 response = await LoginAsync(requestLogin, clientInfo);
-            }
-            catch (Exception ex)
-            {
-                await _logger.LogError("Account-Login{}", ex.ToString()).ConfigureAwait(false);
-            }
+
 
             return Ok(response);
         }
@@ -83,8 +78,7 @@ namespace BookStore.Controllers
             if (!string.IsNullOrEmpty(requestLogin.PhoneNumber))
                 if (!AccountUtils.IsPhoneNumber(requestLogin.PhoneNumber))
                     return Ok(new ResponseApiModel<string>() { Status = EStatusCode.PHONE_INVAILD, Messenger = UltilsHelper.GetMessageByErrorCode(EStatusCode.PHONE_INVAILD) });
-            try
-            {
+
                 var clientInfo = new ClientRequestInfo(Request);
                 //check spam request
                 string key = "SPAM:LOGINGG" + clientInfo.TrueClientIp + "-" + clientInfo.DeviceId;
@@ -143,11 +137,7 @@ namespace BookStore.Controllers
                     await _logger.LogError("Account-LoginGoogle{}", contentLogGoogle).ConfigureAwait(false);
                     return Ok(new ResponseApiModel<string>() { Status = EStatusCode.SYSTEM_ERROR, Messenger = UltilsHelper.GetMessageByErrorCode(EStatusCode.SYSTEM_ERROR) });
                 }
-            }
-            catch (Exception ex)
-            {
-                return Ok(new ResponseApiModel<string>() { Status = EStatusCode.SYSTEM_ERROR, Messenger = UltilsHelper.GetMessageByErrorCode(EStatusCode.SYSTEM_ERROR), DataResponse = ex.ToString() });
-            }
+
         }
         [HttpPost]
         [Route("LoginGoogleJWT")]
@@ -165,8 +155,7 @@ namespace BookStore.Controllers
             if (!string.IsNullOrEmpty(requestLogin.PhoneNumber))
                 if (!AccountUtils.IsPhoneNumber(requestLogin.PhoneNumber))
                     return Ok(new ResponseApiModel<string>() { Status = EStatusCode.PHONE_INVAILD, Messenger = UltilsHelper.GetMessageByErrorCode(EStatusCode.PHONE_INVAILD) });
-            try
-            {
+
                 var clientInfo = new ClientRequestInfo(Request);
                 //check spam request
                 string key = "SPAM:LOGINGG" + clientInfo.TrueClientIp + "-" + clientInfo.DeviceId;
@@ -221,11 +210,7 @@ namespace BookStore.Controllers
                     await _logger.LogError("Account-LoginGoogleJWT{}", contentLogGoogle).ConfigureAwait(false);
                     return Ok(new ResponseApiModel<string>() { Status = EStatusCode.SYSTEM_ERROR, Messenger = UltilsHelper.GetMessageByErrorCode(EStatusCode.SYSTEM_ERROR) });
                 }
-            }
-            catch (Exception ex)
-            {
-                return Ok(new ResponseApiModel<string>() { Status = EStatusCode.SYSTEM_ERROR, Messenger = UltilsHelper.GetMessageByErrorCode(EStatusCode.SYSTEM_ERROR), DataResponse = ex.ToString() });
-            }
+
         }
 
 
@@ -244,8 +229,6 @@ namespace BookStore.Controllers
                 if (!AccountUtils.IsPhoneNumber(requestLogin.PhoneNumber))
                     return Ok(new ResponseApiModel<string>() { Status = EStatusCode.PHONE_INVAILD, Messenger = UltilsHelper.GetMessageByErrorCode(EStatusCode.PHONE_INVAILD) });
 
-            try
-            {
                 var clientInfo = new ClientRequestInfo(Request);
                 //check spam request
                 string key = "SPAM:LOGINFB" + clientInfo.TrueClientIp + "-" + clientInfo.DeviceId;
@@ -302,11 +285,7 @@ namespace BookStore.Controllers
                 {
                     return Ok(new ResponseApiModel<string>() { Status = EStatusCode.SYSTEM_ERROR, Messenger = UltilsHelper.GetMessageByErrorCode(EStatusCode.SYSTEM_ERROR) });
                 }
-            }
-            catch (Exception ex)
-            {
-                return Ok(new ResponseApiModel<string>() { Status = EStatusCode.SYSTEM_ERROR, Messenger = UltilsHelper.GetMessageByErrorCode(EStatusCode.SYSTEM_ERROR), DataResponse = ex.ToString() });
-            }
+
         }
         [HttpPost]
         [Route("LoginApple")]
@@ -324,8 +303,6 @@ namespace BookStore.Controllers
                 if (!AccountUtils.IsPhoneNumber(requestLogin.PhoneNumber))
                     return Ok(new ResponseApiModel<string>() { Status = EStatusCode.PHONE_INVAILD, Messenger = UltilsHelper.GetMessageByErrorCode(EStatusCode.PHONE_INVAILD) });
 
-            try
-            {
                 var clientInfo = new ClientRequestInfo(Request);
                 //check spam request
                 string key = "SPAM:LOGINFB" + clientInfo.TrueClientIp + "-" + clientInfo.DeviceId;
@@ -372,11 +349,7 @@ namespace BookStore.Controllers
                 {
                     return Ok(new ResponseApiModel<string>() { Status = EStatusCode.SYSTEM_ERROR, Messenger = UltilsHelper.GetMessageByErrorCode(EStatusCode.SYSTEM_ERROR) });
                 }
-            }
-            catch (Exception ex)
-            {
-                return Ok(new ResponseApiModel<string>() { Status = EStatusCode.SYSTEM_ERROR, Messenger = UltilsHelper.GetMessageByErrorCode(EStatusCode.SYSTEM_ERROR), DataResponse = ex.ToString() });
-            }
+
         }
 
         [HttpPost]
@@ -401,8 +374,7 @@ namespace BookStore.Controllers
                 return Ok(new ResponseApiModel<string>() { Status = EStatusCode.TRANSACTION_SPAM, Messenger = UltilsHelper.GetMessageByErrorCode(EStatusCode.TRANSACTION_SPAM) });
             await RedisGatewayCacheManager.Inst.SaveDataSecond(key, "1", 3).ConfigureAwait(false);
             var responseCode = -99;
-            try
-            {
+
                 int accountId = 0;
                 string nickName = "";
                 if (!string.IsNullOrEmpty(requestRegis.Email))
@@ -437,19 +409,13 @@ namespace BookStore.Controllers
                 {
                     return Ok(new ResponseApiModel<string>() { Status = responseCode, Messenger = UltilsHelper.GetMessageByErrorCode(responseCode) });
                 }
-            }
-            catch (Exception ex)
-            {
-                await _logger.LogError("Account-Register{}", ex.ToString()).ConfigureAwait(false);
-                return Ok(new ResponseApiModel<string>() { Status = EStatusCode.SUCCESS, Messenger = UtilsSystem.Utils.UltilsHelper.GetMessageByErrorCode(EStatusCode.SUCCESS) });
-            }
+
         }
 
         private async Task<ResponseApiModel<TokenInfo>> LoginAsync(RequestAuthenModel requestLogin, ClientRequestInfo clientInfo)
         {
             ResponseApiModel<TokenInfo> model = new ResponseApiModel<TokenInfo>() { Status = EStatusCode.SYSTEM_ERROR, Messenger = UltilsHelper.GetMessageByErrorCode(EStatusCode.SYSTEM_ERROR) };
-            try
-            {
+
                 var res = EStatusCode.SUCCESS;
                 var accountId = StoreUsersSqlInstance.Inst.DoLogin(requestLogin.AccountName, AccountUtils.EncryptPasswordMd5(requestLogin.Password), clientInfo.MerchantId, clientInfo.TrueClientIp, (int)clientInfo.OsType, ref res);
                 if (accountId >= 0)
@@ -475,11 +441,7 @@ namespace BookStore.Controllers
                 }
                 model.Status = res;
                 model.Messenger = UltilsHelper.GetMessageByErrorCode(res);
-            }
-            catch (Exception ex)
-            {
-                await _logger.LogError("Account-Login{}", ex.ToString()).ConfigureAwait(false);
-            }
+
             return model;
         }
 
@@ -489,8 +451,7 @@ namespace BookStore.Controllers
         public async Task<IActionResult> RefreshToken(TokenInfo data)
         {
             ResponseApiModel<TokenInfo> model = new ResponseApiModel<TokenInfo>() { Status = EStatusCode.SYSTEM_ERROR, Messenger = UltilsHelper.GetMessageByErrorCode(EStatusCode.SYSTEM_ERROR) };
-            try
-            {
+
                 var clientInfo = new ClientRequestInfo(Request);
                 string key = "SPAM:REFRESH" + clientInfo.TrueClientIp + "-" + clientInfo.DeviceId;
                 if (RedisGatewayCacheManager.Inst.CheckExistKey(key))
@@ -516,12 +477,6 @@ namespace BookStore.Controllers
                     return Ok(new ResponseApiModel<TokenInfo>() { Status = response, Messenger = UltilsHelper.GetMessageByErrorCode(response) });
                 }
                 return Ok(model);
-            }
-            catch (Exception ex)
-            {
-                await _logger.LogError("Account-RefreshToken{}", ex.ToString()).ConfigureAwait(false);
-            }
-            return Ok(new ResponseApiModel<string>() { Status = EStatusCode.SYSTEM_ERROR, Messenger = UltilsHelper.GetMessageByErrorCode(EStatusCode.SYSTEM_ERROR) });
         }
 
         [HttpGet]
@@ -531,17 +486,11 @@ namespace BookStore.Controllers
         {
             int responseStatus = -99;
             AccountModelDb response = null;
-            try
-            {
+
                 long accountId = await _tokenManager.GetAccountIdByAccessTokenAsync(Request);
                 if (accountId <= 0)
                     return Ok(new ResponseApiModel<string>() { Status = accountId, Messenger = UltilsHelper.GetMessageByErrorCode((int)accountId) });
                 response = StoreUsersSqlInstance.Inst.GetAccountInfo(accountId, ref responseStatus);
-            }
-            catch (Exception ex)
-            {
-                await _logger.LogError("Account-GetAccountInfo{}", ex.ToString()).ConfigureAwait(false);
-            }
 
             return Ok(new ResponseApiModel<AccountModel>() { Status = responseStatus, Messenger = UltilsHelper.GetMessageByErrorCode(responseStatus), DataResponse = new AccountModel(response) });
         }
@@ -553,17 +502,11 @@ namespace BookStore.Controllers
         {
             int responseStatus = -99;
             AccountModelDb response = null;
-            try
-            {
+
                 long accountId = await _tokenManager.GetAccountIdByAccessTokenAsync(Request);
                 if (accountId <= 0)
                     return Ok(new ResponseApiModel<string>() { Status = accountId, Messenger = UltilsHelper.GetMessageByErrorCode((int)accountId) });
                 response = StoreUsersSqlInstance.Inst.GetAccountInfoByMail(email, ref responseStatus);
-            }
-            catch (Exception ex)
-            {
-                await _logger.LogError("Account-GetAccountInfo{}", ex.ToString()).ConfigureAwait(false);
-            }
 
             return Ok(new ResponseApiModel<AccountModel>() { Status = responseStatus, Messenger = UltilsHelper.GetMessageByErrorCode(responseStatus), DataResponse = new AccountModel(response) });
         }
@@ -633,31 +576,25 @@ namespace BookStore.Controllers
             string passwordMd5 = "";
             string passDeMd5 = "";
             string email = "";
-            try
-            {
-                var clientInfo = new ClientRequestInfo(Request);
-                //check cache send mail
-                string key = "SPAM:ForgotPass" + clientInfo.TrueClientIp + "-" + clientInfo.DeviceId;
-                if (RedisGatewayCacheManager.Inst.CheckExistKey(key))
-                    return Ok(new ResponseApiModel<string>() { Status = EStatusCode.TRANSACTION_SEND_MAIL_SPAM, Messenger = UltilsHelper.GetMessageByErrorCode(EStatusCode.TRANSACTION_SEND_MAIL_SPAM) });
-                await RedisGatewayCacheManager.Inst.SaveDataSecond(key, "1", 300).ConfigureAwait(false);
-                //call db get mail
-                responseStatus = StoreUsersSqlInstance.Inst.ForgotPass(model.mail, out email, out passwordMd5);
-                passDeMd5 = AccountUtils.DecryptPasswordMd5(passwordMd5);
-                // send old pas to mail (md5 )
-                var message = new Message(new string[] { email }, "Quên mật khẩu Gamma Books", 
-                    "Xin chào " + email + "!" + Environment.NewLine +
-                    "Mật khẩu bạn cần dùng để truy cập vào Tài khoản Gamma Books của mình là:" + Environment.NewLine + passDeMd5 + Environment.NewLine +
-                    "Nếu bạn không yêu cầu thao tác này thì có thể là ai đó đang tìm cách truy cập vào Tài khoản Gamma Books của bạn. Không chuyển tiếp hoặc cung cấp mật khẩu này cho bất kỳ ai." + Environment.NewLine +
-                    "Trân trọng!"
-                    );
-                await _emailSender.SendEmailAsync(message);
-                await _logger.LogInfo("Account-ForgotPass{}", passwordMd5 + " - email:"+ email + " "+ responseStatus, responseStatus.ToString()).ConfigureAwait(false);
-            }
-            catch (Exception ex)
-            {
-                await _logger.LogError("Account-UpdateInfo{}", passwordMd5+" - "+ ex.ToString()).ConfigureAwait(false);
-            }
+
+            var clientInfo = new ClientRequestInfo(Request);
+            //check cache send mail
+            string key = "SPAM:ForgotPass" + clientInfo.TrueClientIp + "-" + clientInfo.DeviceId;
+            if (RedisGatewayCacheManager.Inst.CheckExistKey(key))
+                return Ok(new ResponseApiModel<string>() { Status = EStatusCode.TRANSACTION_SEND_MAIL_SPAM, Messenger = UltilsHelper.GetMessageByErrorCode(EStatusCode.TRANSACTION_SEND_MAIL_SPAM) });
+            await RedisGatewayCacheManager.Inst.SaveDataSecond(key, "1", 300).ConfigureAwait(false);
+            //call db get mail
+            responseStatus = StoreUsersSqlInstance.Inst.ForgotPass(model.mail, out email, out passwordMd5);
+            passDeMd5 = AccountUtils.DecryptPasswordMd5(passwordMd5);
+            // send old pas to mail (md5 )
+            var message = new Message(new string[] { email }, "Quên mật khẩu Gamma Books", 
+                "Xin chào " + email + "!" + Environment.NewLine +
+                "Mật khẩu bạn cần dùng để truy cập vào Tài khoản Gamma Books của mình là:" + Environment.NewLine + passDeMd5 + Environment.NewLine +
+                "Nếu bạn không yêu cầu thao tác này thì có thể là ai đó đang tìm cách truy cập vào Tài khoản Gamma Books của bạn. Không chuyển tiếp hoặc cung cấp mật khẩu này cho bất kỳ ai." + Environment.NewLine +
+                "Trân trọng!"
+                );
+            await _emailSender.SendEmailAsync(message);
+
             return Ok(new ResponseApiModel<string>() { Status = responseStatus, Messenger = UltilsHelper.GetMessageByErrorCode(responseStatus)});
         }
 
@@ -668,22 +605,32 @@ namespace BookStore.Controllers
         {
             int responseStatus = -99;
             AccountModelDb response = null;
-            try
-            {
+
+            long accountId = await _tokenManager.GetAccountIdByAccessTokenAsync(Request);
+            if (accountId <= 0)
+                return Ok(new ResponseApiModel<string>() { Status = accountId, Messenger = UltilsHelper.GetMessageByErrorCode((int)accountId) });
+
+            if(model.Sex != null)
+                response = StoreUsersSqlInstance.Inst.UpdateInfoSex(accountId, model.Nickname, model.PhoneNumber, model.BirthDay, model.Adress, model.Sex, model.AvataLink, ref responseStatus);
+            else
+                response = StoreUsersSqlInstance.Inst.UpdateInfo(accountId, model.Nickname, model.PhoneNumber, model.BirthDay, model.Adress, model.AvataLink, ref responseStatus);
+            await _logger.LogInfo("Account-UpdateInfo{}", JsonConvert.SerializeObject(model) + " - accountId:" + accountId + " - " + response, response.ToString()).ConfigureAwait(false);
+
+            return Ok(new ResponseApiModel<AccountModel>() { Status = responseStatus, Messenger = UltilsHelper.GetMessageByErrorCode(responseStatus), DataResponse = new AccountModel(response) });
+        }
+        [HttpPost]
+        [Route("UpdateDeviceInfo")]
+        [ResponseCache(Duration = 0, Location = ResponseCacheLocation.None, NoStore = true)]
+        public async Task<IActionResult> UpdateDeviceInfo(string device)
+        {
+            int responseStatus = -99;
+            AccountModelDb response = null;
+
                 long accountId = await _tokenManager.GetAccountIdByAccessTokenAsync(Request);
                 if (accountId <= 0)
                     return Ok(new ResponseApiModel<string>() { Status = accountId, Messenger = UltilsHelper.GetMessageByErrorCode((int)accountId) });
 
-                if(model.Sex != null)
-                    response = StoreUsersSqlInstance.Inst.UpdateInfoSex(accountId, model.Nickname, model.PhoneNumber, model.BirthDay, model.Adress, model.Sex, model.AvataLink, ref responseStatus);
-                else
-                    response = StoreUsersSqlInstance.Inst.UpdateInfo(accountId, model.Nickname, model.PhoneNumber, model.BirthDay, model.Adress, model.AvataLink, ref responseStatus);
-                await _logger.LogInfo("Account-UpdateInfo{}", JsonConvert.SerializeObject(model) + " - accountId:" + accountId + " - " + response, response.ToString()).ConfigureAwait(false);
-            }
-            catch (Exception ex)
-            {
-                await _logger.LogError("Account-UpdateInfo{}", ex.ToString()).ConfigureAwait(false);
-            }
+                response = StoreUsersSqlInstance.Inst.UpdateDeviceId(accountId, device, ref responseStatus);
 
             return Ok(new ResponseApiModel<AccountModel>() { Status = responseStatus, Messenger = UltilsHelper.GetMessageByErrorCode(responseStatus), DataResponse = new AccountModel(response) });
         }
@@ -975,6 +922,48 @@ namespace BookStore.Controllers
             var message = new Message(new string[] { toAdress }, "Validate email", "This is the content from our email, token lifetime 10 min. Click with validate link: "+ url);
             await _emailSender.SendEmailAsync(message).ConfigureAwait(false);
         }
-       
+
+        #region DELETE ACCOUNT
+
+        [HttpGet]
+        [Route("GetDeleteAccount")]
+        [ResponseCache(Duration = 10)]
+        public async Task<IActionResult> GetDeleteAccount()
+        {
+            var response = new ResponseApiModel<string>() { Status = EStatusCode.SUCCESS, Messenger = UltilsHelper.GetMessageByErrorCode(EStatusCode.SUCCESS) };
+            int responseStatus = EStatusCode.SUCCESS;
+            try
+            {
+                var listModel = StoreUsersSqlInstance.Inst.GetDeleteAccount();
+                response = new ResponseApiModel<string>() { Status = responseStatus, Messenger = UltilsHelper.GetMessageByErrorCode(responseStatus), DataResponse = JsonConvert.SerializeObject(listModel) };
+            }
+            catch (Exception ex)
+            {
+                await _logger.LogError("Account-GetDeleteAccount{}", ex.ToString()).ConfigureAwait(false);
+            }
+            return Ok(response);
+        }
+
+        [HttpPost]
+        [Route("DeleteAccount")]
+        [ResponseCache(Duration = 0, Location = ResponseCacheLocation.None, NoStore = true)]
+        public async Task<IActionResult> DeleteAccount(string data)
+        {
+            string message = "";
+            int responseStatus = -99;
+            try
+            {
+                responseStatus = StoreUsersSqlInstance.Inst.DeleteAccount(data);
+
+                message = UltilsHelper.GetMessageByErrorCode(responseStatus);
+            }
+            catch (Exception ex)
+            {
+                await _logger.LogError("Account-UpdateEmail{}", ex.ToString()).ConfigureAwait(false);
+            }
+
+            return Ok(new ResponseApiModel<AccountModel>() { Status = responseStatus, Messenger = message });
+        }
+        #endregion
     }
 }

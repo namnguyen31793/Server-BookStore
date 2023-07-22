@@ -132,7 +132,7 @@ namespace BookStoreCMS.Controllers
             return model;
         }
 
-        [HttpGet]
+        [HttpPost]
         [Route("RefreshToken")]
         public async Task<IActionResult> RefreshToken(TokenInfo data)
         {
@@ -238,6 +238,26 @@ namespace BookStoreCMS.Controllers
             catch (Exception ex)
             {
                 await _logger.LogError("Books-UpdateRoleUser{}", ex.ToString()).ConfigureAwait(false);
+            }
+            return Ok(response);
+        }
+        [HttpPost]
+        [Route("RestoreDeleteAccount")]
+        public async Task<IActionResult> RestoreDeleteAccount(string accountId)
+        {
+            int checkRole = await _tokenManager.CheckRoleActionAsync(ERole.GM, Request);
+            if (checkRole < 0)
+                return Ok(new ResponseApiModel<string>() { Status = checkRole, Messenger = UltilsHelper.GetMessageByErrorCode(checkRole) });
+
+            var response = new ResponseApiModel<string>() { Status = EStatusCode.SYSTEM_ERROR, Messenger = UltilsHelper.GetMessageByErrorCode(EStatusCode.SYSTEM_ERROR) };
+            try
+            {
+                var responseStatus = StoreUsersSqlInstance.Inst.RestoreDeleteAccount(accountId);
+                response = new ResponseApiModel<string>() { Status = responseStatus, Messenger = UltilsHelper.GetMessageByErrorCode(responseStatus) };
+            }
+            catch (Exception ex)
+            {
+                await _logger.LogError("Books-RestoreDeleteAccount{}", ex.ToString()).ConfigureAwait(false);
             }
             return Ok(response);
         }

@@ -209,6 +209,33 @@ namespace DAO.DAOImp
             return mCurrentMail;
         }
 
+        public void SendAllMail(string senderNickname, string mailHeader, string mailContent, out int responseStatus, long _MainMoney = 0, string _RewardBonusDescription = "")
+        {
+            DBHelper db = null;
+            responseStatus = EStatusCode.DATABASE_ERROR;
+            try
+            {
+                db = new DBHelper(ConfigDb.StoreMailConnectionString);
+                var pars = new SqlParameter[6];
+                pars[0] = new SqlParameter("@_SenderNickname", senderNickname);
+                pars[1] = new SqlParameter("@_MailHeader", mailHeader);
+                pars[2] = new SqlParameter("@_MailContent", mailContent);
+                pars[3] = new SqlParameter("@_MainMoney", _MainMoney);
+                pars[4] = new SqlParameter("@_RewardBonusDescription", _RewardBonusDescription);
+                pars[5] = new SqlParameter("@_ResponseStatus", SqlDbType.Int) { Direction = ParameterDirection.Output };
+                db.ExecuteNonQuerySP("SP_Store_Mail_All_AddMail", 4, pars);
+                responseStatus = Convert.ToInt32(pars[5].Value);
+            }
+            catch (Exception exception)
+            {
+                Task.Run(async () => await _logger.LogError("SQL-SendMail()", exception.ToString()).ConfigureAwait(false));
+            }
+            finally
+            {
+                db?.Close();
+            }
+        }
+
         public void UpdateReadedMail(long mailId, out int responseStatus)
         {
             DBHelper db = null;

@@ -41,31 +41,24 @@ namespace BookStoreCMS.Controllers
         public async Task<IActionResult> GetMailUser(long AccountId, int page = 1, int row = 100)
         {
             var response = new ResponseApiModel<string>() { Status = EStatusCode.SYSTEM_ERROR, Messenger = UltilsHelper.GetMessageByErrorCode(EStatusCode.SYSTEM_ERROR) };
-            try
-            {
+
                 int checkRole = await _tokenManager.CheckRoleActionAsync(ERole.Administrator, Request);
                 if (checkRole < 0)
                     return Ok(new ResponseApiModel<string>() { Status = checkRole, Messenger = UltilsHelper.GetMessageByErrorCode(checkRole) });
                 var model = StoreMailSqlInstance.Inst.GetAllMailListByAccountId(AccountId, page, row);
 
                 response = new ResponseApiModel<string>() { Status = EStatusCode.SUCCESS, Messenger = UltilsHelper.GetMessageByErrorCode(EStatusCode.SUCCESS), DataResponse = JsonConvert.SerializeObject(model) };
-            }
-            catch (Exception ex)
-            {
-                await _logger.LogError("Account-GetMailUser{}", ex.ToString()).ConfigureAwait(false);
-            }
+
 
             return Ok(response);
         }
 
         [HttpPost]
-        [ResponseCache(Duration = 5)]
         [Route("SendMailUser")]
         public async Task<IActionResult> SendMailUser(RequestSendMailModel data)
         {
             var response = new ResponseApiModel<string>() { Status = EStatusCode.SYSTEM_ERROR, Messenger = UltilsHelper.GetMessageByErrorCode(EStatusCode.SYSTEM_ERROR) };
-            try
-            {
+
                 int checkRole = await _tokenManager.CheckRoleActionAsync(ERole.Administrator, Request);
                 if (checkRole < 0)
                     return Ok(new ResponseApiModel<string>() { Status = checkRole, Messenger = UltilsHelper.GetMessageByErrorCode(checkRole) });
@@ -73,11 +66,24 @@ namespace BookStoreCMS.Controllers
                 var model = StoreMailSqlInstance.Inst.SendMail(data.Accountid, data.SenderNickname, data.MailHeader, data.MailContent, out res, data.Money, data.RewardBonusDescription);
 
                 response = new ResponseApiModel<string>() { Status = res, Messenger = UltilsHelper.GetMessageByErrorCode(res), DataResponse = JsonConvert.SerializeObject(model) };
-            }
-            catch (Exception ex)
-            {
-                await _logger.LogError("Account-SendMailUser{}", ex.ToString()).ConfigureAwait(false);
-            }
+
+
+            return Ok(response);
+        }
+
+        [HttpPost]
+        [Route("SendMailAllUser")]
+        public async Task<IActionResult> SendMailAllUser(RequestSendMailModel data)
+        {
+            var response = new ResponseApiModel<string>() { Status = EStatusCode.SYSTEM_ERROR, Messenger = UltilsHelper.GetMessageByErrorCode(EStatusCode.SYSTEM_ERROR) };
+
+                int checkRole = await _tokenManager.CheckRoleActionAsync(ERole.Administrator, Request);
+                if (checkRole < 0)
+                    return Ok(new ResponseApiModel<string>() { Status = checkRole, Messenger = UltilsHelper.GetMessageByErrorCode(checkRole) });
+                int res = EStatusCode.SUCCESS;
+                StoreMailSqlInstance.Inst.SendAllMail(data.SenderNickname, data.MailHeader, data.MailContent, out res, data.Money, data.RewardBonusDescription);
+
+                response = new ResponseApiModel<string>() { Status = res, Messenger = UltilsHelper.GetMessageByErrorCode(res) };
 
             return Ok(response);
         }

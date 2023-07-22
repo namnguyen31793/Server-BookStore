@@ -304,6 +304,31 @@ namespace DAO.DAOImp
             }
             return response;
         }
+        public AccountModelDb UpdateDeviceId(long AccountId, string device, ref int responseStatus)
+        {
+            DBHelper db = null;
+            var response = new AccountModelDb();
+            if (string.IsNullOrEmpty(device)) return null;
+            try
+            {
+                db = new DBHelper(ConfigDb.StoreUsersConnectionString);
+                var pars = new SqlParameter[3];
+                pars[0] = new SqlParameter("@_AccountId", AccountId);
+                pars[1] = new SqlParameter("@_DeviceId", device);
+                pars[2] = new SqlParameter("@_ResponseStatus", SqlDbType.BigInt) { Direction = ParameterDirection.Output };
+                response = db.GetInstanceSP<AccountModelDb>("SP_Store_Users_Update_Device_Id", 4, pars);
+                responseStatus = Convert.ToInt32(pars[2].Value);
+            }
+            catch (Exception exception)
+            {
+                Task.Run(async () => await _logger.LogError("SQL-UpdateDeviceId()", exception.ToString()).ConfigureAwait(false));
+            }
+            finally
+            {
+                db?.Close();
+            }
+            return response;
+        }
 
         public int ValidateUser(long AccountId)
         {
@@ -606,6 +631,75 @@ namespace DAO.DAOImp
                 db?.Close();
             }
             return countRegis;
+        }
+        #endregion
+
+        #region DETELE ACCOUNT
+        public List<DeleteAccountModel> GetDeleteAccount()
+        {
+            DBHelper db = null;
+            List<DeleteAccountModel> listConfig = null;
+            try
+            {
+                db = new DBHelper(ConfigDb.StoreUsersConnectionString);
+                var pars = new SqlParameter[0];
+                listConfig = db.GetListSP<DeleteAccountModel>("SP_Store_User_Delete_Account_GetAll", 4, pars);
+            }
+            catch (Exception exception)
+            {
+                Task.Run(async () => await _logger.LogError("SQL-GetDeleteAccount()", exception.ToString()).ConfigureAwait(false));
+            }
+            finally
+            {
+                db?.Close();
+            }
+            return listConfig;
+        }
+        public int DeleteAccount(string AccountId)
+        {
+            DBHelper db = null;
+            var response = -9999;
+            try
+            {
+                db = new DBHelper(ConfigDb.StoreUsersConnectionString);
+                var pars = new SqlParameter[2];
+                pars[0] = new SqlParameter("@_AccountId", AccountId);
+                pars[1] = new SqlParameter("@_ResponseStatus", SqlDbType.Int) { Direction = ParameterDirection.Output };
+                db.ExecuteNonQuerySP("SP_Store_User_Delete_Account", 4, pars);
+                response = Convert.ToInt32(pars[1].Value);
+            }
+            catch (Exception exception)
+            {
+                Task.Run(async () => await _logger.LogError("SQL-DeleteAccount()", exception.ToString()).ConfigureAwait(false));
+            }
+            finally
+            {
+                db?.Close();
+            }
+            return response;
+        }
+        public int RestoreDeleteAccount(string AccountId)
+        {
+            DBHelper db = null;
+            var response = -9999;
+            try
+            {
+                db = new DBHelper(ConfigDb.StoreUsersConnectionString);
+                var pars = new SqlParameter[2];
+                pars[0] = new SqlParameter("@_AccountId", AccountId);
+                pars[1] = new SqlParameter("@_ResponseStatus", SqlDbType.Int) { Direction = ParameterDirection.Output };
+                db.ExecuteNonQuerySP("SP_Store_User_Delete_Account_Restore", 4, pars);
+                response = Convert.ToInt32(pars[1].Value);
+            }
+            catch (Exception exception)
+            {
+                Task.Run(async () => await _logger.LogError("SQL-RestoreDeleteAccount()", exception.ToString()).ConfigureAwait(false));
+            }
+            finally
+            {
+                db?.Close();
+            }
+            return response;
         }
         #endregion
     }

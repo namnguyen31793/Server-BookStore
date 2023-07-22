@@ -14,4 +14,8 @@ namespace ShareData.DB.Users
         public string VourcherReward { get; set; }
         public DateTime TTL { get; set; }
     }
+    public class DeleteAccountModel
+    {
+        public string AccountId { get; set; }
+    }
 }

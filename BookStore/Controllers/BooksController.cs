@@ -305,7 +305,6 @@ namespace BookStore.Controllers
 
         [HttpGet]
         [Route("GetListSimpleBookSameName")]
-        [ResponseCache(Duration = 60)]
         public async Task<IActionResult> GetListSimpleBookSameName(string bookName)
         {
             var response = new ResponseApiModel<string>() { Status = EStatusCode.SYSTEM_ERROR, Messenger = UltilsHelper.GetMessageByErrorCode(EStatusCode.SYSTEM_ERROR) };
@@ -612,7 +611,7 @@ namespace BookStore.Controllers
         public async Task<IActionResult> CheckReprintBook(string barcode)
         {
             var response = new ResponseApiModel<bool>() { Status = EStatusCode.SYSTEM_ERROR, Messenger = UltilsHelper.GetMessageByErrorCode(EStatusCode.SYSTEM_ERROR) };
-            int responseStatus = EStatusCode.DATABASE_ERROR;
+            int responseStatus = EStatusCode.SUCCESS;
             try
             {
                 var bookData = StoreBookSqlInstance.Inst.CheckReprintBook(barcode);
