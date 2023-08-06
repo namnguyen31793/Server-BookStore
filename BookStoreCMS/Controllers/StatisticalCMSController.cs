@@ -3,6 +3,7 @@ using BookStoreCMS.Interfaces;
 using BookStoreCMS.Utils;
 using DAO.DAOImp;
 using LoggerService;
+using LoggerService.Report;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Newtonsoft.Json;
@@ -148,6 +149,33 @@ namespace BookStoreCMS.Controllers
 
             return Ok(new ResponseApiModel<string>() { Status = 0, Messenger = "", DataResponse = JsonConvert.SerializeObject(data) });
         }
+
+        [HttpGet]
+        [Route("GetCcu")]
+        [ResponseCache(Duration = 0, Location = ResponseCacheLocation.None, NoStore = true)]
+        public async Task<IActionResult> GetCcu()
+        {
+            var response = new ResponseApiModel<string>() { Status = EStatusCode.SYSTEM_ERROR, Messenger = UltilsHelper.GetMessageByErrorCode(EStatusCode.SYSTEM_ERROR) };
+            int responseStatus = EStatusCode.DATABASE_ERROR;
+            string keyRedis = "Token";
+            long ccu = await RedisGatewayCacheManager.Inst.CountItemByString(keyRedis);
+            responseStatus = 0;
+            response = new ResponseApiModel<string>() { Status = responseStatus, Messenger = UltilsHelper.GetMessageByErrorCode(responseStatus), DataResponse = ccu.ToString() };
+            return Ok(response);
+        }
+
+        [HttpPost]
+        [Route("GetCcuByTime")]
+        [ResponseCache(Duration = 0, Location = ResponseCacheLocation.None, NoStore = true)]
+        public async Task<IActionResult> GetCcuByTime(RequestGetByTime model)
+        {
+
+            var data = await Tracking_Online_Manager.Inst.GetListCcuByTime(model.StartTime, model.EndTime);
+
+            var response = new ResponseApiModel<string>() { Status = 0, Messenger = UltilsHelper.GetMessageByErrorCode(EStatusCode.SUCCESS), DataResponse = JsonConvert.SerializeObject(data) };
+            return Ok(response);
+        }
+
 
     }
 }

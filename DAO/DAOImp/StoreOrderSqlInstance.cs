@@ -161,6 +161,33 @@ namespace DAO.DAOImp
             }
             return modelData;
         }
+        public OrderInfoObject UserEndOrder(long AccountId, long OrderId, int Status, string PrivateDescription, out int reponseStatus)
+        {
+            DBHelper db = null;
+            OrderInfoObject modelData = null;
+            reponseStatus = EStatusCode.DATABASE_ERROR;
+            try
+            {
+                db = new DBHelper(ConfigDb.StoreOrderConnectionString);
+                var pars = new SqlParameter[5];
+                pars[0] = new SqlParameter("@@_AccountId", OrderId);
+                pars[1] = new SqlParameter("@_OrderId", OrderId);
+                pars[2] = new SqlParameter("@_PrivateDescription", PrivateDescription);
+                pars[3] = new SqlParameter("@_Status", Status);
+                pars[4] = new SqlParameter("@_ResponseStatus", SqlDbType.Int) { Direction = ParameterDirection.Output };
+                modelData = db.GetInstanceSP<OrderInfoObject>("SP_Store_Order_User_Update_Status_End", 4, pars);
+                reponseStatus = Convert.ToInt32(pars[4].Value);
+            }
+            catch (Exception exception)
+            {
+                Task.Run(async () => await _logger.LogError("SQL-UserEndOrder()", exception.ToString()).ConfigureAwait(false));
+            }
+            finally
+            {
+                db?.Close();
+            }
+            return modelData;
+        }
         public List<OrderInfoObject> GetOrderById(long OrderId, out int reponseStatus)
         {
             DBHelper db = null;

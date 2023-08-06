@@ -261,5 +261,28 @@ namespace BookStoreCMS.Controllers
             }
             return Ok(response);
         }
+
+        [HttpPost]
+        [Route("ForgotPass")]
+        [ResponseCache(Duration = 0, Location = ResponseCacheLocation.None, NoStore = true)]
+        public async Task<IActionResult> ForgotPass(string mail)
+        {
+            int responseStatus = -99;
+            string passwordMd5 = "";
+            string passDeMd5 = "";
+            string email = "";
+
+            int checkRole = await _tokenManager.CheckRoleActionAsync(ERole.GM, Request);
+            if (checkRole < 0)
+                return Ok(new ResponseApiModel<string>() { Status = checkRole, Messenger = UltilsHelper.GetMessageByErrorCode(checkRole) });
+
+            //call db get mail
+            responseStatus = StoreUsersSqlInstance.Inst.ForgotPass(mail, out email, out passwordMd5);
+            passDeMd5 = AccountUtils.DecryptPasswordMd5(passwordMd5);
+
+            if(responseStatus!= 0)
+                return Ok(new ResponseApiModel<string>() { Status = responseStatus, Messenger = UltilsHelper.GetMessageByErrorCode(responseStatus) });
+            return Ok(new ResponseApiModel<string>() { Status = responseStatus, Messenger = UltilsHelper.GetMessageByErrorCode(responseStatus), DataResponse = "Mật khẩu Gamma Books: " + passDeMd5 });
+        }
     }
 }

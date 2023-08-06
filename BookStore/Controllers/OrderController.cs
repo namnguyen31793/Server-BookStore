@@ -219,5 +219,20 @@ namespace BookStore.Controllers
             }
             return Ok(new ResponseApiModel<string>() { Status = responseStatus, Messenger = UltilsHelper.GetMessageByErrorCode(responseStatus), DataResponse = jsonTag });
         }
+
+        [HttpPost]
+        [Route("UpdateOrderEnd")]
+        [ResponseCache(Duration = 0, Location = ResponseCacheLocation.None, NoStore = true)]
+        public async Task<IActionResult> UpdateOrderEnd(long OrderId)
+        {
+            int responseStatus = -99;
+            long accountId = await _tokenManager.GetAccountIdByAccessTokenAsync(Request);
+            if (accountId <= 0)
+                return Ok(new ResponseApiModel<string>() { Status = accountId, Messenger = UltilsHelper.GetMessageByErrorCode((int)accountId) });
+
+            var data = StoreOrderSqlInstance.Inst.UserEndOrder(accountId, OrderId, 4, "User "+ accountId+" huy order", out responseStatus);
+
+            return Ok(new ResponseApiModel<OrderInfoObject>() { Status = responseStatus, Messenger = UltilsHelper.GetMessageByErrorCode(responseStatus), DataResponse = data });
+        }
     }
 }

@@ -209,7 +209,7 @@ namespace BookStore.Controllers
         }
         [HttpGet]
         [Route("{barcode}/GetBookDemo")]
-        [ResponseCache(Duration = 60)]
+        [ResponseCache(Duration = 10)]
         public async Task<IActionResult> GetBookDemo(string barcode)
         {
             var response = new ResponseApiModel<string>() { Status = EStatusCode.SYSTEM_ERROR, Messenger = UltilsHelper.GetMessageByErrorCode(EStatusCode.SYSTEM_ERROR) };

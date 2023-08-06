@@ -333,6 +333,11 @@ namespace BookStoreCMS.Controllers
             try
             {
                 var book = StoreBookSqlInstance.Inst.UpdateBook(model, out responseStatus);
+                if (responseStatus == EStatusCode.SUCCESS)
+                {
+                    await RedisGatewayCacheManager.Inst.DeleteDataFromCacheAsync("CacheSimpleBookDemo:" + model.Barcode);
+                    await RedisGatewayCacheManager.Inst.DeleteDataFromCacheAsync("CacheSimpleBook:" + model.Barcode);
+                }
                 response = new ResponseApiModel<string>() { Status = responseStatus, Messenger = UltilsHelper.GetMessageByErrorCode(responseStatus), DataResponse = JsonConvert.SerializeObject(book) };
             }
             catch (Exception ex)

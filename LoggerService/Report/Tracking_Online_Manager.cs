@@ -156,5 +156,29 @@ namespace LoggerService.Report
                     
             }
         }
+        public async Task<List<Tracking_Ccu_Model>> GetListCcuByTime(DateTime start, DateTime end)
+        {
+            List<Tracking_Ccu_Model> listDataBson = new List<Tracking_Ccu_Model>();
+
+            var database = _client.GetDatabase(NO_SQL_CONFIG.API_TRACKING_SYSTEM_DATABASE_NAME);
+            IMongoCollection<BsonDocument> collection = database.GetCollection<BsonDocument>(NO_SQL_CONFIG.API_LOG_CCU_COLLECTION);
+            var pipeline = new[]{new BsonDocument(){
+                {"$match", new BsonDocument(){
+                    {"ActionTime", new BsonDocument(){
+                        {"$gte", start},
+                        {"$lt", end}
+                    }}
+                }}
+            }};
+
+            var results = await collection.Aggregate<BsonDocument>(pipeline).ToListAsync();
+            foreach (var document in results)
+            {
+                var databson = BsonSerializer.Deserialize<Tracking_Ccu_Model>(document.ToBsonDocument());
+                if (databson != null)
+                    listDataBson.Add(databson);
+            }
+            return listDataBson;
+        }
     }
 }
