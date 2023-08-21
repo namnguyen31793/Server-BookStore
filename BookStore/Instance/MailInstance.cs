@@ -36,7 +36,7 @@ namespace BookStore.Instance
         public void SendMailRegis(long accountId)
         {
             string nickNameSend = "admin@gmail.com";
-            string mailHeader = "Chào mừng bạn đến với Gammma!";
+            string mailHeader = "Chào mừng bạn đến với Gamma!";
             string mailContent = "Chúc bạn có các trải nghiệm tốt đẹp với chúng tôi.";
             int responseStatus = -99;
             string _Description = "";//json khuyen mai

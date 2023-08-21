@@ -34,9 +34,11 @@ namespace BookStoreCMS.Instance
             var cancellationTokenSource = new CancellationTokenSource();
             cancellationTokenSource.CancelAfter(30000); //30s
 
-            var request = new RestRequest(String.Format("available-services?token={0}&from_district={1}&to_district={2}&shop_id={3}", NO_SQL_CONFIG.GHN_Token, fromdistrict, todistrict , NO_SQL_CONFIG.GHN_Id), Method.Get);            
+            var request = new RestRequest(String.Format("available-services?token={0}&from_district={1}&to_district={2}&shop_id={3}", NO_SQL_CONFIG.GHN_Token, fromdistrict, todistrict , NO_SQL_CONFIG.GHN_Id), Method.Get);
+            request.AddHeader("Content-Type", "application/json");
             request.AddHeader("token", NO_SQL_CONFIG.GHN_Token);
             var client = new RestClient(NO_SQL_CONFIG.GHN_Url + "shiip/public-api/v2/shipping-order/");
+
             ServicePointManager.SecurityProtocol = SecurityProtocolType.Tls12 | SecurityProtocolType.Tls11 | SecurityProtocolType.Tls;
             var response = await client.ExecuteAsync(request, cancellationTokenSource.Token);
             var content = response.Content;

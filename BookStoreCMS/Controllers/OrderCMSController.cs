@@ -93,7 +93,7 @@ namespace BookStoreCMS.Controllers
                 }
                 else
                 {
-                    return Ok(new ResponseApiModel<OrderInfoObject>() { Status = modelResponseGghn.code, Messenger = modelResponseGghn.message });
+                    return Ok(new ResponseApiModel<string>() { Status = modelResponseGghn.code, Messenger = modelResponseGghn.message, DataResponse = dataGhn });
                 }
             }
             catch (Exception ex)
