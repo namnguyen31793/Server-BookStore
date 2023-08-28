@@ -192,6 +192,30 @@ namespace DAO.DAOImp
             }
             return modelData;
         }
+        public int RemoveComment(string barcode, long accountId)
+        {
+            DBHelper db = null;
+            int reponseStatus = EStatusCode.DATABASE_ERROR;
+            try
+            {
+                db = new DBHelper(ConfigDb.StoreBookConnectionString);
+                var pars = new SqlParameter[3];
+                pars[0] = new SqlParameter("@_AccountId", accountId);
+                pars[1] = new SqlParameter("@_Barcode", barcode);
+                pars[2] = new SqlParameter("@_ResponseStatus", SqlDbType.Int) { Direction = ParameterDirection.Output };
+                db.ExecuteNonQuerySP("SP_Store_Book_Rate_Remove_By_Barcodes", 4, pars);
+                reponseStatus = Convert.ToInt32(pars[2].Value);
+            }
+            catch (Exception exception)
+            {
+                Task.Run(async () => await _logger.LogError("SQL-RemoveComment()", exception.ToString()).ConfigureAwait(false));
+            }
+            finally
+            {
+                db?.Close();
+            }
+            return reponseStatus;
+        }
         #endregion
 
         #region BOOK

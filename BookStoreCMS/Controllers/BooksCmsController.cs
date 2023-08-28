@@ -88,6 +88,68 @@ namespace BookStoreCMS.Controllers
             }
             return Ok(response);
         }
+
+        [HttpGet]
+        [Route("{barcode}/GetListComment")]
+        [ResponseCache(Duration = 10)]
+        public async Task<IActionResult> GetListComment(string barcode)
+        {
+            if (string.IsNullOrEmpty(barcode))
+                return Ok(new ResponseApiModel<string>() { Status = EStatusCode.DATA_INVAILD, Messenger = UltilsHelper.GetMessageByErrorCode(EStatusCode.DATA_INVAILD) });
+
+            var response = new ResponseApiModel<string>() { Status = EStatusCode.SYSTEM_ERROR, Messenger = UltilsHelper.GetMessageByErrorCode(EStatusCode.SYSTEM_ERROR) };
+            int responseStatus = EStatusCode.DATABASE_ERROR;
+
+            string keyRedis = "CacheComment:" + barcode;
+            string jsonListMail = await RedisGatewayCacheManager.Inst.GetDataFromCacheAsync(keyRedis);
+            if (string.IsNullOrEmpty(jsonListMail))
+            {
+                var listComment = StoreBookSqlInstance.Inst.GetListRateComment(barcode, out responseStatus);
+                if (responseStatus == EStatusCode.SUCCESS)
+                {
+                    jsonListMail = JsonConvert.SerializeObject(listComment);
+                    await RedisGatewayCacheManager.Inst.SaveDataAsync(keyRedis, jsonListMail, 10);
+                }
+            }
+            else
+            {
+                responseStatus = EStatusCode.SUCCESS;
+            }
+            response = new ResponseApiModel<string>() { Status = responseStatus, Messenger = UltilsHelper.GetMessageByErrorCode(responseStatus), DataResponse = jsonListMail };
+          
+            return Ok(response);
+        }
+        [HttpPost]
+        [Route("RemoveComment")]
+        [ResponseCache(Duration = 10)]
+        public async Task<IActionResult> GetListComment(string barcode, long accountId)
+        {
+            if (string.IsNullOrEmpty(barcode))
+                return Ok(new ResponseApiModel<string>() { Status = EStatusCode.DATA_INVAILD, Messenger = UltilsHelper.GetMessageByErrorCode(EStatusCode.DATA_INVAILD) });
+
+            int checkRole = await _tokenManager.CheckRoleActionAsync(ERole.Administrator, Request);
+            if (checkRole < 0)
+                return Ok(new ResponseApiModel<string>() { Status = checkRole, Messenger = UltilsHelper.GetMessageByErrorCode(checkRole) });
+
+            var response = new ResponseApiModel<string>() { Status = EStatusCode.SYSTEM_ERROR, Messenger = UltilsHelper.GetMessageByErrorCode(EStatusCode.SYSTEM_ERROR) };
+            int responseStatus = EStatusCode.DATABASE_ERROR;
+            try
+            {
+                responseStatus = StoreBookSqlInstance.Inst.RemoveComment(barcode, accountId);
+                if (responseStatus == EStatusCode.SUCCESS)
+                {
+                    string keyRedis = "CacheComment:" + barcode;
+                    await RedisGatewayCacheManager.Inst.DeleteDataFromCacheAsync(keyRedis);
+                }
+                response = new ResponseApiModel<string>() { Status = responseStatus, Messenger = UltilsHelper.GetMessageByErrorCode(responseStatus) };
+            }
+            catch (Exception ex)
+            {
+                await _logger.LogError("Books-GetListComment{}", ex.ToString()).ConfigureAwait(false);
+            }
+            return Ok(response);
+        }
+
         #endregion
 
         #region COLOR
