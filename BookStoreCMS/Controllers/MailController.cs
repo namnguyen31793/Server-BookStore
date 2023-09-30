@@ -185,5 +185,51 @@ namespace BookStoreCMS.Controllers
             return Ok(response);
         }
         #endregion
+        
+        #region NOTIFY MAIL
+        [HttpPost]
+        [Route("AddNotifyMailCms")]
+        public async Task<IActionResult> AddNotifyMailCms(RequestSendNotifyMailModel data)
+        {
+            int checkRole = await _tokenManager.CheckRoleActionAsync(ERole.Administrator, Request);
+            if (checkRole < 0)
+                return Ok(new ResponseApiModel<string>() { Status = checkRole, Messenger = UltilsHelper.GetMessageByErrorCode(checkRole) });
+            int res = EStatusCode.SUCCESS;
+            var mail = StoreMailSqlInstance.Inst.AddNotifyMailCms(data.SenderNickname, data.MailHeader, data.MailContent, out res, data.RewardDescription);
+
+            var response = new ResponseApiModel<string>() { Status = res, Messenger = UltilsHelper.GetMessageByErrorCode(res), DataResponse = JsonConvert.SerializeObject(mail) };
+
+            return Ok(response);
+        }
+
+        [HttpPost]
+        [Route("DeleteNotifyMailCms")]
+        public async Task<IActionResult> DeleteNotifyMailCms(long MailId)
+        {
+            int checkRole = await _tokenManager.CheckRoleActionAsync(ERole.Administrator, Request);
+            if (checkRole < 0)
+                return Ok(new ResponseApiModel<string>() { Status = checkRole, Messenger = UltilsHelper.GetMessageByErrorCode(checkRole) });
+
+            int responseStatus = EStatusCode.DATABASE_ERROR;
+            var listMail = StoreMailSqlInstance.Inst.DeleteNotifyMailCms(MailId, out responseStatus);
+            var response = new ResponseApiModel<string>() { Status = responseStatus, Messenger = UltilsHelper.GetMessageByErrorCode(responseStatus), DataResponse = JsonConvert.SerializeObject(listMail) };
+
+            return Ok(response);
+        }
+        [HttpGet]
+        [Route("GetNotifyMailCms")]
+        public async Task<IActionResult> GetNotifyMailCms()
+        {
+            int checkRole = await _tokenManager.CheckRoleActionAsync(ERole.Administrator, Request);
+            if (checkRole < 0)
+                return Ok(new ResponseApiModel<string>() { Status = checkRole, Messenger = UltilsHelper.GetMessageByErrorCode(checkRole) });
+
+            int responseStatus = EStatusCode.DATABASE_ERROR;
+            var listMail = StoreMailSqlInstance.Inst.GetNotifyMailCms(out responseStatus);
+            var response = new ResponseApiModel<string>() { Status = responseStatus, Messenger = UltilsHelper.GetMessageByErrorCode(responseStatus) };
+
+            return Ok(response);
+        }
+        #endregion
     }
 }

@@ -345,6 +345,30 @@ namespace DAO.DAOImp
             }
             return modelData;
         }
+        public DownloadBookModel GetDownloadBookByBarcode(string barcode, out int reponseStatus)
+        {
+            DBHelper db = null;
+            DownloadBookModel modelData = null;
+            reponseStatus = EStatusCode.DATABASE_ERROR;
+            try
+            {
+                db = new DBHelper(ConfigDb.StoreBookConnectionString);
+                var pars = new SqlParameter[2];
+                pars[0] = new SqlParameter("@_Barcode", barcode);
+                pars[1] = new SqlParameter("@_ResponseStatus", SqlDbType.Int) { Direction = ParameterDirection.Output };
+                modelData = db.GetInstanceSP<DownloadBookModel>("SP_Store_Book_Get_Info_Book_Download_Not_Id", 4, pars);
+                reponseStatus = Convert.ToInt32(pars[1].Value);
+            }
+            catch (Exception exception)
+            {
+                Task.Run(async () => await _logger.LogError("SQL-GetDownloadBookByBarcode2()", exception.ToString()).ConfigureAwait(false));
+            }
+            finally
+            {
+                db?.Close();
+            }
+            return modelData;
+        }
 
         public FullDemoBookModel GetFullBookDemoByBarcode(string barcode, out int reponseStatus)
         {

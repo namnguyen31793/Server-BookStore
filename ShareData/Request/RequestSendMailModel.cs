@@ -13,4 +13,11 @@ namespace ShareData.Request
         public long Money { get; set; }
         public string RewardBonusDescription { get; set; }
     }
+    public class RequestSendNotifyMailModel
+    {
+        public string SenderNickname { get; set; }
+        public string MailHeader { get; set; }
+        public string MailContent { get; set; }
+        public string RewardDescription { get; set; }
+    }
 }

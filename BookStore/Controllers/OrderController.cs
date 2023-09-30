@@ -144,6 +144,7 @@ namespace BookStore.Controllers
         }
         #endregion
 
+        #region ORDER GHTK
         [HttpPost]
         [Route("CreateOrder")]
         [ResponseCache(Duration = 0, Location = ResponseCacheLocation.None, NoStore = true)]
@@ -231,8 +232,110 @@ namespace BookStore.Controllers
                 return Ok(new ResponseApiModel<string>() { Status = accountId, Messenger = UltilsHelper.GetMessageByErrorCode((int)accountId) });
 
             var data = StoreOrderSqlInstance.Inst.UserEndOrder(accountId, OrderId, 4, "User "+ accountId+" huy order", out responseStatus);
-
+            if (responseStatus == 0)
+            {
+                string keyRedis = "ORDER:" + accountId;
+                await RedisGatewayCacheManager.Inst.DeleteDataFromCacheAsync(keyRedis).ConfigureAwait(false);
+            }
             return Ok(new ResponseApiModel<OrderInfoObject>() { Status = responseStatus, Messenger = UltilsHelper.GetMessageByErrorCode(responseStatus), DataResponse = data });
         }
+        #endregion
+
+        #region ORDER NHANH
+        [HttpPost]
+        [Route("CreateOrderNhanh")]
+        [ResponseCache(Duration = 0, Location = ResponseCacheLocation.None, NoStore = true)]
+        public async Task<IActionResult> CreateOrderNhanh(RequestCreateOrderModel request)
+        {
+            int responseStatus = -99;
+            var clientInfo = new ClientRequestInfo(Request);
+            string key = "SPAM:CREATE_ORDER" + clientInfo.TrueClientIp + "-" + clientInfo.DeviceId;
+            if (RedisGatewayCacheManager.Inst.CheckExistKey(key))
+                return Ok(new ResponseApiModel<string>() { Status = EStatusCode.TRANSACTION_SPAM, Messenger = UltilsHelper.GetMessageByErrorCode(EStatusCode.TRANSACTION_SPAM) });
+            long accountId = await _tokenManager.GetAccountIdByAccessTokenAsync(Request);
+            if (accountId <= 0)
+                return Ok(new ResponseApiModel<string>() { Status = accountId, Messenger = UltilsHelper.GetMessageByErrorCode((int)accountId) });
+            await RedisGatewayCacheManager.Inst.SaveDataSecond(key, "1", 3).ConfigureAwait(false);
+            //check barcode
+            if (string.IsNullOrEmpty(request.Barcodes) || string.IsNullOrEmpty(request.Numbers))
+                return Ok(new ResponseApiModel<string>() { Status = EStatusCode.ORDER_NOT_DATA, Messenger = UltilsHelper.GetMessageByErrorCode(EStatusCode.ORDER_NOT_DATA) });
+            var dataBook = request.Barcodes.Split(",");
+            var dataNumber = request.Numbers.Split(",");
+            if (dataBook.Length != dataNumber.Length)
+                return Ok(new ResponseApiModel<string>() { Status = EStatusCode.ORDER_NOT_DATA, Messenger = UltilsHelper.GetMessageByErrorCode(EStatusCode.ORDER_NOT_DATA) });
+            try
+            {
+                for (int i = 0; i < dataNumber.Length; i++)
+                {
+                    var check = int.Parse(dataNumber[i]);
+                }
+            }
+            catch
+            {
+                return Ok(new ResponseApiModel<string>() { Status = EStatusCode.ORDER_NOT_DATA, Messenger = UltilsHelper.GetMessageByErrorCode(EStatusCode.ORDER_NOT_DATA) });
+            }
+            var data = StoreOrderSqlInstance.Inst.CreateNewOrder(accountId, request.CustomerId, request.Type, request.Description, request.Barcodes, request.Numbers, request.VourcherId, request.PaymentMethod, request.cityCode, out responseStatus);
+            if (responseStatus == EStatusCode.SUCCESS)
+            {
+                string keyRedis = "ORDER:" + accountId;
+                await RedisGatewayCacheManager.Inst.DeleteDataFromCacheAsync(keyRedis).ConfigureAwait(false);
+            }
+            return Ok(new ResponseApiModel<OrderInfoObject>() { Status = responseStatus, Messenger = UltilsHelper.GetMessageByErrorCode(responseStatus), DataResponse = data });
+        }
+
+        [HttpGet]
+        [Route("GetOrderNhanh")]
+        [ResponseCache(Duration = 5)]
+        public async Task<IActionResult> GetOrderNhanh()
+        {
+            long accountId = await _tokenManager.GetAccountIdByAccessTokenAsync(Request);
+            if (accountId <= 0)
+                return Ok(new ResponseApiModel<string>() { Status = accountId, Messenger = UltilsHelper.GetMessageByErrorCode((int)accountId) });
+            int responseStatus = EStatusCode.DATABASE_ERROR;
+            string keyRedis = "ORDER:" + accountId;
+            string jsonTag = await RedisGatewayCacheManager.Inst.GetDataFromCacheAsync(keyRedis);
+            try
+            {
+                if (string.IsNullOrEmpty(jsonTag))
+                {
+                    var data = StoreOrderSqlInstance.Inst.GetOrderByAccountId(accountId, out responseStatus);
+                    //update cache
+                    if (responseStatus == EStatusCode.SUCCESS)
+                    {
+                        jsonTag = JsonConvert.SerializeObject(data);
+                        await RedisGatewayCacheManager.Inst.SaveDataSecond(keyRedis, jsonTag, 300).ConfigureAwait(false);
+                    }
+                }
+                else
+                {
+                    responseStatus = EStatusCode.SUCCESS;
+                }
+            }
+            catch
+            {
+
+            }
+            return Ok(new ResponseApiModel<string>() { Status = responseStatus, Messenger = UltilsHelper.GetMessageByErrorCode(responseStatus), DataResponse = jsonTag });
+        }
+
+        [HttpPost]
+        [Route("UpdateOrderNhanhEnd")]
+        [ResponseCache(Duration = 0, Location = ResponseCacheLocation.None, NoStore = true)]
+        public async Task<IActionResult> UpdateOrderNhanhEnd(long OrderId)
+        {
+            int responseStatus = -99;
+            long accountId = await _tokenManager.GetAccountIdByAccessTokenAsync(Request);
+            if (accountId <= 0)
+                return Ok(new ResponseApiModel<string>() { Status = accountId, Messenger = UltilsHelper.GetMessageByErrorCode((int)accountId) });
+
+            var data = StoreOrderSqlInstance.Inst.UserEndOrder(accountId, OrderId, 4, "User " + accountId + " huy order", out responseStatus);
+            if (responseStatus == 0)
+            {
+                string keyRedis = "ORDER:" + accountId;
+                await RedisGatewayCacheManager.Inst.DeleteDataFromCacheAsync(keyRedis).ConfigureAwait(false);
+            }
+            return Ok(new ResponseApiModel<OrderInfoObject>() { Status = responseStatus, Messenger = UltilsHelper.GetMessageByErrorCode(responseStatus), DataResponse = data });
+        }
+        #endregion
     }
 }

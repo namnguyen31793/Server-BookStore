@@ -170,7 +170,7 @@ namespace DAO.DAOImp
             {
                 db = new DBHelper(ConfigDb.StoreOrderConnectionString);
                 var pars = new SqlParameter[5];
-                pars[0] = new SqlParameter("@@_AccountId", OrderId);
+                pars[0] = new SqlParameter("@_AccountId", AccountId);
                 pars[1] = new SqlParameter("@_OrderId", OrderId);
                 pars[2] = new SqlParameter("@_PrivateDescription", PrivateDescription);
                 pars[3] = new SqlParameter("@_Status", Status);

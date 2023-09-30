@@ -395,5 +395,149 @@ namespace DAO.DAOImp
             return responseStatus;
         }
         #endregion
+
+        #region NOTIFY 
+        public List<object> GetNotifyMail(long accountId, int page, int row, out int reponseStatus)
+        {
+            DBHelper db = null;
+            List<object> mCurrentMail = null;
+            reponseStatus = EStatusCode.DATABASE_ERROR;
+            try
+            {
+                db = new DBHelper(ConfigDb.StoreMailConnectionString);
+                var pars = new SqlParameter[3];
+                pars[0] = new SqlParameter("@_AccountId", accountId);
+                pars[1] = new SqlParameter("@_Index", page);
+                pars[2] = new SqlParameter("@_NUMBER_GET", row);
+                mCurrentMail = db.GetInstanceSP<List<object>>("SP_Store_Notify_Mail_GetByAccountId", 4, pars);
+                reponseStatus = 0;
+            }
+            catch (Exception exception)
+            {
+                Task.Run(async () => await _logger.LogError("SQL-ReadNotifyMail()", exception.ToString()).ConfigureAwait(false));
+            }
+            finally
+            {
+                db?.Close();
+            }
+            return mCurrentMail;
+        }
+        public void ReadNotifyMail(long accountId, long mailId, out int reponseStatus)
+        {
+            DBHelper db = null;
+            reponseStatus = EStatusCode.DATABASE_ERROR;
+            try
+            {
+                db = new DBHelper(ConfigDb.StoreMailConnectionString);
+                var pars = new SqlParameter[2];
+                pars[0] = new SqlParameter("@_AccountId", accountId);
+                pars[1] = new SqlParameter("@_MailId", mailId);
+                db.ExecuteNonQuerySP("SP_Store_Notify_Mail_UpdateReadMail", 4, pars);
+                reponseStatus = 0;
+            }
+            catch (Exception exception)
+            {
+                Task.Run(async () => await _logger.LogError("SQL-GetNotifyMail()", exception.ToString()).ConfigureAwait(false));
+            }
+            finally
+            {
+                db?.Close();
+            }
+        }
+        public void DeleteNotifyMail(long accountId, long mailId, out int reponseStatus)
+        {
+            DBHelper db = null;
+            reponseStatus = EStatusCode.DATABASE_ERROR;
+            try
+            {
+                db = new DBHelper(ConfigDb.StoreMailConnectionString);
+                var pars = new SqlParameter[2];
+                pars[0] = new SqlParameter("@_AccountId", accountId);
+                pars[1] = new SqlParameter("@_MailId", mailId);
+                db.ExecuteNonQuerySP("SP_Store_Notify_Mail_UpdateDeleteMail", 4, pars);
+                reponseStatus = 0;
+            }
+            catch (Exception exception)
+            {
+                Task.Run(async () => await _logger.LogError("SQL-DeleteNotifyMail()", exception.ToString()).ConfigureAwait(false));
+            }
+            finally
+            {
+                db?.Close();
+            }
+        }
+
+        public object AddNotifyMailCms(string senderNickname, string mailHeader, string mailContent, out int responseStatus, string _RewardBonusDescription = "")
+        {
+            DBHelper db = null;
+            responseStatus = EStatusCode.DATABASE_ERROR;
+            object mCurrentMail = null;
+            try
+            {
+                db = new DBHelper(ConfigDb.StoreMailConnectionString);
+                var pars = new SqlParameter[4];
+                pars[0] = new SqlParameter("@_SenderNickname", senderNickname);
+                pars[1] = new SqlParameter("@_MailHeader", mailHeader);
+                pars[2] = new SqlParameter("@_MailContent", mailContent);
+                pars[3] = new SqlParameter("@_RewardDescription", _RewardBonusDescription);
+                mCurrentMail = db.GetInstanceSP<MailObject>("SP_Store_Notify_Mail_Cms_AddMail", 4, pars);
+                responseStatus = 0;
+            }
+            catch (Exception exception)
+            {
+                Task.Run(async () => await _logger.LogError("SQL-AddNotifyMailCms()", exception.ToString()).ConfigureAwait(false));
+            }
+            finally
+            {
+                db?.Close();
+            }
+            return mCurrentMail;
+        }
+        public List<object> DeleteNotifyMailCms(long mailId, out int reponseStatus)
+        {
+            DBHelper db = null;
+            List<object> mCurrentMail = null;
+            reponseStatus = EStatusCode.DATABASE_ERROR;
+            try
+            {
+                db = new DBHelper(ConfigDb.StoreMailConnectionString);
+                var pars = new SqlParameter[1];
+                pars[0] = new SqlParameter("@_MailId", mailId);
+                mCurrentMail = db.GetInstanceSP<List<object>>("SP_Store_Notify_Mail_Cms_DeleteMail", 4, pars);
+                reponseStatus = 0;
+            }
+            catch (Exception exception)
+            {
+                Task.Run(async () => await _logger.LogError("SQL-DeleteNotifyMailCms()", exception.ToString()).ConfigureAwait(false));
+            }
+            finally
+            {
+                db?.Close();
+            }
+            return mCurrentMail;
+        }
+        public List<object> GetNotifyMailCms(out int reponseStatus)
+        {
+            DBHelper db = null;
+            List<object> mCurrentMail = null;
+            reponseStatus = EStatusCode.DATABASE_ERROR;
+            try
+            {
+                db = new DBHelper(ConfigDb.StoreMailConnectionString);
+                var pars = new SqlParameter[0];
+                mCurrentMail = db.GetInstanceSP<List<object>>("SP_Store_Notify_Mail_Cms_GetMail", 4, pars);
+                reponseStatus = 0;
+            }
+            catch (Exception exception)
+            {
+                Task.Run(async () => await _logger.LogError("SQL-GetNotifyMailCms()", exception.ToString()).ConfigureAwait(false));
+            }
+            finally
+            {
+                db?.Close();
+            }
+            return mCurrentMail;
+        }
+        #endregion
     }
 }

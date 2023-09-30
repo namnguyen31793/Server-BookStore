@@ -169,5 +169,51 @@ namespace BookStore.Controllers
             }
             return valueString;
         }
+
+        #region NOTIFY MAIL
+        [HttpGet]
+        [Route("GetNotifyMail")]
+        public async Task<IActionResult> GetNotifyMail(int page = 0, int row = 10)
+        {
+            long accountId = await _tokenManager.GetAccountIdByAccessTokenAsync(Request);
+            if (accountId <= 0)
+                return Ok(new ResponseApiModel<string>() { Status = accountId, Messenger = UltilsHelper.GetMessageByErrorCode((int)accountId) });
+
+            int responseStatus = EStatusCode.DATABASE_ERROR;
+            var data = StoreMailSqlInstance.Inst.GetNotifyMail(accountId, page, row, out responseStatus);
+            var response = new ResponseApiModel<string>() { Status = responseStatus, Messenger = UltilsHelper.GetMessageByErrorCode(responseStatus), DataResponse = JsonConvert.SerializeObject(data) };
+
+            return Ok(response);
+        }
+
+        [HttpPost]
+        [Route("ReadNotifyMail")]
+        public async Task<IActionResult> ReadNotifyMail(long MailId)
+        {
+            long accountId = await _tokenManager.GetAccountIdByAccessTokenAsync(Request);
+            if (accountId <= 0)
+                return Ok(new ResponseApiModel<string>() { Status = accountId, Messenger = UltilsHelper.GetMessageByErrorCode((int)accountId) });
+
+            int responseStatus = EStatusCode.DATABASE_ERROR;
+            StoreMailSqlInstance.Inst.ReadNotifyMail(accountId, MailId, out responseStatus);
+            var response = new ResponseApiModel<string>() { Status = responseStatus, Messenger = UltilsHelper.GetMessageByErrorCode(responseStatus) };
+
+            return Ok(response);
+        }
+        [HttpPost]
+        [Route("DeleteNotifyMail")]
+        public async Task<IActionResult> DeleteNotifyMail(long MailId)
+        {
+            long accountId = await _tokenManager.GetAccountIdByAccessTokenAsync(Request);
+            if (accountId <= 0)
+                return Ok(new ResponseApiModel<string>() { Status = accountId, Messenger = UltilsHelper.GetMessageByErrorCode((int)accountId) });
+
+            int responseStatus = EStatusCode.DATABASE_ERROR;
+            StoreMailSqlInstance.Inst.DeleteNotifyMail(accountId, MailId, out responseStatus);
+            var response = new ResponseApiModel<string>() { Status = responseStatus, Messenger = UltilsHelper.GetMessageByErrorCode(responseStatus) };
+
+            return Ok(response);
+        }
+        #endregion
     }
 }
