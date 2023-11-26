@@ -59,13 +59,13 @@ namespace BookStoreCMS.Controllers
         {
             var response = new ResponseApiModel<string>() { Status = EStatusCode.SYSTEM_ERROR, Messenger = UltilsHelper.GetMessageByErrorCode(EStatusCode.SYSTEM_ERROR) };
 
-                int checkRole = await _tokenManager.CheckRoleActionAsync(ERole.Administrator, Request);
-                if (checkRole < 0)
-                    return Ok(new ResponseApiModel<string>() { Status = checkRole, Messenger = UltilsHelper.GetMessageByErrorCode(checkRole) });
-                int res = EStatusCode.DATABASE_ERROR;
-                var model = StoreMailSqlInstance.Inst.SendMail(data.Accountid, data.SenderNickname, data.MailHeader, data.MailContent, out res, data.Money, data.RewardBonusDescription);
+            int checkRole = await _tokenManager.CheckRoleActionAsync(ERole.Administrator, Request);
+            if (checkRole < 0)
+                return Ok(new ResponseApiModel<string>() { Status = checkRole, Messenger = UltilsHelper.GetMessageByErrorCode(checkRole) });
+            int res = EStatusCode.DATABASE_ERROR;
+            var model = StoreMailSqlInstance.Inst.SendMail(data.Accountid, data.SenderNickname, data.MailHeader, data.MailContent, out res, data.Money, data.RewardBonusDescription);
 
-                response = new ResponseApiModel<string>() { Status = res, Messenger = UltilsHelper.GetMessageByErrorCode(res), DataResponse = JsonConvert.SerializeObject(model) };
+            response = new ResponseApiModel<string>() { Status = res, Messenger = UltilsHelper.GetMessageByErrorCode(res), DataResponse = JsonConvert.SerializeObject(model) };
 
 
             return Ok(response);
@@ -77,13 +77,13 @@ namespace BookStoreCMS.Controllers
         {
             var response = new ResponseApiModel<string>() { Status = EStatusCode.SYSTEM_ERROR, Messenger = UltilsHelper.GetMessageByErrorCode(EStatusCode.SYSTEM_ERROR) };
 
-                int checkRole = await _tokenManager.CheckRoleActionAsync(ERole.Administrator, Request);
-                if (checkRole < 0)
-                    return Ok(new ResponseApiModel<string>() { Status = checkRole, Messenger = UltilsHelper.GetMessageByErrorCode(checkRole) });
-                int res = EStatusCode.SUCCESS;
-                StoreMailSqlInstance.Inst.SendAllMail(data.SenderNickname, data.MailHeader, data.MailContent, out res, data.Money, data.RewardBonusDescription);
+            int checkRole = await _tokenManager.CheckRoleActionAsync(ERole.Administrator, Request);
+            if (checkRole < 0)
+                return Ok(new ResponseApiModel<string>() { Status = checkRole, Messenger = UltilsHelper.GetMessageByErrorCode(checkRole) });
+            int res = EStatusCode.SUCCESS;
+            StoreMailSqlInstance.Inst.SendAllMail(data.SenderNickname, data.MailHeader, data.MailContent, out res, data.Money, data.RewardBonusDescription);
 
-                response = new ResponseApiModel<string>() { Status = res, Messenger = UltilsHelper.GetMessageByErrorCode(res) };
+            response = new ResponseApiModel<string>() { Status = res, Messenger = UltilsHelper.GetMessageByErrorCode(res) };
 
             return Ok(response);
         }
@@ -97,20 +97,13 @@ namespace BookStoreCMS.Controllers
             long accountId = await _tokenManager.GetAccountIdByAccessTokenAsync(Request);
             if (accountId <= 0)
                 return Ok(new ResponseApiModel<string>() { Status = accountId, Messenger = UltilsHelper.GetMessageByErrorCode((int)accountId) });
-            try
-            {
-                int checkRole = await _tokenManager.CheckRoleActionAsync(ERole.Administrator, Request);
-                if (checkRole < 0)
-                    return Ok(new ResponseApiModel<string>() { Status = checkRole, Messenger = UltilsHelper.GetMessageByErrorCode(checkRole) });
-                int res = EStatusCode.DATABASE_ERROR;
-                var model = StoreMailSqlInstance.Inst.RestoreMail(MailId, out res);
+            int checkRole = await _tokenManager.CheckRoleActionAsync(ERole.Administrator, Request);
+            if (checkRole < 0)
+                return Ok(new ResponseApiModel<string>() { Status = checkRole, Messenger = UltilsHelper.GetMessageByErrorCode(checkRole) });
+            int res = EStatusCode.DATABASE_ERROR;
+            var model = StoreMailSqlInstance.Inst.RestoreMail(MailId, out res);
 
-                response = new ResponseApiModel<string>() { Status = res, Messenger = UltilsHelper.GetMessageByErrorCode(res), DataResponse = JsonConvert.SerializeObject(model) };
-            }
-            catch (Exception ex)
-            {
-                await _logger.LogError("Account-Login{}", ex.ToString()).ConfigureAwait(false);
-            }
+            response = new ResponseApiModel<string>() { Status = res, Messenger = UltilsHelper.GetMessageByErrorCode(res), DataResponse = JsonConvert.SerializeObject(model) };
 
             return Ok(response);
         }
@@ -145,19 +138,13 @@ namespace BookStoreCMS.Controllers
         {
             var response = new ResponseApiModel<string>() { Status = EStatusCode.SYSTEM_ERROR, Messenger = UltilsHelper.GetMessageByErrorCode(EStatusCode.SYSTEM_ERROR) };
             int responseStatus = 0;
-            try
-            {
-                int checkRole = await _tokenManager.CheckRoleActionAsync(ERole.Administrator, Request);
-                if (checkRole < 0)
-                    return Ok(new ResponseApiModel<string>() { Status = checkRole, Messenger = UltilsHelper.GetMessageByErrorCode(checkRole) });
-                var model = StoreMailSqlInstance.Inst.AddEmailAdmin(request.Username, request.Password, request.Status, out responseStatus);
 
-                response = new ResponseApiModel<string>() { Status = responseStatus, Messenger = UltilsHelper.GetMessageByErrorCode(responseStatus), DataResponse = JsonConvert.SerializeObject(model) };
-            }
-            catch (Exception ex)
-            {
-                await _logger.LogError("Account-GetMailUser{}", ex.ToString()).ConfigureAwait(false);
-            }
+            int checkRole = await _tokenManager.CheckRoleActionAsync(ERole.Administrator, Request);
+            if (checkRole < 0)
+                return Ok(new ResponseApiModel<string>() { Status = checkRole, Messenger = UltilsHelper.GetMessageByErrorCode(checkRole) });
+            var model = StoreMailSqlInstance.Inst.AddEmailAdmin(request.Username, request.Password, request.Status, out responseStatus);
+
+            response = new ResponseApiModel<string>() { Status = responseStatus, Messenger = UltilsHelper.GetMessageByErrorCode(responseStatus), DataResponse = JsonConvert.SerializeObject(model) };
 
             return Ok(response);
         }
@@ -168,19 +155,13 @@ namespace BookStoreCMS.Controllers
         {
             var response = new ResponseApiModel<string>() { Status = EStatusCode.SYSTEM_ERROR, Messenger = UltilsHelper.GetMessageByErrorCode(EStatusCode.SYSTEM_ERROR) };
             int responseStatus = 0;
-            try
-            {
-                int checkRole = await _tokenManager.CheckRoleActionAsync(ERole.Administrator, Request);
-                if (checkRole < 0)
-                    return Ok(new ResponseApiModel<string>() { Status = checkRole, Messenger = UltilsHelper.GetMessageByErrorCode(checkRole) });
-                var model = StoreMailSqlInstance.Inst.UpdateEmailAdmin(request.MailId, request.Username, request.Password, request.Status, out responseStatus);
 
-                response = new ResponseApiModel<string>() { Status = responseStatus, Messenger = UltilsHelper.GetMessageByErrorCode(responseStatus), DataResponse = JsonConvert.SerializeObject(model) };
-            }
-            catch (Exception ex)
-            {
-                await _logger.LogError("Account-GetMailUser{}", ex.ToString()).ConfigureAwait(false);
-            }
+            int checkRole = await _tokenManager.CheckRoleActionAsync(ERole.Administrator, Request);
+            if (checkRole < 0)
+                return Ok(new ResponseApiModel<string>() { Status = checkRole, Messenger = UltilsHelper.GetMessageByErrorCode(checkRole) });
+            var model = StoreMailSqlInstance.Inst.UpdateEmailAdmin(request.MailId, request.Username, request.Password, request.Status, out responseStatus);
+
+            response = new ResponseApiModel<string>() { Status = responseStatus, Messenger = UltilsHelper.GetMessageByErrorCode(responseStatus), DataResponse = JsonConvert.SerializeObject(model) };
 
             return Ok(response);
         }
@@ -226,7 +207,7 @@ namespace BookStoreCMS.Controllers
 
             int responseStatus = EStatusCode.DATABASE_ERROR;
             var listMail = StoreMailSqlInstance.Inst.GetNotifyMailCms(out responseStatus);
-            var response = new ResponseApiModel<string>() { Status = responseStatus, Messenger = UltilsHelper.GetMessageByErrorCode(responseStatus) };
+            var response = new ResponseApiModel<string>() { Status = responseStatus, Messenger = UltilsHelper.GetMessageByErrorCode(responseStatus), DataResponse = JsonConvert.SerializeObject(listMail) };
 
             return Ok(response);
         }

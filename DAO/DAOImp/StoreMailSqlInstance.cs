@@ -307,7 +307,7 @@ namespace DAO.DAOImp
             return mCurrentMail;
         }
 
-        public EmailObject AddEmailAdmin(string Username, string Password, bool Status, out int responseStatus)
+        public EmailObject AddEmailAdmin(string Username, string Password, int Status, out int responseStatus)
         {
             DBHelper db = null;
             EmailObject mCurrentMail = null;
@@ -335,7 +335,7 @@ namespace DAO.DAOImp
             return mCurrentMail;
         }
 
-        public List<EmailObject> UpdateEmailAdmin(long EmailId, string Username, string Password, bool Status, out int responseStatus)
+        public List<EmailObject> UpdateEmailAdmin(long EmailId, string Username, string Password, int Status, out int responseStatus)
         {
             DBHelper db = null;
             List<EmailObject> mCurrentMail = new List<EmailObject>();
@@ -397,10 +397,10 @@ namespace DAO.DAOImp
         #endregion
 
         #region NOTIFY 
-        public List<object> GetNotifyMail(long accountId, int page, int row, out int reponseStatus)
+        public List<NotifyMailObject> GetNotifyMail(long accountId, int page, int row, out int reponseStatus)
         {
             DBHelper db = null;
-            List<object> mCurrentMail = null;
+            List<NotifyMailObject> mCurrentMail = null;
             reponseStatus = EStatusCode.DATABASE_ERROR;
             try
             {
@@ -409,7 +409,7 @@ namespace DAO.DAOImp
                 pars[0] = new SqlParameter("@_AccountId", accountId);
                 pars[1] = new SqlParameter("@_Index", page);
                 pars[2] = new SqlParameter("@_NUMBER_GET", row);
-                mCurrentMail = db.GetInstanceSP<List<object>>("SP_Store_Notify_Mail_GetByAccountId", 4, pars);
+                mCurrentMail = db.GetListSP<NotifyMailObject>("SP_Store_Notify_Mail_GetByAccountId", 4, pars);
                 reponseStatus = 0;
             }
             catch (Exception exception)
@@ -493,17 +493,17 @@ namespace DAO.DAOImp
             }
             return mCurrentMail;
         }
-        public List<object> DeleteNotifyMailCms(long mailId, out int reponseStatus)
+        public List<NotifyMailCmsObject> DeleteNotifyMailCms(long mailId, out int reponseStatus)
         {
             DBHelper db = null;
-            List<object> mCurrentMail = null;
+            List<NotifyMailCmsObject> mCurrentMail = null;
             reponseStatus = EStatusCode.DATABASE_ERROR;
             try
             {
                 db = new DBHelper(ConfigDb.StoreMailConnectionString);
                 var pars = new SqlParameter[1];
                 pars[0] = new SqlParameter("@_MailId", mailId);
-                mCurrentMail = db.GetInstanceSP<List<object>>("SP_Store_Notify_Mail_Cms_DeleteMail", 4, pars);
+                mCurrentMail = db.GetListSP<NotifyMailCmsObject>("SP_Store_Notify_Mail_Cms_DeleteMail", 4, pars);
                 reponseStatus = 0;
             }
             catch (Exception exception)
@@ -516,16 +516,15 @@ namespace DAO.DAOImp
             }
             return mCurrentMail;
         }
-        public List<object> GetNotifyMailCms(out int reponseStatus)
+        public List<NotifyMailCmsObject> GetNotifyMailCms(out int reponseStatus)
         {
             DBHelper db = null;
-            List<object> mCurrentMail = null;
+            List<NotifyMailCmsObject> mCurrentMail = null;
             reponseStatus = EStatusCode.DATABASE_ERROR;
             try
             {
                 db = new DBHelper(ConfigDb.StoreMailConnectionString);
-                var pars = new SqlParameter[0];
-                mCurrentMail = db.GetInstanceSP<List<object>>("SP_Store_Notify_Mail_Cms_GetMail", 4, pars);
+                mCurrentMail = db.GetListSP<NotifyMailCmsObject>("SP_Store_Notify_Mail_Cms_GetMail", 4);
                 reponseStatus = 0;
             }
             catch (Exception exception)

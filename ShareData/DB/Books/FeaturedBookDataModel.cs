@@ -14,4 +14,9 @@ namespace ShareData.DB.Books
     {
         public string Barcode { get; set; }
     }
+    public class TopLike
+    {
+        public string Barcode { get; set; }
+        public long TotalLike { get; set; }
+    }
 }

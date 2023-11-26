@@ -1294,7 +1294,31 @@ namespace DAO.DAOImp
         }
 
         #endregion
-
+        #region TRACKING
+        public List<TopLike> GetTopLike(out int reponseStatus)
+        {
+            DBHelper db = null;
+            List<TopLike> data = null;
+            reponseStatus = EStatusCode.DATABASE_ERROR;
+            try
+            {
+                db = new DBHelper(ConfigDb.StoreBookConnectionString);
+                var pars = new SqlParameter[1];
+                pars[0] = new SqlParameter("@_ResponseStatus", SqlDbType.Int) { Direction = ParameterDirection.Output };
+                data = db.GetListSP<TopLike>("SP_Store_Book_Like_Statistical_Top", 4, pars);
+                reponseStatus = Convert.ToInt32(pars[0].Value);
+            }
+            catch (Exception exception)
+            {
+                Task.Run(async () => await _logger.LogError("SQL-SP_Store_Book_Like_Statistical_Top()", exception.ToString()).ConfigureAwait(false));
+            }
+            finally
+            {
+                db?.Close();
+            }
+            return data;
+        }
+        #endregion
         private string GetDataString(string data) {
             if (!string.IsNullOrEmpty(data))
                 return data;

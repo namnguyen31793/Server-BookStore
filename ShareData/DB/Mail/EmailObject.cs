@@ -11,6 +11,6 @@ namespace ShareData.DB.Mail
         public string Password { get; set; }
         public long CountUse { get; set; }
         public DateTime? LastActionTime { get; set; }
-        public bool Status { get; set; }
+        public int Status { get; set; }
     }
 }

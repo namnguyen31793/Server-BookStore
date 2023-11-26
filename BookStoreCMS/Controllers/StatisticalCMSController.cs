@@ -177,5 +177,17 @@ namespace BookStoreCMS.Controllers
         }
 
 
+        [HttpGet]
+        [Route("GetTopBookLike")]
+        [ResponseCache(Duration = 0, Location = ResponseCacheLocation.None, NoStore = true)]
+        public async Task<IActionResult> GetTopBookLike()
+        {
+            var response = new ResponseApiModel<string>() { Status = EStatusCode.SYSTEM_ERROR, Messenger = UltilsHelper.GetMessageByErrorCode(EStatusCode.SYSTEM_ERROR) };
+            int responseStatus = EStatusCode.DATABASE_ERROR;
+            var data = StoreBookSqlInstance.Inst.GetTopLike(out responseStatus);
+            response = new ResponseApiModel<string>() { Status = responseStatus, Messenger = UltilsHelper.GetMessageByErrorCode(responseStatus), DataResponse = JsonConvert.SerializeObject(data) };
+            return Ok(response);
+        }
+
     }
 }

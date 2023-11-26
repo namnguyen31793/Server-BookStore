@@ -43,26 +43,21 @@ namespace BookStoreCMS.Controllers
             var response = new ResponseApiModel<string>() { Status = EStatusCode.SYSTEM_ERROR, Messenger = UltilsHelper.GetMessageByErrorCode(EStatusCode.SYSTEM_ERROR) };
             int responseStatus = EStatusCode.DATABASE_ERROR;
             string jsonListMail = "";
-            try
+
+            string keyRedis = "CacheAvgRate:" + barcode;
+            jsonListMail = await RedisGatewayCacheManager.Inst.GetDataFromCacheAsync(keyRedis);
+            if (string.IsNullOrEmpty(jsonListMail))
             {
-                string keyRedis = "CacheAvgRate:" + barcode;
-                jsonListMail = await RedisGatewayCacheManager.Inst.GetDataFromCacheAsync(keyRedis);
-                if (string.IsNullOrEmpty(jsonListMail))
+                RateCountModel starRate = null;
+                responseStatus = StoreBookSqlInstance.Inst.GetAvgRate(barcode, out starRate);
+                if (responseStatus == EStatusCode.SUCCESS)
                 {
-                    RateCountModel starRate = null;
-                    responseStatus = StoreBookSqlInstance.Inst.GetAvgRate(barcode, out starRate);
-                    if (responseStatus == EStatusCode.SUCCESS)
-                    {
-                        jsonListMail = JsonConvert.SerializeObject(starRate);
-                        await RedisGatewayCacheManager.Inst.SaveDataAsync(keyRedis, jsonListMail, 10);
-                    }
+                    jsonListMail = JsonConvert.SerializeObject(starRate);
+                    await RedisGatewayCacheManager.Inst.SaveDataAsync(keyRedis, jsonListMail, 10);
                 }
-                response = new ResponseApiModel<string>() { Status = responseStatus, Messenger = UltilsHelper.GetMessageByErrorCode(responseStatus), DataResponse = jsonListMail };
             }
-            catch (Exception ex)
-            {
-                await _logger.LogError("Books-GetAvgRate{}", ex.ToString()).ConfigureAwait(false);
-            }
+            response = new ResponseApiModel<string>() { Status = responseStatus, Messenger = UltilsHelper.GetMessageByErrorCode(responseStatus), DataResponse = jsonListMail };
+
             return Ok(response);
         }
 
@@ -76,16 +71,11 @@ namespace BookStoreCMS.Controllers
                 return Ok(new ResponseApiModel<string>() { Status = checkRole, Messenger = UltilsHelper.GetMessageByErrorCode(checkRole) });
             var response = new ResponseApiModel<string>() { Status = EStatusCode.SYSTEM_ERROR, Messenger = UltilsHelper.GetMessageByErrorCode(EStatusCode.SYSTEM_ERROR) };
             int responseStatus = EStatusCode.DATABASE_ERROR;
-            try
-            {
-                RateCountModel modelRate = null;
-                var book = StoreBookSqlInstance.Inst.SendComment(model.AccountId,model.Barcode, model.StarRate, model.Comment, model.ActionTime, model.NickName, out responseStatus, out modelRate);
-                response = new ResponseApiModel<string>() { Status = responseStatus, Messenger = UltilsHelper.GetMessageByErrorCode(responseStatus), DataResponse = JsonConvert.SerializeObject(book) };
-            }
-            catch (Exception ex)
-            {
-                await _logger.LogError("Books-UpdateAuthorConfig{}", ex.ToString()).ConfigureAwait(false);
-            }
+
+            RateCountModel modelRate = null;
+            var book = StoreBookSqlInstance.Inst.SendComment(model.AccountId,model.Barcode, model.StarRate, model.Comment, model.ActionTime, model.NickName, out responseStatus, out modelRate);
+            response = new ResponseApiModel<string>() { Status = responseStatus, Messenger = UltilsHelper.GetMessageByErrorCode(responseStatus), DataResponse = JsonConvert.SerializeObject(book) };
+
             return Ok(response);
         }
 
@@ -102,19 +92,14 @@ namespace BookStoreCMS.Controllers
 
             string keyRedis = "CacheComment:" + barcode;
             string jsonListMail = await RedisGatewayCacheManager.Inst.GetDataFromCacheAsync(keyRedis);
-            if (string.IsNullOrEmpty(jsonListMail))
+
+            var listComment = StoreBookSqlInstance.Inst.GetListRateComment(barcode, out responseStatus);
+            if (responseStatus == EStatusCode.SUCCESS)
             {
-                var listComment = StoreBookSqlInstance.Inst.GetListRateComment(barcode, out responseStatus);
-                if (responseStatus == EStatusCode.SUCCESS)
-                {
-                    jsonListMail = JsonConvert.SerializeObject(listComment);
-                    await RedisGatewayCacheManager.Inst.SaveDataAsync(keyRedis, jsonListMail, 10);
-                }
+                jsonListMail = JsonConvert.SerializeObject(listComment);
+                await RedisGatewayCacheManager.Inst.SaveDataAsync(keyRedis, jsonListMail, 10);
             }
-            else
-            {
-                responseStatus = EStatusCode.SUCCESS;
-            }
+
             response = new ResponseApiModel<string>() { Status = responseStatus, Messenger = UltilsHelper.GetMessageByErrorCode(responseStatus), DataResponse = jsonListMail };
           
             return Ok(response);
@@ -133,20 +118,15 @@ namespace BookStoreCMS.Controllers
 
             var response = new ResponseApiModel<string>() { Status = EStatusCode.SYSTEM_ERROR, Messenger = UltilsHelper.GetMessageByErrorCode(EStatusCode.SYSTEM_ERROR) };
             int responseStatus = EStatusCode.DATABASE_ERROR;
-            try
+
+            responseStatus = StoreBookSqlInstance.Inst.RemoveComment(barcode, accountId);
+            if (responseStatus == EStatusCode.SUCCESS)
             {
-                responseStatus = StoreBookSqlInstance.Inst.RemoveComment(barcode, accountId);
-                if (responseStatus == EStatusCode.SUCCESS)
-                {
-                    string keyRedis = "CacheComment:" + barcode;
-                    await RedisGatewayCacheManager.Inst.DeleteDataFromCacheAsync(keyRedis);
-                }
-                response = new ResponseApiModel<string>() { Status = responseStatus, Messenger = UltilsHelper.GetMessageByErrorCode(responseStatus) };
+                string keyRedis = "CacheComment:" + barcode;
+                await RedisGatewayCacheManager.Inst.DeleteDataFromCacheAsync(keyRedis);
             }
-            catch (Exception ex)
-            {
-                await _logger.LogError("Books-GetListComment{}", ex.ToString()).ConfigureAwait(false);
-            }
+            response = new ResponseApiModel<string>() { Status = responseStatus, Messenger = UltilsHelper.GetMessageByErrorCode(responseStatus) };
+
             return Ok(response);
         }
 
