@@ -1,6 +1,7 @@
 ﻿using MongoDB.Bson;
 using MongoDB.Bson.Serialization.Attributes;
 using MongoDB.Bson.Serialization.IdGenerators;
+using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -28,5 +29,18 @@ namespace BookStoreCMS.ModelMongo
             this.CountAccount = (long)Model.CountAccount;
             this.CountAction = (long)Model.CountAction;
         }
+    }
+
+    public class Tracking_Buy_Book
+    {
+        [JsonIgnore]
+        [BsonId]
+        public BsonDocument Id { get; set; } // Sử dụng BsonDocument cho trường _id là document
+
+        [BsonElement("Barcode")] // Ánh xạ trường Barcode trong document
+        public string Barcode { get; set; }
+
+        [BsonElement("Count")] // Ánh xạ trường Count trong document
+        public long Count { get; set; }
     }
 }

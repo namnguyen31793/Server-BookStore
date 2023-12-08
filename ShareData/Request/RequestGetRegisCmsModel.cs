@@ -29,4 +29,11 @@ namespace ShareData.Request
         public DateTime StartTime { get; set; }
         public DateTime EndTime { get; set; }
     }
+    public class RequestGetActionExtend
+    {
+        public string Action { get; set; }
+        public string Extension { get; set; }
+        public DateTime StartTime { get; set; }
+        public DateTime EndTime { get; set; }
+    }
 }

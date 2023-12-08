@@ -113,11 +113,25 @@ namespace BookStoreCMS.Controllers
         [ResponseCache(Duration = 0, Location = ResponseCacheLocation.None, NoStore = true)]
         public async Task<IActionResult> GetActionUser(RequestGetAction request)
         {
+            int checkRole = await _tokenManager.CheckRoleActionAsync(ERole.Administrator, Request);
+            if (checkRole < 0)
+                return Ok(new ResponseApiModel<string>() { Status = checkRole, Messenger = UltilsHelper.GetMessageByErrorCode(checkRole) });
+
+            var data = TrackingLogSystemInstance.Inst.Get_ActionUser(request.Action, request.StartTime, request.EndTime);
+
+            return Ok(new ResponseApiModel<string>() { Status = 0, Messenger = "", DataResponse = JsonConvert.SerializeObject(data) });
+        }
+
+        [HttpPost]
+        [Route("GetActionUserExtend")]
+        [ResponseCache(Duration = 0, Location = ResponseCacheLocation.None, NoStore = true)]
+        public async Task<IActionResult> GetActionUserExtend(RequestGetActionExtend request)
+        {
             //int checkRole = await _tokenManager.CheckRoleActionAsync(ERole.Administrator, Request);
             //if (checkRole < 0)
             //    return Ok(new ResponseApiModel<string>() { Status = checkRole, Messenger = UltilsHelper.GetMessageByErrorCode(checkRole) });
 
-            var data = TrackingLogSystemInstance.Inst.Get_ActionUser(request.Action, request.StartTime, request.EndTime);
+            var data = TrackingLogSystemInstance.Inst.Get_ActionUser(request.Action, request.Extension, request.StartTime, request.EndTime);
 
             return Ok(new ResponseApiModel<string>() { Status = 0, Messenger = "", DataResponse = JsonConvert.SerializeObject(data) });
         }
@@ -127,11 +141,25 @@ namespace BookStoreCMS.Controllers
         [ResponseCache(Duration = 0, Location = ResponseCacheLocation.None, NoStore = true)]
         public async Task<IActionResult> GetActionHome(RequestGetAction request)
         {
+            int checkRole = await _tokenManager.CheckRoleActionAsync(ERole.Administrator, Request);
+            if (checkRole < 0)
+                return Ok(new ResponseApiModel<string>() { Status = checkRole, Messenger = UltilsHelper.GetMessageByErrorCode(checkRole) });
+
+            var data = TrackingLogSystemInstance.Inst.Get_ActionHome(request.Action, request.StartTime, request.EndTime);
+
+            return Ok(new ResponseApiModel<string>() { Status = 0, Messenger = "", DataResponse = JsonConvert.SerializeObject(data) });
+        }
+
+        [HttpPost]
+        [Route("GetActionHomeExtend")]
+        [ResponseCache(Duration = 0, Location = ResponseCacheLocation.None, NoStore = true)]
+        public async Task<IActionResult> GetActionHomeExtend(RequestGetActionExtend request)
+        {
             //int checkRole = await _tokenManager.CheckRoleActionAsync(ERole.Administrator, Request);
             //if (checkRole < 0)
             //    return Ok(new ResponseApiModel<string>() { Status = checkRole, Messenger = UltilsHelper.GetMessageByErrorCode(checkRole) });
 
-            var data = TrackingLogSystemInstance.Inst.Get_ActionHome(request.Action, request.StartTime, request.EndTime);
+            var data = TrackingLogSystemInstance.Inst.Get_ActionHome(request.Action, request.Extension, request.StartTime, request.EndTime);
 
             return Ok(new ResponseApiModel<string>() { Status = 0, Messenger = "", DataResponse = JsonConvert.SerializeObject(data) });
         }
@@ -141,9 +169,9 @@ namespace BookStoreCMS.Controllers
         [ResponseCache(Duration = 0, Location = ResponseCacheLocation.None, NoStore = true)]
         public async Task<IActionResult> GetActionFindBook(RequestGetAction request)
         {
-            //int checkRole = await _tokenManager.CheckRoleActionAsync(ERole.Administrator, Request);
-            //if (checkRole < 0)
-            //    return Ok(new ResponseApiModel<string>() { Status = checkRole, Messenger = UltilsHelper.GetMessageByErrorCode(checkRole) });
+            int checkRole = await _tokenManager.CheckRoleActionAsync(ERole.Administrator, Request);
+            if (checkRole < 0)
+                return Ok(new ResponseApiModel<string>() { Status = checkRole, Messenger = UltilsHelper.GetMessageByErrorCode(checkRole) });
 
             var data = TrackingLogSystemInstance.Inst.Get_ActionFindBook(request.Action, request.StartTime, request.EndTime);
 
@@ -176,7 +204,6 @@ namespace BookStoreCMS.Controllers
             return Ok(response);
         }
 
-
         [HttpGet]
         [Route("GetTopBookLike")]
         [ResponseCache(Duration = 0, Location = ResponseCacheLocation.None, NoStore = true)]
@@ -189,5 +216,40 @@ namespace BookStoreCMS.Controllers
             return Ok(response);
         }
 
+        [HttpPost]
+        [Route("GetTopBarcodeBuy")]
+        public async Task<IActionResult> GetTopBarcodeBuy(RequestGetByTime model)
+        {
+            try
+            {
+                var data = TrackingLogSystemInstance.Inst.GetTopBuyBarcode(model.StartTime, model.EndTime);
+
+                var response = new ResponseApiModel<string>() { Status = 0, Messenger = UltilsHelper.GetMessageByErrorCode(0), DataResponse = JsonConvert.SerializeObject(data) };
+                return Ok(response);
+            }
+            catch (Exception ex)
+            {
+                var response = new ResponseApiModel<string>() { Status = 0, Messenger = ex.ToString() };
+                return Ok(response);
+            }
+        }
+
+        [HttpPost]
+        [Route("GetTopBarcodeSearch")]
+        public async Task<IActionResult> GetTopBarcodeSearch(RequestGetByTime model)
+        {
+            try
+            {
+                var data = TrackingLogSystemInstance.Inst.GetTopBookSearch();
+
+                var response = new ResponseApiModel<string>() { Status = 0, Messenger = UltilsHelper.GetMessageByErrorCode(0), DataResponse = JsonConvert.SerializeObject(data) };
+                return Ok(response);
+            }
+            catch (Exception ex)
+            {
+                var response = new ResponseApiModel<string>() { Status = 0, Messenger = ex.ToString() };
+                return Ok(response);
+            }
+        }
     }
 }
