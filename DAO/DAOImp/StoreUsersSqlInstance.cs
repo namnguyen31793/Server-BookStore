@@ -702,5 +702,33 @@ namespace DAO.DAOImp
             return response;
         }
         #endregion
+
+        public int AddVourcherUser(long AccountId, int VourcherId, string VourcherName, int CountUse)
+        {
+            DBHelper db = null;
+            int responseStatus = EStatusCode.DATABASE_ERROR;
+            try
+            {
+                db = new DBHelper(ConfigDb.StoreUsersConnectionString);
+                var pars = new SqlParameter[8];
+                pars[0] = new SqlParameter("@_AccountId", AccountId);
+                pars[1] = new SqlParameter("@_VourcherId", VourcherId);
+                pars[2] = new SqlParameter("@_VourcherName", VourcherName);
+                pars[3] = new SqlParameter("@_CountUse", CountUse);
+                pars[4] = new SqlParameter("@_ResponseStatus", SqlDbType.BigInt) { Direction = ParameterDirection.Output };
+                db.ExecuteNonQuerySP("SP_Store_Vourcher_Add", 4, pars);
+                responseStatus = Convert.ToInt32(pars[4].Value.ToString());
+            }
+            catch (Exception exception)
+            {
+                responseStatus = -9999;
+                Task.Run(async () => await _logger.LogError("SQL-AddVourcherUser()", exception.ToString()).ConfigureAwait(false));
+            }
+            finally
+            {
+                db?.Close();
+            }
+            return responseStatus;
+        }
     }
 }
