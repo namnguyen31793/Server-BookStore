@@ -417,7 +417,13 @@ namespace BookStore.Controllers
             ResponseApiModel<TokenInfo> model = new ResponseApiModel<TokenInfo>() { Status = EStatusCode.SYSTEM_ERROR, Messenger = UltilsHelper.GetMessageByErrorCode(EStatusCode.SYSTEM_ERROR) };
 
                 var res = EStatusCode.SUCCESS;
-                var accountId = StoreUsersSqlInstance.Inst.DoLogin(requestLogin.AccountName, AccountUtils.EncryptPasswordMd5(requestLogin.Password), clientInfo.MerchantId, clientInfo.TrueClientIp, (int)clientInfo.OsType, ref res);
+            //check spam request
+            string key = "SPAM:LOGIN" + clientInfo.TrueClientIp + "-" + clientInfo.DeviceId;
+            if (RedisGatewayCacheManager.Inst.CheckExistKey(key))
+                return new ResponseApiModel<TokenInfo>() { Status = EStatusCode.TRANSACTION_SPAM, Messenger = UltilsHelper.GetMessageByErrorCode(EStatusCode.TRANSACTION_SPAM) };
+            await RedisGatewayCacheManager.Inst.SaveDataSecond(key, "1", 1).ConfigureAwait(false);
+
+            var accountId = StoreUsersSqlInstance.Inst.DoLogin(requestLogin.AccountName, AccountUtils.EncryptPasswordMd5(requestLogin.Password), clientInfo.MerchantId, clientInfo.TrueClientIp, (int)clientInfo.OsType, ref res);
                 if (accountId >= 0)
                 {
                     //create refresh token -> save db

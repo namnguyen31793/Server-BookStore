@@ -185,6 +185,48 @@ namespace BookStore.Controllers
             }
             return Ok(new ResponseApiModel<OrderInfoObject>() { Status = responseStatus, Messenger = UltilsHelper.GetMessageByErrorCode(responseStatus), DataResponse = data });
         }
+        [HttpPost]
+        [Route("CreateOrderVer2")]
+        [ResponseCache(Duration = 0, Location = ResponseCacheLocation.None, NoStore = true)]
+        public async Task<IActionResult> CreateOrderVer2(RequestCreateOrderModel request)
+        {
+            int responseStatus = -99;
+            var clientInfo = new ClientRequestInfo(Request);
+            string key = "SPAM:CREATE_ORDER" + clientInfo.TrueClientIp + "-" + clientInfo.DeviceId;
+            if (RedisGatewayCacheManager.Inst.CheckExistKey(key))
+                return Ok(new ResponseApiModel<string>() { Status = EStatusCode.TRANSACTION_SPAM, Messenger = UltilsHelper.GetMessageByErrorCode(EStatusCode.TRANSACTION_SPAM) });
+            long accountId = await _tokenManager.GetAccountIdByAccessTokenAsync(Request);
+            if (accountId <= 0)
+                return Ok(new ResponseApiModel<string>() { Status = accountId, Messenger = UltilsHelper.GetMessageByErrorCode((int)accountId) });
+            await RedisGatewayCacheManager.Inst.SaveDataSecond(key, "1", 3).ConfigureAwait(false);
+            //check barcode
+            if (string.IsNullOrEmpty(request.Barcodes) || string.IsNullOrEmpty(request.Numbers))
+                return Ok(new ResponseApiModel<string>() { Status = EStatusCode.ORDER_NOT_DATA, Messenger = UltilsHelper.GetMessageByErrorCode(EStatusCode.ORDER_NOT_DATA) });
+            var dataBook = request.Barcodes.Split(",");
+            var dataNumber = request.Numbers.Split(",");
+            if (dataBook.Length != dataNumber.Length)
+                return Ok(new ResponseApiModel<string>() { Status = EStatusCode.ORDER_NOT_DATA, Messenger = UltilsHelper.GetMessageByErrorCode(EStatusCode.ORDER_NOT_DATA) });
+            try
+            {
+                for (int i = 0; i < dataNumber.Length; i++)
+                {
+                    var check = int.Parse(dataNumber[i]);
+                }
+            }
+            catch
+            {
+                return Ok(new ResponseApiModel<string>() { Status = EStatusCode.ORDER_NOT_DATA, Messenger = UltilsHelper.GetMessageByErrorCode(EStatusCode.ORDER_NOT_DATA) });
+            }
+            var data = StoreOrderSqlInstance.Inst.CreateNewOrder_v2(accountId, request.CustomerId, request.Type, request.Description, request.Barcodes, request.Numbers, request.VourcherId,
+                request.PaymentMethod, request.cityCode, out responseStatus);
+            if (responseStatus == EStatusCode.SUCCESS)
+            {
+                string keyRedis = "ORDER:" + accountId;
+                await RedisGatewayCacheManager.Inst.DeleteDataFromCacheAsync(keyRedis).ConfigureAwait(false);
+            }
+            data.VourcherId = request.VourcherId;
+            return Ok(new ResponseApiModel<OrderInfoObject>() { Status = responseStatus, Messenger = UltilsHelper.GetMessageByErrorCode(responseStatus), DataResponse = data });
+        }
 
         [HttpGet]
         [Route("GetOrder")]

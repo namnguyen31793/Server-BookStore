@@ -28,4 +28,10 @@ namespace ShareData.DB.Vourcher
         public DateTime EndTime { get; set; }
         public bool Status { get; set; } //giai thich
     }
+    public class VourcherCountUse
+    {
+        public int VourcherId { get; set; }
+        public string VourcherName { get; set; }
+        public long CountUse { get; set; }  
+    }
 }

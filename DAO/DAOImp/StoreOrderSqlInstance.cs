@@ -108,6 +108,39 @@ namespace DAO.DAOImp
             return modelData;
         }
 
+        public OrderInfoObject CreateNewOrder_v2(long AccountId, long CustomerId, string type, string Description, string Barcodes, string Numbers, int VourcherId, string PaymentMethod, int CityCode, out int reponseStatus)
+        {
+            DBHelper db = null;
+            OrderInfoObject modelData = null;
+            reponseStatus = EStatusCode.DATABASE_ERROR;
+            try
+            {
+                db = new DBHelper(ConfigDb.StoreOrderConnectionString);
+                var pars = new SqlParameter[10];
+                pars[0] = new SqlParameter("@_AccountId", AccountId);
+                pars[1] = new SqlParameter("@_CustomerId", CustomerId);
+                pars[2] = new SqlParameter("@_Type", type);
+                pars[3] = new SqlParameter("@_Description", Description);
+                pars[4] = new SqlParameter("@_Barcodes", Barcodes);
+                pars[5] = new SqlParameter("@_Numbers", Numbers);
+                pars[6] = new SqlParameter("@_VourcherId", VourcherId);
+                pars[7] = new SqlParameter("@_PaymentMethod", PaymentMethod);
+                pars[8] = new SqlParameter("@_CityCode", CityCode);
+                pars[9] = new SqlParameter("@_ResponseStatus", SqlDbType.Int) { Direction = ParameterDirection.Output };
+                modelData = db.GetInstanceSP<OrderInfoObject>("SP_Store_Order_Order_New_Ver2", 10, pars);
+                reponseStatus = Convert.ToInt32(pars[9].Value);
+            }
+            catch (Exception exception)
+            {
+                Task.Run(async () => await _logger.LogError("SQL-CreateNewOrder_v2()", exception.ToString()).ConfigureAwait(false));
+            }
+            finally
+            {
+                db?.Close();
+            }
+            return modelData;
+        }
+
         public OrderInfoObject ChangeOrderProcess(long OrderId, long ShipMoney, string PrivateDescription, int AllowTest, out int reponseStatus)
         {
             DBHelper db = null;

@@ -6,7 +6,9 @@ using LoggerService;
 using LoggerService.Interfaces;
 using Microsoft.AspNetCore.Mvc;
 using Newtonsoft.Json;
+using RedisSystem;
 using ShareData.API;
+using ShareData.ErrorCode;
 using System.Threading.Tasks;
 using UtilsSystem.Utils;
 
@@ -37,9 +39,40 @@ namespace BookStore.Controllers
         {
             int responseStatus = -99;
 
-            var data = StoreVourcherSqlInstance.Inst.GetVourcherById(vourcherId, ref responseStatus);
+            string keyRedis = "VourcherInfo:" + vourcherId;
+            string jsonString = await RedisGatewayCacheManager.Inst.GetDataFromCacheAsync(keyRedis);
+            if (string.IsNullOrEmpty(jsonString))
+            {
+                var listComment = StoreVourcherSqlInstance.Inst.GetVourcherById(vourcherId, ref responseStatus);
+                if (responseStatus == EStatusCode.SUCCESS)
+                {
+                    jsonString = JsonConvert.SerializeObject(listComment);
+                    await RedisGatewayCacheManager.Inst.SaveDataAsync(keyRedis, jsonString, 2);
+                }
+            }
+            else
+            {
+                responseStatus = EStatusCode.SUCCESS;
+            }
+            return Ok(new ResponseApiModel<string>() { Status = responseStatus, Messenger = UltilsHelper.GetMessageByErrorCode(responseStatus), DataResponse = jsonString });
+        }
 
-            return Ok(new ResponseApiModel<string>() { Status = responseStatus, Messenger = UltilsHelper.GetMessageByErrorCode(responseStatus), DataResponse = JsonConvert.SerializeObject(data) });
+        [HttpGet]
+        [Route("GetAllVourcher")]
+        [ResponseCache(Duration = 0, Location = ResponseCacheLocation.None, NoStore = true)]
+        public async Task<IActionResult> GetAllVourcher()
+        {
+            int responseStatus = EStatusCode.SUCCESS;
+            string keyRedis = "AllVourcher";
+            string jsonString = await RedisGatewayCacheManager.Inst.GetDataFromCacheAsync(keyRedis);
+            if (string.IsNullOrEmpty(jsonString))
+            {
+                var listComment = StoreVourcherSqlInstance.Inst.UserGetAllVourcher();
+                jsonString = JsonConvert.SerializeObject(listComment);
+                await RedisGatewayCacheManager.Inst.SaveDataAsync(keyRedis, jsonString, 2);
+            }
+
+            return Ok(new ResponseApiModel<string>() { Status = responseStatus, Messenger = UltilsHelper.GetMessageByErrorCode(responseStatus), DataResponse = jsonString });
         }
     }
 }

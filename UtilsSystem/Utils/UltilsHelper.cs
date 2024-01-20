@@ -202,6 +202,9 @@ namespace UtilsSystem.Utils
                 case EStatusCode.EMAIL_NOT_ENOUGH:
                     message = "Đã sử dụng hết email trong kho!";
                     break;
+                case EStatusCode.VOURCHER_SPAM:
+                    message = "Tài khoản đã sử dụng vourcher!";
+                    break;
             }
             return message;
         }

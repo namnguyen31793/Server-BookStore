@@ -5,9 +5,11 @@ using DAO.DAOImp;
 using LoggerService;
 using Microsoft.AspNetCore.Mvc;
 using Newtonsoft.Json;
+using RedisSystem;
 using ShareData.API;
 using ShareData.DataEnum;
 using ShareData.DB.Vourcher;
+using ShareData.ErrorCode;
 using ShareData.Request;
 using System.Threading.Tasks;
 using UtilsSystem.Utils;
@@ -59,6 +61,11 @@ namespace BookStoreCMS.Controllers
 
             var data = StoreVourcherSqlInstance.Inst.UpdateVourcher(request.VourcherId, request.VourcherName, request.VourcherType, request.CountUse, request.VourcherReward, request.VourcherDescription, request.thumbnail, request.Targets, request.StartTime, request.EndTime, request.Status, out responseStatus);
 
+            if (responseStatus == EStatusCode.SUCCESS)
+            {
+                await RedisGatewayCacheManager.Inst.DeleteDataFromCacheAsync("AllVourcher").ConfigureAwait(false);
+                await RedisGatewayCacheManager.Inst.DeleteDataFromCacheAsync("VourcherInfo:" + request.VourcherId).ConfigureAwait(false);
+            }
             return Ok(new ResponseApiModel<string>() { Status = responseStatus, Messenger = UltilsHelper.GetMessageByErrorCode(responseStatus), DataResponse = JsonConvert.SerializeObject(data) });
         }
 
@@ -90,8 +97,26 @@ namespace BookStoreCMS.Controllers
                 return Ok(new ResponseApiModel<string>() { Status = checkRole, Messenger = UltilsHelper.GetMessageByErrorCode(checkRole) });
 
             responseStatus = StoreUsersSqlInstance.Inst.AddVourcherUser(request.AccountId, request.VourcherId, request.VourcherName, request.CountUse);
-
+            if (responseStatus == EStatusCode.SUCCESS) {
+                await RedisGatewayCacheManager.Inst.DeleteDataFromCacheAsync("AllVourcher").ConfigureAwait(false);
+            }
             return Ok(new ResponseApiModel<string>() { Status = responseStatus, Messenger = UltilsHelper.GetMessageByErrorCode(responseStatus)});
+        }
+
+        [HttpGet]
+        [Route("GetTopVourcher")]
+        [ResponseCache(Duration = 10)]
+        public async Task<IActionResult> GetTopVourcher(RequestGetMemberCmsModel request)
+        {
+            int responseStatus = 0;
+
+            int checkRole = await _tokenManager.CheckRoleActionAsync(ERole.Administrator, Request);
+            if (checkRole < 0)
+                return Ok(new ResponseApiModel<string>() { Status = checkRole, Messenger = UltilsHelper.GetMessageByErrorCode(checkRole) });
+
+            var data = StoreVourcherSqlInstance.Inst.GetTopVourcher(request.StartTime, request.EndTime);
+
+            return Ok(new ResponseApiModel<string>() { Status = responseStatus, Messenger = UltilsHelper.GetMessageByErrorCode(responseStatus), DataResponse = JsonConvert.SerializeObject(data) });
         }
     }
 }

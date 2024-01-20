@@ -58,6 +58,26 @@ namespace DAO.DAOImp
             }
             return response;
         }
+        public List<VourcherModelVer2> UserGetAllVourcher()
+        {
+            DBHelper db = null;
+            var response = new List<VourcherModelVer2>();
+            try
+            {
+                db = new DBHelper(ConfigDb.StoreVourcherConnectionString);
+                var pars = new SqlParameter[0];
+                response = db.GetListSP<VourcherModelVer2>("SP_StoreVourcher_Config_Ver2_User_Get_All", 4, pars);
+            }
+            catch (Exception exception)
+            {
+                Task.Run(async () => await _logger.LogError("SQL-UserGetAllVourcher()", exception.ToString()).ConfigureAwait(false));
+            }
+            finally
+            {
+                db?.Close();
+            }
+            return response;
+        }
 
         public VourcherModelVer2 GetVourcherById(int vourcherId, ref int responseStatus)
         {
@@ -147,6 +167,28 @@ namespace DAO.DAOImp
             catch (Exception exception)
             {
                 Task.Run(async () => await _logger.LogError("SQL-UpdateVourcher()", exception.ToString()).ConfigureAwait(false));
+            }
+            finally
+            {
+                db?.Close();
+            }
+            return response;
+        }
+        public List<VourcherCountUse> GetTopVourcher(DateTime start, DateTime end)
+        {
+            DBHelper db = null;
+            var response = new List<VourcherCountUse>();
+            try
+            {
+                db = new DBHelper(ConfigDb.StoreVourcherConnectionString);
+                var pars = new SqlParameter[2];
+                pars[0] = new SqlParameter("@StartTime", start);
+                pars[1] = new SqlParameter("@EndTime", end);
+                response = db.GetListSP<VourcherCountUse>("SP_StoreVourcher_Ver2_Log_GetTop_Use_ByTime", 4, pars);
+            }
+            catch (Exception exception)
+            {
+                Task.Run(async () => await _logger.LogError("SQL-GetTopVourcher()", exception.ToString()).ConfigureAwait(false));
             }
             finally
             {

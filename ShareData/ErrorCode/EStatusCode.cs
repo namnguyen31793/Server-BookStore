@@ -43,6 +43,7 @@ namespace ShareData.ErrorCode
         public const int ACOUNT_NOT_EXIST_BARCODE = -76;
         public const int VOURCHER_NAME_EXIST = -77;
         public const int VOURCHER_NOT_ACCEPT = -78;
+        public const int VOURCHER_SPAM = -79;
 
         public const int TOKEN_EXPIRES = -86;
         public const int TRANSACTION_SEND_MAIL_SPAM = -87;

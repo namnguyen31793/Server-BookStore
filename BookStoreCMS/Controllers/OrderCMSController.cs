@@ -134,30 +134,39 @@ namespace BookStoreCMS.Controllers
             var dataGhn = await GhnInstance.Inst.SendCreateOrderGhn(modelOrder.Description, modelOrder.CustomerName, modelOrder.CustomerMobile, modelAdress.AdrDetail, modelAdress.AdrWard, modelAdress.AdrdDistrict, modelAdress.AdrCity, modelOrder.TotalMoney, 
                 requestchange.PrivateDescription, requestchange.weight, requestchange.length, requestchange.width, requestchange.height, listItem, requestchange.service_id, requestchange.service_type_id);
 
+            ResponseGhnModel<ResponseGhnData> modelResponseGghn = null;
             await _logger.LogError("Account-ChangeOrderProcess GHN{}", dataGhn + "  " + JsonConvert.SerializeObject(modelOrder) + "  "+JsonConvert.SerializeObject(requestchange)).ConfigureAwait(false);
-            ResponseGhnModel<ResponseGhnData> modelResponseGghn = JsonConvert.DeserializeObject<ResponseGhnModel<ResponseGhnData>>(dataGhn);
-            if (modelResponseGghn.code == 200)
+            try
             {
-                long totalFee = 0;
-                long.TryParse(modelResponseGghn.data.total_fee, out totalFee);
-                //send mail
-                var message = new Message(new string[] { modelOrder.CustomerEmail }, "Xác nhận đơn hàng Gamma Books",
-                  "Chào bạn " + modelOrder.CustomerEmail.Split("@")[0] + "!" + Environment.NewLine +
-                  "Cảm ơn bạn đã đặt hàng trên ứng dụng Gamma Books." + Environment.NewLine +
-                  "Dưới đây là thông tin chi tiết về đơn hàng của bạn:" + Environment.NewLine +
+                modelResponseGghn = JsonConvert.DeserializeObject<ResponseGhnModel<ResponseGhnData>>(dataGhn);
+                if (modelResponseGghn.code == 200)
+                {
+                    long totalFee = 0;
+                    long.TryParse(modelResponseGghn.data.total_fee, out totalFee);
+                    //send mail
+                    var message = new Message(new string[] { modelOrder.CustomerEmail }, "Xác nhận đơn hàng Gamma Books",
+                      "Chào bạn " + modelOrder.CustomerEmail.Split("@")[0] + "!" + Environment.NewLine +
+                      "Cảm ơn bạn đã đặt hàng trên ứng dụng Gamma Books." + Environment.NewLine +
+                      "Dưới đây là thông tin chi tiết về đơn hàng của bạn:" + Environment.NewLine +
 
-                  "Đơn hàng ["+ modelResponseGghn.data.order_code+ "] đã được tạo và sẽ được chuyển tới bạn trong thời gian sớm nhất." + Environment.NewLine +
-                  "Bạn có thể theo dõi trạng thái đơn hàng tại địa chỉ: https://ghn.vn" + Environment.NewLine +
-                  "Nếu bạn cần hỗ trợ, vui lòng gọi theo số hotline: 0934466060, hoặc liên hệ fanpage của Gamma để được giải đáp mọi thắc mắc."
-                  );
-                await _emailSender.SendEmailAsync(message);
-                //save to db
-                var data = StoreOrderSqlInstance.Inst.ChangeOrderProcess(requestchange.OrderId, totalFee, modelResponseGghn.data.order_code, requestchange.AllowTest, out responseStatus);
-                return Ok(new ResponseApiModel<OrderInfoObject>() { Status = responseStatus, Messenger = UltilsHelper.GetMessageByErrorCode(responseStatus), DataResponse = data });
+                      "Đơn hàng [" + modelResponseGghn.data.order_code + "] đã được tạo và sẽ được chuyển tới bạn trong thời gian sớm nhất." + Environment.NewLine +
+                      "Bạn có thể theo dõi trạng thái đơn hàng tại địa chỉ: https://ghn.vn" + Environment.NewLine +
+                      "Nếu bạn cần hỗ trợ, vui lòng gọi theo số hotline: 0934466060, hoặc liên hệ fanpage của Gamma để được giải đáp mọi thắc mắc."
+                      );
+                    await _emailSender.SendEmailAsync(message);
+                    //save to db
+                    var data = StoreOrderSqlInstance.Inst.ChangeOrderProcess(requestchange.OrderId, totalFee, modelResponseGghn.data.order_code, requestchange.AllowTest, out responseStatus);
+                    return Ok(new ResponseApiModel<OrderInfoObject>() { Status = responseStatus, Messenger = UltilsHelper.GetMessageByErrorCode(responseStatus), DataResponse = data });
+                }
+                else
+                {
+                    return Ok(new ResponseApiModel<OrderInfoObject>() { Status = modelResponseGghn.code, Messenger = modelResponseGghn.message });
+                }
             }
-            else
+            catch (Exception ex)
             {
-                return Ok(new ResponseApiModel<OrderInfoObject>() { Status = modelResponseGghn.code, Messenger = modelResponseGghn.message});
+                await _logger.LogError("Account-ChangeOrderProcess GHN{}", ex.ToString() + "  " + JsonConvert.SerializeObject(modelResponseGghn)).ConfigureAwait(false);
+                return Ok(new ResponseApiModel<OrderInfoObject>() { Status = EStatusCode.SYSTEM_ERROR, Messenger = UltilsHelper.GetMessageByErrorCode(EStatusCode.SYSTEM_ERROR) });
             }
         }
 
