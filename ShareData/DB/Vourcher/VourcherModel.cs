@@ -30,7 +30,7 @@ namespace ShareData.DB.Vourcher
     }
     public class VourcherCountUse
     {
-        public int VourcherId { get; set; }
+        public string VourcherId { get; set; }
         public string VourcherName { get; set; }
         public long CountUse { get; set; }  
     }

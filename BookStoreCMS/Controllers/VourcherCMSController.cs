@@ -103,7 +103,7 @@ namespace BookStoreCMS.Controllers
             return Ok(new ResponseApiModel<string>() { Status = responseStatus, Messenger = UltilsHelper.GetMessageByErrorCode(responseStatus)});
         }
 
-        [HttpGet]
+        [HttpPost]
         [Route("GetTopVourcher")]
         [ResponseCache(Duration = 10)]
         public async Task<IActionResult> GetTopVourcher(RequestGetMemberCmsModel request)
