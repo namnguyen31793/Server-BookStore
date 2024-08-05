@@ -84,6 +84,8 @@ namespace CoreWebApi
         private void SetupConfig(IConfiguration Configuration)
         {
             NO_SQL_CONFIG.Initialize(Configuration.GetSection("Mongo")["IpAddress"]);
+            var nhanhInfo = Configuration.GetSection("NHANH");
+            NO_SQL_CONFIG.InitializeNHANH(nhanhInfo["Url"], nhanhInfo["AccessToken"], nhanhInfo["AppId"], nhanhInfo["BusinessId"], nhanhInfo["utmCampaign"], nhanhInfo["utmSource"], nhanhInfo["utmMedium"]);
             RedisConfig.Initialize(Configuration.GetSection("RedisConfig")["RedisIp"], Configuration.GetSection("RedisConfig")["RedisPort"], Configuration.GetSection("RedisConfig")["RedisPassword"]);
             ConfigDb.Initialize(Configuration.GetSection("DbConfig")["CONNECTION"], Configuration.GetSection("DbConfig")["SQLPASS"]);
             var emailConfig = Configuration.GetSection("EmailConfiguration").Get<EmailConfiguration>();

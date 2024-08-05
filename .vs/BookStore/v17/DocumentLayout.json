@@ -1,0 +1,197 @@
+{
+  "Version": 1,
+  "WorkspaceRootPath": "D:\\Server\\Server-BookStore\\",
+  "Documents": [
+    {
+      "AbsoluteMoniker": "D:0:0:{4639EEEC-CEE3-4D7E-9171-B41FE62BF7C5}|BookStoreCMS\\BookStoreCMS.csproj|d:\\server\\server-bookstore\\bookstorecms\\controllers\\nhanhcontroller.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{4639EEEC-CEE3-4D7E-9171-B41FE62BF7C5}|BookStoreCMS\\BookStoreCMS.csproj|solutionrelative:bookstorecms\\controllers\\nhanhcontroller.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{7C28BAFD-6207-4901-82DB-3F4FEAAB695A}|ShareData\\ShareData.csproj|d:\\server\\server-bookstore\\sharedata\\request\\requestaddnhanhmodel.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{7C28BAFD-6207-4901-82DB-3F4FEAAB695A}|ShareData\\ShareData.csproj|solutionrelative:sharedata\\request\\requestaddnhanhmodel.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{7C28BAFD-6207-4901-82DB-3F4FEAAB695A}|ShareData\\ShareData.csproj|d:\\server\\server-bookstore\\sharedata\\request\\requestprocessordermodel.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{7C28BAFD-6207-4901-82DB-3F4FEAAB695A}|ShareData\\ShareData.csproj|solutionrelative:sharedata\\request\\requestprocessordermodel.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{0E097A4C-52F6-41EE-8552-4AF45F9FD2B1}|UtilsSystem\\UtilsSystem.csproj|d:\\server\\server-bookstore\\utilssystem\\utils\\nhanhinstance.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{0E097A4C-52F6-41EE-8552-4AF45F9FD2B1}|UtilsSystem\\UtilsSystem.csproj|solutionrelative:utilssystem\\utils\\nhanhinstance.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{9C1F7EBC-6B5B-4367-BEE3-1F8A73E15591}|LoggerService\\LoggerService.csproj|d:\\server\\server-bookstore\\loggerservice\\no_sql_config.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{9C1F7EBC-6B5B-4367-BEE3-1F8A73E15591}|LoggerService\\LoggerService.csproj|solutionrelative:loggerservice\\no_sql_config.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{4639EEEC-CEE3-4D7E-9171-B41FE62BF7C5}|BookStoreCMS\\BookStoreCMS.csproj|d:\\server\\server-bookstore\\bookstorecms\\instance\\ghninstance.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{4639EEEC-CEE3-4D7E-9171-B41FE62BF7C5}|BookStoreCMS\\BookStoreCMS.csproj|solutionrelative:bookstorecms\\instance\\ghninstance.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{4639EEEC-CEE3-4D7E-9171-B41FE62BF7C5}|BookStoreCMS\\BookStoreCMS.csproj|d:\\server\\server-bookstore\\bookstorecms\\startup.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{4639EEEC-CEE3-4D7E-9171-B41FE62BF7C5}|BookStoreCMS\\BookStoreCMS.csproj|solutionrelative:bookstorecms\\startup.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{4993EAB4-5D1D-46AA-BA96-65C69BD1C5F9}|BookStore\\BookStore.csproj|d:\\server\\server-bookstore\\bookstore\\startup.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{4993EAB4-5D1D-46AA-BA96-65C69BD1C5F9}|BookStore\\BookStore.csproj|solutionrelative:bookstore\\startup.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{4639EEEC-CEE3-4D7E-9171-B41FE62BF7C5}|BookStoreCMS\\BookStoreCMS.csproj|d:\\server\\server-bookstore\\bookstorecms\\appsettings.json||{90A6B3A7-C1A3-4009-A288-E2FF89E96FA0}",
+      "RelativeMoniker": "D:0:0:{4639EEEC-CEE3-4D7E-9171-B41FE62BF7C5}|BookStoreCMS\\BookStoreCMS.csproj|solutionrelative:bookstorecms\\appsettings.json||{90A6B3A7-C1A3-4009-A288-E2FF89E96FA0}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{4639EEEC-CEE3-4D7E-9171-B41FE62BF7C5}|BookStoreCMS\\BookStoreCMS.csproj|d:\\server\\server-bookstore\\bookstorecms\\controllers\\ordercmscontroller.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{4639EEEC-CEE3-4D7E-9171-B41FE62BF7C5}|BookStoreCMS\\BookStoreCMS.csproj|solutionrelative:bookstorecms\\controllers\\ordercmscontroller.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{4993EAB4-5D1D-46AA-BA96-65C69BD1C5F9}|BookStore\\BookStore.csproj|d:\\server\\server-bookstore\\bookstore\\controllers\\ordercontroller.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{4993EAB4-5D1D-46AA-BA96-65C69BD1C5F9}|BookStore\\BookStore.csproj|solutionrelative:bookstore\\controllers\\ordercontroller.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    }
+  ],
+  "DocumentGroupContainers": [
+    {
+      "Orientation": 0,
+      "VerticalTabListWidth": 256,
+      "DocumentGroups": [
+        {
+          "DockedWidth": 200,
+          "SelectedChildIndex": 5,
+          "Children": [
+            {
+              "$type": "Document",
+              "DocumentIndex": 1,
+              "Title": "RequestAddNhanhModel.cs",
+              "DocumentMoniker": "D:\\Server\\Server-BookStore\\ShareData\\Request\\RequestAddNhanhModel.cs",
+              "RelativeDocumentMoniker": "ShareData\\Request\\RequestAddNhanhModel.cs",
+              "ToolTip": "D:\\Server\\Server-BookStore\\ShareData\\Request\\RequestAddNhanhModel.cs",
+              "RelativeToolTip": "ShareData\\Request\\RequestAddNhanhModel.cs",
+              "ViewState": "AQIAABUAAAAAAAAAAAAgwCMAAAAgAAAA",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2024-08-03T02:51:00.886Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 2,
+              "Title": "RequestProcessOrderModel.cs",
+              "DocumentMoniker": "D:\\Server\\Server-BookStore\\ShareData\\Request\\RequestProcessOrderModel.cs",
+              "RelativeDocumentMoniker": "ShareData\\Request\\RequestProcessOrderModel.cs",
+              "ToolTip": "D:\\Server\\Server-BookStore\\ShareData\\Request\\RequestProcessOrderModel.cs",
+              "RelativeToolTip": "ShareData\\Request\\RequestProcessOrderModel.cs",
+              "ViewState": "AQIAAA0AAAAAAAAAAAAwwCUAAAAPAAAA",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2024-08-03T02:44:50.277Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 4,
+              "Title": "NO_SQL_CONFIG.cs",
+              "DocumentMoniker": "D:\\Server\\Server-BookStore\\LoggerService\\NO_SQL_CONFIG.cs",
+              "RelativeDocumentMoniker": "LoggerService\\NO_SQL_CONFIG.cs",
+              "ToolTip": "D:\\Server\\Server-BookStore\\LoggerService\\NO_SQL_CONFIG.cs",
+              "RelativeToolTip": "LoggerService\\NO_SQL_CONFIG.cs",
+              "ViewState": "AQIAACoAAAAAAAAAAAAAAEYAAABHAAAA",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2024-07-18T14:26:39.354Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 5,
+              "Title": "GhnInstance.cs",
+              "DocumentMoniker": "D:\\Server\\Server-BookStore\\BookStoreCMS\\Instance\\GhnInstance.cs",
+              "RelativeDocumentMoniker": "BookStoreCMS\\Instance\\GhnInstance.cs",
+              "ToolTip": "D:\\Server\\Server-BookStore\\BookStoreCMS\\Instance\\GhnInstance.cs",
+              "RelativeToolTip": "BookStoreCMS\\Instance\\GhnInstance.cs",
+              "ViewState": "AQIAAA4AAAAAAAAAAAAQwCkAAABNAAAA",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2024-07-17T14:33:38.286Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 3,
+              "Title": "NhanhInstance.cs",
+              "DocumentMoniker": "D:\\Server\\Server-BookStore\\UtilsSystem\\Utils\\NhanhInstance.cs",
+              "RelativeDocumentMoniker": "UtilsSystem\\Utils\\NhanhInstance.cs",
+              "ToolTip": "D:\\Server\\Server-BookStore\\UtilsSystem\\Utils\\NhanhInstance.cs",
+              "RelativeToolTip": "UtilsSystem\\Utils\\NhanhInstance.cs",
+              "ViewState": "AQIAABAAAAAAAAAAAAA1wAoAAAABAAAA",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2024-07-17T14:28:25.071Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 0,
+              "Title": "NhanhController.cs",
+              "DocumentMoniker": "D:\\Server\\Server-BookStore\\BookStoreCMS\\Controllers\\NhanhController.cs",
+              "RelativeDocumentMoniker": "BookStoreCMS\\Controllers\\NhanhController.cs",
+              "ToolTip": "D:\\Server\\Server-BookStore\\BookStoreCMS\\Controllers\\NhanhController.cs",
+              "RelativeToolTip": "BookStoreCMS\\Controllers\\NhanhController.cs",
+              "ViewState": "AQIAANgAAAAAAAAAAAAqwPMAAACVAAAA",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2024-07-15T13:51:57.382Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 9,
+              "Title": "OrderCMSController.cs",
+              "DocumentMoniker": "D:\\Server\\Server-BookStore\\BookStoreCMS\\Controllers\\OrderCMSController.cs",
+              "RelativeDocumentMoniker": "BookStoreCMS\\Controllers\\OrderCMSController.cs",
+              "ToolTip": "D:\\Server\\Server-BookStore\\BookStoreCMS\\Controllers\\OrderCMSController.cs",
+              "RelativeToolTip": "BookStoreCMS\\Controllers\\OrderCMSController.cs",
+              "ViewState": "AQIAAHUAAAAAAAAAAAApwKcAAABiAAAA",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2024-07-15T13:52:01.02Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 6,
+              "Title": "Startup.cs",
+              "DocumentMoniker": "D:\\Server\\Server-BookStore\\BookStoreCMS\\Startup.cs",
+              "RelativeDocumentMoniker": "BookStoreCMS\\Startup.cs",
+              "ToolTip": "D:\\Server\\Server-BookStore\\BookStoreCMS\\Startup.cs",
+              "RelativeToolTip": "BookStoreCMS\\Startup.cs",
+              "ViewState": "AQIAACUAAAAAAAAAAAAgwDUAAAA+AAAA",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2024-07-15T13:59:15.646Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 7,
+              "Title": "Startup.cs",
+              "DocumentMoniker": "D:\\Server\\Server-BookStore\\BookStore\\Startup.cs",
+              "RelativeDocumentMoniker": "BookStore\\Startup.cs",
+              "ToolTip": "D:\\Server\\Server-BookStore\\BookStore\\Startup.cs",
+              "RelativeToolTip": "BookStore\\Startup.cs",
+              "ViewState": "AQIAAEMAAAAAAAAAAAAAAFcAAADLAAAA",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2024-07-15T13:58:49.236Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 8,
+              "Title": "appsettings.json",
+              "DocumentMoniker": "D:\\Server\\Server-BookStore\\BookStoreCMS\\appsettings.json",
+              "RelativeDocumentMoniker": "BookStoreCMS\\appsettings.json",
+              "ToolTip": "D:\\Server\\Server-BookStore\\BookStoreCMS\\appsettings.json",
+              "RelativeToolTip": "BookStoreCMS\\appsettings.json",
+              "ViewState": "AQIAABIAAAAAAAAAAAAAAB8AAAAxAAAA",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.001642|",
+              "WhenOpened": "2024-07-15T13:57:14.669Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 10,
+              "Title": "OrderController.cs",
+              "DocumentMoniker": "D:\\Server\\Server-BookStore\\BookStore\\Controllers\\OrderController.cs",
+              "RelativeDocumentMoniker": "BookStore\\Controllers\\OrderController.cs",
+              "ToolTip": "D:\\Server\\Server-BookStore\\BookStore\\Controllers\\OrderController.cs",
+              "RelativeToolTip": "BookStore\\Controllers\\OrderController.cs",
+              "ViewState": "AQIAABUAAAAAAAAAAAAAAD0AAAANAAAA",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2024-06-04T14:21:58.858Z"
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

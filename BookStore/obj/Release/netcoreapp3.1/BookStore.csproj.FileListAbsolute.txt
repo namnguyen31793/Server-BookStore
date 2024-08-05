@@ -86,7 +86,6 @@ D:\Server\Server-BookStore\BookStore\bin\Release\netcoreapp3.1\ShareData.pdb
 D:\Server\Server-BookStore\BookStore\bin\Release\netcoreapp3.1\UtilsSystem.pdb
 D:\Server\Server-BookStore\BookStore\obj\Release\netcoreapp3.1\staticwebassets\BookStore.StaticWebAssets.Manifest.cache
 D:\Server\Server-BookStore\BookStore\obj\Release\netcoreapp3.1\BookStore.RazorTargetAssemblyInfo.cache
-D:\Server\Server-BookStore\BookStore\obj\Release\netcoreapp3.1\BookStore.csproj.CopyComplete
 D:\Server\Server-BookStore\BookStore\obj\Release\netcoreapp3.1\BookStore.dll
 D:\Server\Server-BookStore\BookStore\obj\Release\netcoreapp3.1\BookStore.pdb
 D:\Server\Server-BookStore\BookStore\obj\Release\netcoreapp3.1\BookStore.genruntimeconfig.cache
@@ -100,3 +99,10 @@ D:\Server\Server-BookStore\BookStore\bin\Release\netcoreapp3.1\Quartz.AspNetCore
 D:\Server\Server-BookStore\BookStore\bin\Release\netcoreapp3.1\Quartz.Extensions.DependencyInjection.dll
 D:\Server\Server-BookStore\BookStore\bin\Release\netcoreapp3.1\Quartz.Extensions.Hosting.dll
 D:\Server\Server-BookStore\BookStore\bin\Release\netcoreapp3.1\System.Diagnostics.DiagnosticSource.dll
+D:\Server\Server-BookStore\BookStore\obj\Release\netcoreapp3.1\BookStore.sourcelink.json
+D:\Server\Server-BookStore\BookStore\obj\Release\netcoreapp3.1\staticwebassets\BookStore.StaticWebAssets.Pack.cache
+D:\Server\Server-BookStore\BookStore\obj\Release\netcoreapp3.1\staticwebassets\msbuild.BookStore.Microsoft.AspNetCore.StaticWebAssets.props
+D:\Server\Server-BookStore\BookStore\obj\Release\netcoreapp3.1\staticwebassets\msbuild.build.BookStore.props
+D:\Server\Server-BookStore\BookStore\obj\Release\netcoreapp3.1\staticwebassets\msbuild.buildMultiTargeting.BookStore.props
+D:\Server\Server-BookStore\BookStore\obj\Release\netcoreapp3.1\staticwebassets\msbuild.buildTransitive.BookStore.props
+D:\Server\Server-BookStore\BookStore\obj\Release\netcoreapp3.1\BookStore.csproj.Up2Date

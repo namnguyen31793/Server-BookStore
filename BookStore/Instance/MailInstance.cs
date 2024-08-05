@@ -121,10 +121,12 @@ namespace BookStore.Instance
             {
                 try
                 {
+                    client.ServerCertificateValidationCallback = (s, c, h, e) => true;
                     client.Connect(CONFIG.EmailConfig.SmtpServer, CONFIG.EmailConfig.Port, true);
                     client.AuthenticationMechanisms.Remove("XOAUTH2");
                     client.Authenticate(CONFIG.EmailConfig.UserName, CONFIG.EmailConfig.Password);
                     client.Send(mailMessage);
+                    client.Disconnect(true);
                 }
                 catch
                 {

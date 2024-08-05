@@ -53,8 +53,11 @@ namespace CoreWebApi
 
         private void SetupConfig(IConfiguration Configuration)
         {
+            var adressInfo = Configuration.GetSection("Adress");
             NO_SQL_CONFIG.InitializeCMS(Configuration.GetSection("Mongo")["IpAddress"], Configuration.GetSection("GHN")["CONNECTION"], Configuration.GetSection("GHN")["Token"], Configuration.GetSection("GHN")["ShopId"],
-                Configuration.GetSection("Adress")["from_name"], Configuration.GetSection("Adress")["from_phone"], Configuration.GetSection("Adress")["from_address"], Configuration.GetSection("Adress")["from_ward_name"], Configuration.GetSection("Adress")["from_district_name"], Configuration.GetSection("Adress")["from_district_code"], Configuration.GetSection("Adress")["from_province_name"]);
+                adressInfo["from_name"], adressInfo["from_phone"], adressInfo["from_address"], adressInfo["from_ward_name"], adressInfo["from_district_name"], adressInfo["from_district_code"], adressInfo["from_province_name"]);
+            var nhanhInfo = Configuration.GetSection("NHANH");
+            NO_SQL_CONFIG.InitializeNHANH(nhanhInfo["Url"], nhanhInfo["AccessToken"], nhanhInfo["AppId"], nhanhInfo["BusinessId"], nhanhInfo["utmCampaign"], nhanhInfo["utmSource"], nhanhInfo["utmMedium"]);
             RedisConfig.Initialize(Configuration.GetSection("RedisConfig")["RedisIp"], Configuration.GetSection("RedisConfig")["RedisPort"], Configuration.GetSection("RedisConfig")["RedisPassword"]);
             ConfigDb.Initialize(Configuration.GetSection("DbConfig")["CONNECTION"], Configuration.GetSection("DbConfig")["SQLPASS"]);
             var emailConfig = Configuration.GetSection("EmailConfiguration").Get<EmailConfiguration>();

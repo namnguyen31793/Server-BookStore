@@ -102,4 +102,5 @@ D:\Server\Server-BookStore\DAO\bin\Release\netcoreapp3.1\LoggerService.dll
 D:\Server\Server-BookStore\DAO\bin\Release\netcoreapp3.1\ShareData.dll
 D:\Server\Server-BookStore\DAO\bin\Release\netcoreapp3.1\LoggerService.pdb
 D:\Server\Server-BookStore\DAO\bin\Release\netcoreapp3.1\ShareData.pdb
-D:\Server\Server-BookStore\DAO\obj\Release\netcoreapp3.1\DAO.csproj.CopyComplete
+D:\Server\Server-BookStore\DAO\obj\Release\netcoreapp3.1\DAO.sourcelink.json
+D:\Server\Server-BookStore\DAO\obj\Release\netcoreapp3.1\DAO.csproj.Up2Date

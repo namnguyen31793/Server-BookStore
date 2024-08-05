@@ -210,6 +210,9 @@ namespace BookStoreCMS.Controllers
                         await RedisGatewayCacheManager.Inst.SaveDataAsync(keyRedis, jsonListSimpleBook, 10);
                     }
                 }
+                else {
+                    responseStatus = 0;
+                }
                 response = new ResponseApiModel<string>() { Status = responseStatus, Messenger = UltilsHelper.GetMessageByErrorCode(responseStatus), DataResponse = jsonListSimpleBook };
             }
             catch (Exception ex)

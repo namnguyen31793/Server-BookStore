@@ -427,7 +427,6 @@ namespace DAO.DAOImp
         {
             DBHelper db = null;
             var response = -9999;
-            accountId = 0;
             try
             {
                 db = new DBHelper(ConfigDb.StoreUsersConnectionString);

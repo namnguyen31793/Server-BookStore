@@ -68,3 +68,4 @@ D:\Server\Server-BookStore\ShareData\bin\Release\netcoreapp3.1\ShareData.dll
 D:\Server\Server-BookStore\ShareData\bin\Release\netcoreapp3.1\ShareData.pdb
 D:\Server\Server-BookStore\ShareData\obj\Release\netcoreapp3.1\ShareData.dll
 D:\Server\Server-BookStore\ShareData\obj\Release\netcoreapp3.1\ShareData.pdb
+D:\Server\Server-BookStore\ShareData\obj\Release\netcoreapp3.1\ShareData.sourcelink.json

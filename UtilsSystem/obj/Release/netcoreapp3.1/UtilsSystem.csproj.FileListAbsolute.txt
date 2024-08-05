@@ -114,6 +114,7 @@ D:\Server\Server-BookStore\UtilsSystem\bin\Release\netcoreapp3.1\ShareData.dll
 D:\Server\Server-BookStore\UtilsSystem\bin\Release\netcoreapp3.1\LoggerService.pdb
 D:\Server\Server-BookStore\UtilsSystem\bin\Release\netcoreapp3.1\RedisSystem.pdb
 D:\Server\Server-BookStore\UtilsSystem\bin\Release\netcoreapp3.1\ShareData.pdb
-D:\Server\Server-BookStore\UtilsSystem\obj\Release\netcoreapp3.1\UtilsSystem.csproj.CopyComplete
 D:\Server\Server-BookStore\UtilsSystem\obj\Release\netcoreapp3.1\UtilsSystem.dll
 D:\Server\Server-BookStore\UtilsSystem\obj\Release\netcoreapp3.1\UtilsSystem.pdb
+D:\Server\Server-BookStore\UtilsSystem\obj\Release\netcoreapp3.1\UtilsSystem.sourcelink.json
+D:\Server\Server-BookStore\UtilsSystem\obj\Release\netcoreapp3.1\UtilsSys.6A3DF792.Up2Date

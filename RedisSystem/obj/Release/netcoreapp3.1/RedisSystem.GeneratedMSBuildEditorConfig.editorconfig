@@ -1,3 +1,5 @@
 is_global = true
 build_property.RootNamespace = RedisSystem
 build_property.ProjectDir = D:\Server\Server-BookStore\RedisSystem\
+build_property.EnableComHosting = 
+build_property.EnableGeneratedComInterfaceComImportInterop = 

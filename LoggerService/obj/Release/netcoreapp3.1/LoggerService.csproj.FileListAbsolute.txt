@@ -86,6 +86,7 @@ D:\Server\Server-BookStore\LoggerService\bin\Release\netcoreapp3.1\LoggerService
 D:\Server\Server-BookStore\LoggerService\bin\Release\netcoreapp3.1\LoggerService.pdb
 D:\Server\Server-BookStore\LoggerService\bin\Release\netcoreapp3.1\ShareData.dll
 D:\Server\Server-BookStore\LoggerService\bin\Release\netcoreapp3.1\ShareData.pdb
-D:\Server\Server-BookStore\LoggerService\obj\Release\netcoreapp3.1\LoggerService.csproj.CopyComplete
 D:\Server\Server-BookStore\LoggerService\obj\Release\netcoreapp3.1\LoggerService.dll
 D:\Server\Server-BookStore\LoggerService\obj\Release\netcoreapp3.1\LoggerService.pdb
+D:\Server\Server-BookStore\LoggerService\obj\Release\netcoreapp3.1\LoggerService.sourcelink.json
+D:\Server\Server-BookStore\LoggerService\obj\Release\netcoreapp3.1\LoggerSe.E7AEA5A8.Up2Date

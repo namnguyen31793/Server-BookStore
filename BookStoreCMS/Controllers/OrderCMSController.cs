@@ -143,17 +143,17 @@ namespace BookStoreCMS.Controllers
                 {
                     long totalFee = 0;
                     long.TryParse(modelResponseGghn.data.total_fee, out totalFee);
-                    //send mail
-                    var message = new Message(new string[] { modelOrder.CustomerEmail }, "Xác nhận đơn hàng Gamma Books",
-                      "Chào bạn " + modelOrder.CustomerEmail.Split("@")[0] + "!" + Environment.NewLine +
-                      "Cảm ơn bạn đã đặt hàng trên ứng dụng Gamma Books." + Environment.NewLine +
-                      "Dưới đây là thông tin chi tiết về đơn hàng của bạn:" + Environment.NewLine +
+                    ////send mail
+                    //var message = new Message(new string[] { modelOrder.CustomerEmail }, "Xác nhận đơn hàng Gamma Books",
+                    //  "Chào bạn " + modelOrder.CustomerEmail.Split("@")[0] + "!" + Environment.NewLine +
+                    //  "Cảm ơn bạn đã đặt hàng trên ứng dụng Gamma Books." + Environment.NewLine +
+                    //  "Dưới đây là thông tin chi tiết về đơn hàng của bạn:" + Environment.NewLine +
 
-                      "Đơn hàng [" + modelResponseGghn.data.order_code + "] đã được tạo và sẽ được chuyển tới bạn trong thời gian sớm nhất." + Environment.NewLine +
-                      "Bạn có thể theo dõi trạng thái đơn hàng tại địa chỉ: https://ghn.vn" + Environment.NewLine +
-                      "Nếu bạn cần hỗ trợ, vui lòng gọi theo số hotline: 0934466060, hoặc liên hệ fanpage của Gamma để được giải đáp mọi thắc mắc."
-                      );
-                    await _emailSender.SendEmailAsync(message);
+                    //  "Đơn hàng [" + modelResponseGghn.data.order_code + "] đã được tạo và sẽ được chuyển tới bạn trong thời gian sớm nhất." + Environment.NewLine +
+                    //  "Bạn có thể theo dõi trạng thái đơn hàng tại địa chỉ: https://ghn.vn" + Environment.NewLine +
+                    //  "Nếu bạn cần hỗ trợ, vui lòng gọi theo số hotline: 0934466060, hoặc liên hệ fanpage của Gamma để được giải đáp mọi thắc mắc."
+                    //  );
+                    //await _emailSender.SendEmailAsync(message);
                     //save to db
                     var data = StoreOrderSqlInstance.Inst.ChangeOrderProcess(requestchange.OrderId, totalFee, modelResponseGghn.data.order_code, requestchange.AllowTest, out responseStatus);
                     return Ok(new ResponseApiModel<OrderInfoObject>() { Status = responseStatus, Messenger = UltilsHelper.GetMessageByErrorCode(responseStatus), DataResponse = data });
@@ -276,6 +276,34 @@ namespace BookStoreCMS.Controllers
             return Ok(new ResponseApiModel<string>() { Status = responseStatus, Messenger = UltilsHelper.GetMessageByErrorCode(responseStatus), DataResponse = jsonTag });
         }
         #endregion
+
+        [HttpPost]
+        [Route("TestSendMail")]
+        [ResponseCache(Duration = 0, Location = ResponseCacheLocation.None, NoStore = true)]
+        public async Task<IActionResult> TestSendMail(string CustomerEmail)
+        {
+            try
+            {
+                //send mail
+                var message = new Message(new string[] { CustomerEmail }, "Xác nhận đơn hàng Gamma Books",
+                    "Chào bạn " + CustomerEmail.Split("@")[0] + "!" + Environment.NewLine +
+                    "Cảm ơn bạn đã đặt hàng trên ứng dụng Gamma Books." + Environment.NewLine +
+                    "Dưới đây là thông tin chi tiết về đơn hàng của bạn:" + Environment.NewLine +
+
+                    "Đơn hàng [" + "123456" + "] đã được tạo và sẽ được chuyển tới bạn trong thời gian sớm nhất." + Environment.NewLine +
+                    "Bạn có thể theo dõi trạng thái đơn hàng tại địa chỉ: https://ghn.vn" + Environment.NewLine +
+                    "Nếu bạn cần hỗ trợ, vui lòng gọi theo số hotline: 0934466060, hoặc liên hệ fanpage của Gamma để được giải đáp mọi thắc mắc."
+                    );
+                await _emailSender.SendEmailAsync(message);
+                //save to db
+                return Ok(new ResponseApiModel<OrderInfoObject>() { Status = 0, Messenger = UltilsHelper.GetMessageByErrorCode(0), DataResponse = null });
+            } catch (Exception ex)
+            {
+                await _logger.LogError("TestSendMail", ex.ToString() ).ConfigureAwait(false);
+                return Ok();
+            }
+
+        }
     }
 
 }

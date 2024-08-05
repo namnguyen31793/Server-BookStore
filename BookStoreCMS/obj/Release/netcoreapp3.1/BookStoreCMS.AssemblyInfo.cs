@@ -14,7 +14,7 @@ using System.Reflection;
 [assembly: System.Reflection.AssemblyCompanyAttribute("BookStoreCMS")]
 [assembly: System.Reflection.AssemblyConfigurationAttribute("Release")]
 [assembly: System.Reflection.AssemblyFileVersionAttribute("1.0.0.0")]
-[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0")]
+[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+21abdbd5a398a0894e2e680931307a4792d150cd")]
 [assembly: System.Reflection.AssemblyProductAttribute("BookStoreCMS")]
 [assembly: System.Reflection.AssemblyTitleAttribute("BookStoreCMS")]
 [assembly: System.Reflection.AssemblyVersionAttribute("1.0.0.0")]

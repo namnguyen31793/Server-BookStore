@@ -28,3 +28,4 @@ D:\Server\Server-BookStore\ShareData\obj\Debug\netcoreapp3.1\ShareData.pdb
 D:\Server\Server-BookStore\ShareData\bin\Debug\netcoreapp3.1\ShareData.deps.json
 D:\Server\Server-BookStore\ShareData\bin\Debug\netcoreapp3.1\ShareData.dll
 D:\Server\Server-BookStore\ShareData\bin\Debug\netcoreapp3.1\ShareData.pdb
+D:\Server\Server-BookStore\ShareData\obj\Debug\netcoreapp3.1\ShareData.sourcelink.json

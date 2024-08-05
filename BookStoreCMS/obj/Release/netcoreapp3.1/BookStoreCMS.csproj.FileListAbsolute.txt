@@ -90,7 +90,13 @@ D:\Server\Server-BookStore\BookStoreCMS\bin\Release\netcoreapp3.1\ShareData.pdb
 D:\Server\Server-BookStore\BookStoreCMS\bin\Release\netcoreapp3.1\UtilsSystem.pdb
 D:\Server\Server-BookStore\BookStoreCMS\obj\Release\netcoreapp3.1\staticwebassets\BookStoreCMS.StaticWebAssets.Manifest.cache
 D:\Server\Server-BookStore\BookStoreCMS\obj\Release\netcoreapp3.1\BookStoreCMS.RazorTargetAssemblyInfo.cache
-D:\Server\Server-BookStore\BookStoreCMS\obj\Release\netcoreapp3.1\BookStoreCMS.csproj.CopyComplete
 D:\Server\Server-BookStore\BookStoreCMS\obj\Release\netcoreapp3.1\BookStoreCMS.dll
 D:\Server\Server-BookStore\BookStoreCMS\obj\Release\netcoreapp3.1\BookStoreCMS.pdb
 D:\Server\Server-BookStore\BookStoreCMS\obj\Release\netcoreapp3.1\BookStoreCMS.genruntimeconfig.cache
+D:\Server\Server-BookStore\BookStoreCMS\obj\Release\netcoreapp3.1\BookStoreCMS.sourcelink.json
+D:\Server\Server-BookStore\BookStoreCMS\obj\Release\netcoreapp3.1\staticwebassets\BookStoreCMS.StaticWebAssets.Pack.cache
+D:\Server\Server-BookStore\BookStoreCMS\obj\Release\netcoreapp3.1\staticwebassets\msbuild.BookStoreCMS.Microsoft.AspNetCore.StaticWebAssets.props
+D:\Server\Server-BookStore\BookStoreCMS\obj\Release\netcoreapp3.1\staticwebassets\msbuild.build.BookStoreCMS.props
+D:\Server\Server-BookStore\BookStoreCMS\obj\Release\netcoreapp3.1\staticwebassets\msbuild.buildMultiTargeting.BookStoreCMS.props
+D:\Server\Server-BookStore\BookStoreCMS\obj\Release\netcoreapp3.1\staticwebassets\msbuild.buildTransitive.BookStoreCMS.props
+D:\Server\Server-BookStore\BookStoreCMS\obj\Release\netcoreapp3.1\BookStor.FEA390B0.Up2Date

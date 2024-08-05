@@ -24,6 +24,17 @@ namespace LoggerService
             from_district_code = int.Parse(From_district_code);
             From_province_name = from_province_name;
         }
+
+        public static void InitializeNHANH( string url, string token, string appid, string BusinessId, string utmCampaign, string utmSource, string utmMedium)
+        {
+            NHANH_Url = url;
+            NHANH_Token = token;
+            NHANH_AppId = appid;
+            NHANH_BusinessId = BusinessId;
+            NHANH_utmCampaign = utmCampaign;
+            NHANH_utmSource = utmSource;
+            NHANH_utmMedium = utmMedium;
+        }
         public static string HOST_CONFIG = "mongodb://localhost:27017";
         public static readonly string LOG_SYSTEM_DATABASE = "LogSystem";
         public static readonly string SLOT_MACHINE_SPIN_LOG_COLLECTION = "SlotMachine_SpinLog";
@@ -32,6 +43,16 @@ namespace LoggerService
         public static string GHN_Url = "";
         public static string GHN_Token = "";
         public static string GHN_Id = "";
+        #endregion
+
+        #region NHANH
+        public static string NHANH_Url = "";
+        public static string NHANH_Token = "";
+        public static string NHANH_AppId = "";
+        public static string NHANH_BusinessId = "";
+        public static string NHANH_utmCampaign = "";
+        public static string NHANH_utmSource = "";
+        public static string NHANH_utmMedium = "";
         #endregion
         #region Adress
         public static string From_name = "";
