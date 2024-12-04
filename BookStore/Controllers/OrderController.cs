@@ -328,9 +328,9 @@ namespace BookStore.Controllers
 
         #region ORDER NHANH
         [HttpPost]
-        [Route("CreateOrderNhanh")]
+        [Route("CreateOrderNhanh2")]
         [ResponseCache(Duration = 0, Location = ResponseCacheLocation.None, NoStore = true)]
-        public async Task<IActionResult> CreateOrderNhanh(RequestCreateOrderModel request)
+        public async Task<IActionResult> CreateOrderNhanh2(RequestCreateOrderModel request)
         {
             int responseStatus = -99;
             var clientInfo = new ClientRequestInfo(Request);

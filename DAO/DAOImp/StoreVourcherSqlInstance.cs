@@ -58,6 +58,45 @@ namespace DAO.DAOImp
             }
             return response;
         }
+
+        public int UserGetVourcher_ById(int vourcherId, out int VourcherType, out string VourcherName, out string VourcherReward, out string Target)
+        {
+            DBHelper db = null;
+            var responseStatus = -99;
+            VourcherType = 0;
+            VourcherName = "";
+            VourcherReward = "";
+            Target = "";
+            try
+            {
+                db = new DBHelper(ConfigDb.StoreVourcherConnectionString);
+                var pars = new SqlParameter[6];
+                pars[0] = new SqlParameter("@_VourcherId", vourcherId);
+                pars[1] = new SqlParameter("@_VourcherType", SqlDbType.Int) { Direction = ParameterDirection.Output };
+                pars[2] = new SqlParameter("@_VourcherName", SqlDbType.NVarChar, 512) { Direction = ParameterDirection.Output };
+                pars[3] = new SqlParameter("@_VourcherReward", SqlDbType.NVarChar, 512) { Direction = ParameterDirection.Output };
+                pars[4] = new SqlParameter("@_Target", SqlDbType.NVarChar, 512) { Direction = ParameterDirection.Output };
+                pars[5] = new SqlParameter("@_ResponseStatus", SqlDbType.Int) { Direction = ParameterDirection.Output };
+                db.ExecuteNonQuerySP("SP_StoreVourcher_Config_Ver2_Get_Reward_By_VourcherId", 4, pars);
+                responseStatus = Convert.ToInt32(pars[5].Value);
+                if (responseStatus >= 0)
+                {
+                    VourcherType = Convert.ToInt32(pars[1].Value);
+                    VourcherName = pars[2].Value.ToString();
+                    VourcherReward = pars[3].Value.ToString();
+                    Target = pars[4].Value.ToString();
+                }
+            }
+            catch (Exception exception)
+            {
+                Task.Run(async () => await _logger.LogError("SQL-UserGetVourcher_ById()", exception.ToString()).ConfigureAwait(false));
+            }
+            finally
+            {
+                db?.Close();
+            }
+            return responseStatus;
+        }
         public List<VourcherModelVer2> UserGetAllVourcher()
         {
             DBHelper db = null;

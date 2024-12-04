@@ -32,7 +32,7 @@ namespace ShareData.Request
         public string description { get; set; }
         public string privateDescription { get; set; }
         public string trafficSource { get; set; }
-        public ProductListModel productList { get; set; }
+        public ProductModel[] productList { get; set; }
         public string couponCode { get; set; }
         public int allowTest { get; set; }
         public int saleId { get; set; }
@@ -49,13 +49,14 @@ namespace ShareData.Request
         public int isPartDelivery { get; set; }
     }
 
-    public class ProductListModel {
+    public class ProductModel {
         public string id { get; set; }
         public long idNhanh { get; set; }
         public int quantity { get; set; }
         public string name { get; set; }
         public string code { get; set; }
         public string imei { get; set; }
+        public string type { get; set; }
         public int price { get; set; }
         public int weight { get; set; }
         public int importPrice { get; set; }

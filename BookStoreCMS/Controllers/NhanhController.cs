@@ -3,14 +3,14 @@ using BookStoreCMS.Interfaces;
 using BookStoreCMS.Utils;
 using DAO.DAOImp;
 using LoggerService;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Newtonsoft.Json;
+using Org.BouncyCastle.Asn1.X509;
 using RedisSystem;
-using RestSharp;
 using ShareData.API;
 using ShareData.DataEnum;
 using ShareData.DB.Order;
+using ShareData.DB.Vourcher;
 using ShareData.ErrorCode;
 using ShareData.Request;
 using ShareData.Response;
@@ -18,8 +18,10 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using System.Net.Http.Headers;
+using System.Threading.Tasks;
+using System.Xml.Linq;
 using UtilsSystem.Utils;
+using static MongoDB.Driver.WriteConcern;
 
 namespace BookStoreCMS.Controllers
 {
@@ -174,6 +176,43 @@ namespace BookStoreCMS.Controllers
                 return Ok(new ResponseApiModel<string>() { Status = EStatusCode.ADRESS_NOT_EXITS, Messenger = UltilsHelper.GetMessageByErrorCode(EStatusCode.ADRESS_NOT_EXITS) });
             //list item
             AdressModel modelAdress = JsonConvert.DeserializeObject<AdressModel>(modelOrder.CustomerAddress);
+            string BarcodeStrings = modelOrder.TempBarcodes;
+            string BarcodeNumberStrings = modelOrder.TempNumbers;
+            var listBarcode = BarcodeStrings.Split(',');
+            var listNumber = BarcodeNumberStrings.Split(',');
+
+            bool useVourcher = false;
+            string nameVourcher = "";
+            if (modelOrder.VourcherId > 0)
+            {
+                useVourcher = await CheckHaveUseVourcherAsync(modelOrder.VourcherId, BarcodeStrings, modelOrder.TotalBaseMoney);
+                var data = await GetInfoVourcherAsync(modelOrder.VourcherId);
+                nameVourcher = data.VourcherName;
+            }
+
+            List<ProductModel> listProductModel = new List<ProductModel>();
+            for (int i = 0; i < listBarcode.Count(); i++) {
+                var book = StoreBookSqlInstance.Inst.GetBookCmsByBarcode(listBarcode[i], out responseStatus);
+                var price = (int)book.AmountSale;
+                if(modelOrder.VourcherId > 0 && useVourcher)
+                    price = await CheckDiscountVourcherAsync(modelOrder.VourcherId, price);
+                
+                ProductModel productList = new ProductModel() {
+                    id = listBarcode[i],
+                    idNhanh = 0,
+                    quantity = int.Parse(listNumber[i]),
+                    name = book.BookName,
+                    code = book.Barcode,
+                    imei = "",
+                    type = "Product",
+                    price = price,
+                    weight = 1,
+                    importPrice = 0,
+                    description = ""//book.ContentBook
+                };
+                listProductModel.Add(productList);
+            }
+            //data send
             RequestAddNhanhModel dataSendNhanh = new RequestAddNhanhModel()
             {
                 id = requestchange.OrderId.ToString(),
@@ -201,8 +240,9 @@ namespace BookStoreCMS.Controllers
                 status = "New",
                 description = modelOrder.Description,
                 privateDescription = requestchange.PrivateDescription,
+                productList = listProductModel.ToArray(),
                 trafficSource = "app",
-                couponCode = modelOrder.VourcherId.ToString(),
+                couponCode = nameVourcher,
                 allowTest = requestchange.AllowTest,
                 saleId = 0,
                 autoSend = 0,
@@ -260,6 +300,85 @@ namespace BookStoreCMS.Controllers
                 await _logger.LogError("Account-ChangeOrderProcessNhanh{}", ex.ToString()).ConfigureAwait(false);
                 return Ok(new ResponseApiModel<OrderInfoObject>() { Status = EStatusCode.SYSTEM_ERROR, Messenger = UltilsHelper.GetMessageByErrorCode(EStatusCode.SYSTEM_ERROR) });
             }
+        }
+
+        private async Task<VourcherCheck> GetInfoVourcherAsync(int VourcherId) {
+            int VourcherType = 0;
+            string VourcherName = "";
+            string VourcherReward = "";
+            string Target = "";
+            string keyRedis = "AllVourcher:" + VourcherId;
+            string jsonString = await RedisGatewayCacheManager.Inst.GetDataFromCacheAsync(keyRedis);
+            if (string.IsNullOrEmpty(jsonString))
+            {
+                var res = StoreVourcherSqlInstance.Inst.UserGetVourcher_ById(VourcherId, out VourcherType, out VourcherName, out VourcherReward, out Target);
+                if (res >= 0)
+                    jsonString = VourcherType + "-" + VourcherName + "-" + VourcherReward + "-" + Target;
+                await RedisGatewayCacheManager.Inst.SaveDataAsync(keyRedis, jsonString, 2);
+            }
+            else
+            {
+                var listData = jsonString.Split("-");
+                VourcherType = int.Parse(listData[0]);
+                VourcherName = listData[1];
+                VourcherReward = listData[2];
+                Target = listData[3];
+            }
+            return new VourcherCheck() { VourcherType = VourcherType, VourcherName = VourcherName, VourcherReward = VourcherReward, Target = Target };
+        }
+        private async Task<bool> CheckHaveUseVourcherAsync(int VourcherId, string barCode, long totalMoney)
+        {
+            bool haveuse = false;
+            if (VourcherId >= 1 && VourcherId < 5)
+            {
+                return true;
+            }
+            var data = await GetInfoVourcherAsync(VourcherId);
+            if (data != null) {
+                if (string.IsNullOrEmpty(data.Target))
+                    haveuse = true;
+                else { 
+                    var listTarget = data.Target.Split(',');
+                    var listBook = barCode.Split(',');
+                    var commonItems = listBook.Intersect(listTarget).ToList();
+                    if (commonItems.Any())
+                        haveuse = true;
+                }
+                if (VourcherId >= 5 && ( data.VourcherType == 1 || data.VourcherType == 2)) { 
+                    var minMoney = Int32.Parse(data.VourcherReward.Split(',')[1]);
+                    if (totalMoney < minMoney)
+                        haveuse = false;
+                }
+            }
+            return haveuse;
+        }
+        private async Task<int> CheckDiscountVourcherAsync(int VourcherId, int baseValue) {
+            int price = baseValue;
+            var data = await GetInfoVourcherAsync(VourcherId);
+            if (data == null)  {
+                return price;
+            }
+            if (VourcherId >= 1 && VourcherId < 5)
+            {
+                var saleDiscount = Int32.Parse(data.VourcherReward);
+                price -= (int)(baseValue * saleDiscount / 100);
+            }
+            else
+            {
+                if (data.VourcherType == 1) {    //đạt min sẽ trừ theo %
+                    var listData = data.VourcherReward.Split(',');
+                    int saleDiscount = Int32.Parse(listData[2]);
+
+                    price -= (int)(baseValue * saleDiscount / 100);
+                }else if (data.VourcherType == 2)   //đạt min sẽ trừ tiền
+                {
+                    var listData = data.VourcherReward.Split(',');
+                    int saleDiscount = Int32.Parse(listData[2]);
+
+                    price -= (int)saleDiscount;
+                }
+            }
+            return price;
         }
     }
 }
